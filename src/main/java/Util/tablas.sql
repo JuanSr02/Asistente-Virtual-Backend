@@ -86,12 +86,12 @@ CREATE TABLE Experiencia (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nroRegistro_Estudiante INT NOT NULL,
     examen_id INT NOT NULL,
-    dificultad INT, -- Escala de 1 a 5/10
+    dificultad INT, -- Escala de 1 a 10
     dias_estudio INT,
     horas_diarias INT,
     intentos_previos INT,
-    modalidad VARCHAR (20),
-    recursos VARCHAR (200),
+    modalidad VARCHAR (20), -- modalidad del examen
+    recursos VARCHAR (200), -- con que recursos estudio de la materia
     motivacion VARCHAR(100) -- rindió por necesidad (última materia, correlatividad) o por preferencia.
     condiciones VARCHAR(100) -- Ambiente, claridad de consignas, calidad de corrección, tiempo suficiente.
     -- Aca se pueden poner muchas mas cosas
