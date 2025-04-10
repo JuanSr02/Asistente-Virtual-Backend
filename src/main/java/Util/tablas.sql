@@ -52,7 +52,7 @@ CREATE TABLE HistoriaAcademica (
 );
 
 CREATE TABLE Renglon (
-    id SERIAL PRIMARY KEY
+    id SERIAL PRIMARY KEY,
     fecha VARCHAR(12) NOT NULL,
     tipo VARCHAR(50) NOT NULL,
     nota DECIMAL(4,2),
@@ -90,7 +90,7 @@ CREATE TABLE Experiencia (
     intentos_previos INT NOT NULL,
     modalidad VARCHAR (20), -- modalidad del examen
     recursos VARCHAR (200), -- con que recursos estudio de la materia
-    motivacion VARCHAR(100) -- rindió por necesidad (última materia, correlatividad) o por preferencia.
-    condiciones VARCHAR(100) -- Ambiente, claridad de consignas, calidad de corrección, tiempo suficiente.
-    FOREIGN KEY (examen_id) REFERENCES Examen(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    motivacion VARCHAR(100), -- rindió por necesidad (última materia, correlatividad) o por preferencia.
+    condiciones VARCHAR(100), -- Ambiente, claridad de consignas, calidad de corrección, tiempo suficiente.
+    FOREIGN KEY (examen_id) REFERENCES Examen(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
