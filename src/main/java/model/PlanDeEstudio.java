@@ -26,5 +26,3 @@ public class PlanDeEstudio {
     @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL)
     private List<Correlativa> correlativas;
 }
-
-

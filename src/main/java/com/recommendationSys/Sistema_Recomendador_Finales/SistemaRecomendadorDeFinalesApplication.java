@@ -2,11 +2,14 @@ package com.recommendationSys.Sistema_Recomendador_Finales;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "repository")
+@EntityScan(basePackages = {"model"})  // Escanear entidades en el paquete model
+@EnableJpaRepositories(basePackages = {"repository"})  // Escanear repositorios en el paquete repository
 public class SistemaRecomendadorDeFinalesApplication {
+
 	public static void main(String[] args) {
 		SpringApplication.run(SistemaRecomendadorDeFinalesApplication.class, args);
 	}
