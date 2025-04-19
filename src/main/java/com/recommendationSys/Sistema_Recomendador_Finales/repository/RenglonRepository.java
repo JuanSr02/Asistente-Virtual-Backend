@@ -1,8 +1,8 @@
-package repository;
+package com.recommendationSys.Sistema_Recomendador_Finales.repository;
 
-import model.HistoriaAcademica;
-import model.Materia;
-import model.Renglon;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.HistoriaAcademica;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Renglon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

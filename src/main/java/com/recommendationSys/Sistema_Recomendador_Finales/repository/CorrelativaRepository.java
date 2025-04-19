@@ -1,9 +1,9 @@
-package repository;
+package com.recommendationSys.Sistema_Recomendador_Finales.repository;
 
-import model.Correlativa;
-import model.CorrelativaId;
-import model.Materia;
-import model.PlanDeEstudio;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Correlativa;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.CorrelativaId;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package model;
+package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

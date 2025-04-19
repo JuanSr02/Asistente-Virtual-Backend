@@ -1,6 +1,6 @@
-package repository;
+package com.recommendationSys.Sistema_Recomendador_Finales.repository;
 
-import model.Persona;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Persona;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

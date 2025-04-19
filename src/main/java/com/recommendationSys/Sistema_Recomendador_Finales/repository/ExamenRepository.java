@@ -1,7 +1,7 @@
-package repository;
+package com.recommendationSys.Sistema_Recomendador_Finales.repository;
 
-import model.Examen;
-import model.Renglon;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Renglon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
