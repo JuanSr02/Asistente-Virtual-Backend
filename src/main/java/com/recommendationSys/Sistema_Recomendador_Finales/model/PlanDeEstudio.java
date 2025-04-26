@@ -3,6 +3,7 @@ package com.recommendationSys.Sistema_Recomendador_Finales.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,12 +18,39 @@ public class PlanDeEstudio {
     @Column(nullable = false, length = 30)
     private String propuesta;
 
-    @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL)
-    private List<Materia> materias;
+    @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Materia> materias = new ArrayList<>();
 
-    @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL)
-    private List<HistoriaAcademica> historiasAcademicas;
+    public PlanDeEstudio(String codigo, String propuesta, List<Materia> materias) {
+        this.codigo = codigo;
+        this.propuesta = propuesta;
+        this.materias = materias;
+    }
 
-    @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL)
-    private List<Correlativa> correlativas;
+    public PlanDeEstudio() {
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getPropuesta() {
+        return propuesta;
+    }
+
+    public void setPropuesta(String propuesta) {
+        this.propuesta = propuesta;
+    }
+
+    public List<Materia> getMaterias() {
+        return materias;
+    }
+
+    public void setMaterias(List<Materia> materias) {
+        this.materias = materias;
+    }
 }
