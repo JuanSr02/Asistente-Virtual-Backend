@@ -6,7 +6,6 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Entity
 @Table(name = "Materia")
 public class Materia {
@@ -18,7 +17,7 @@ public class Materia {
     @Column(nullable = false, length = 200)
     private String nombre;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PlanDeEstudio_codigo", nullable = false)
     private PlanDeEstudio planDeEstudio;
 

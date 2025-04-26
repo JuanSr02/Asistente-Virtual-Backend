@@ -1,16 +1,18 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
 
+import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.PlanEstudioException;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.PlanEstudioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/public")
@@ -22,14 +24,59 @@ public class PlanEstudioController {
         this.planEstudioService = planEstudioService;
     }
 
+
     @PostMapping("/cargar-plan")
-    public ResponseEntity<String> cargarPlanDesdeExcel(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> cargarPlanDesdeExcel(@RequestParam("file") MultipartFile file) {
         try {
             planEstudioService.procesarArchivoExcel(file);
-            return ResponseEntity.ok("Plan de estudios cargado exitosamente");
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al procesar el archivo: " + e.getMessage());
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Plan de estudios cargado exitosamente",
+                    "timestamp", LocalDateTime.now()
+            ));
+        } catch (PlanEstudioException e) {
+            return ResponseEntity.status(e.getStatus()).body(Map.of(
+                    "success", false,
+                    "error", e.getMessage(),
+                    "status", e.getStatus().value(),
+                    "timestamp", LocalDateTime.now()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "success", false,
+                    "error", "Error interno del servidor: " + e.getMessage(),
+                    "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "timestamp", LocalDateTime.now()
+            ));
         }
     }
+
+    @DeleteMapping
+    public ResponseEntity<Map<String, Object>> eliminarPlanDeEstudio(
+            @RequestParam("codigo") String codigoPlan) {
+
+        try {
+            planEstudioService.eliminarPlanDeEstudio(codigoPlan);
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Plan eliminado correctamente",
+                    "codigo", codigoPlan,
+                    "timestamp", Instant.now()
+            ));
+        } catch (PlanEstudioException e) {
+            return ResponseEntity.status(e.getStatus())
+                    .body(errorResponse(e.getMessage(), e.getStatus(), codigoPlan));
+        }
+    }
+
+    private Map<String, Object> errorResponse(String message, HttpStatus status, String codigo) {
+        return Map.of(
+                "status", "error",
+                "message", message,
+                "codigo", codigo,
+                "httpStatus", status.value(),
+                "timestamp", Instant.now()
+        );
+    }
+
 }

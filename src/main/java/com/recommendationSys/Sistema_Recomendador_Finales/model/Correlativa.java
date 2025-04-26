@@ -10,17 +10,17 @@ import lombok.Data;
 public class Correlativa {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "materia_codigo", nullable = false)
     private Materia materia;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "correlativa_codigo", nullable = false)
     private Materia correlativa;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PlanDeEstudio_codigo", nullable = false)
     private PlanDeEstudio planDeEstudio;
 

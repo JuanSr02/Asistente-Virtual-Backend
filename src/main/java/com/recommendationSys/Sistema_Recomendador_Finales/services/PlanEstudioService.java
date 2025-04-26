@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.PlanEstudioException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Correlativa;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
@@ -8,16 +9,20 @@ import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepo
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.PlanDeEstudioRepository;
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.SQLOutput;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Transactional
 public class PlanEstudioService {
+
+    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("xls", "xlsx");
 
     private final PlanDeEstudioRepository planRepo;
     private final MateriaRepository materiaRepo;
@@ -32,14 +37,68 @@ public class PlanEstudioService {
     }
 
     public void procesarArchivoExcel(MultipartFile file) throws IOException {
+        // Validación 1: Archivo no vacío
+        if (file == null || file.isEmpty()) {
+            throw new PlanEstudioException("El archivo no puede estar vacío", HttpStatus.BAD_REQUEST);
+        }
+
+        // Validación 2: Extensión permitida
+        String fileName = file.getOriginalFilename();
+        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+
+        if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
+            throw new PlanEstudioException(
+                    "Solo se permiten archivos Excel (.xls, .xlsx)",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        try {
+            procesarContenidoPlan(file);
+        } catch (IOException e) {
+            throw new PlanEstudioException(
+                    "Error al leer el archivo Excel: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            throw new PlanEstudioException(
+                    "Formato de datos incorrecto en el archivo: " + e.getMessage(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+    }
+
+    private void procesarContenidoPlan(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
-        // Leer datos del plan
+        // Validar fila de plan de estudios
         Row planRow = sheet.getRow(1);
+        if (planRow == null || planRow.getCell(0) == null) {
+            throw new PlanEstudioException(
+                    "No se encontró la información del plan de estudios en la primera fila",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         String propuesta = planRow.getCell(0).getStringCellValue();
+        if (propuesta == null || propuesta.trim().isEmpty()) {
+            throw new PlanEstudioException(
+                    "La propuesta del plan de estudios no puede estar vacía",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // Validar formato de código de plan
         String codigoPlan = planRow.getCell(1).getStringCellValue();
-        System.out.println(propuesta +"  "+ codigoPlan);
+        if (codigoPlan == null || codigoPlan.trim().isEmpty()) {
+            throw new PlanEstudioException(
+                    "No se pudo encontrar el código del plan de estudios",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+
 
         // Crear o actualizar plan
         PlanDeEstudio plan = planRepo.findById(codigoPlan)
@@ -48,7 +107,6 @@ public class PlanEstudioService {
         plan.setPropuesta(propuesta);
         // Después de guardar el plan, verifica que tiene un código
         planRepo.save(plan);
-        System.out.println("Plan guardado con código: " + plan.getCodigo()); // Verifica esto
 
         int lastRowWithData = 0;
         for (int i = 0; i <= sheet.getLastRowNum(); i++) {
@@ -57,13 +115,30 @@ public class PlanEstudioService {
             }
         }
 
-        // Procesar materias (empezando desde la fila 3)
+        // Procesar materias (empezando desde la fila 4)
         for (int i = 4; i <= lastRowWithData; i++) {
             Row row = sheet.getRow(i);
             if (row == null) continue;
-            String codigoMateria = String.valueOf((int) row.getCell(1).getNumericCellValue());
+
+            // Validar celdas requeridas
+            if (row.getCell(0) == null || row.getCell(1) == null || row.getCell(5) == null) {
+                throw new PlanEstudioException(
+                        String.format("Fila %d: Faltan datos requeridos para la materia", i+1),
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
+            String codigoMateria = checkCell(row.getCell(1));
+            if (codigoMateria == null || codigoMateria.trim().isEmpty()) {
+                throw new PlanEstudioException(
+                        String.format("Fila %d: El código de la materia no puede estar vacío", i+1),
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
+
+
             String nombreMateria = row.getCell(0).getStringCellValue();
-            System.out.println(codigoMateria +"  "+ nombreMateria);
 
             Materia materia = materiaRepo.findById(codigoMateria)
                     .orElse(new Materia());
@@ -73,21 +148,8 @@ public class PlanEstudioService {
             materiaRepo.save(materia);
 
             // Procesar correlativas
-            String correlativasStr = "";
             Cell cell = row.getCell(5);
-            switch (cell.getCellType()) {
-                case STRING:
-                    correlativasStr = cell.getStringCellValue();
-                    break;
-                case NUMERIC:
-                    correlativasStr = String.valueOf(cell.getNumericCellValue());
-                    break;
-                case BLANK:
-                    break;
-                default:
-                    throw new IllegalArgumentException("Tipo de celda no soportado: " + cell.getCellType());
-            }
-            Materia materia1;
+            String correlativasStr = checkCell(cell);
             if (!"No tiene".equalsIgnoreCase(correlativasStr)) {
                 String[] codigosCorrelativas = correlativasStr.split("-");
                 for (String codigoCorrelativa : codigosCorrelativas) {
@@ -99,16 +161,15 @@ public class PlanEstudioService {
                             correlativa.setMateria(materia);
                             correlativa.setCorrelativa(materiaCorrelativa);
                             correlativa.setPlanDeEstudio(plan);
-                            System.out.println("Plan código antes de correlativas: " + plan.getCodigo());
-                            System.out.println("Guardando correlativa con plan: " + correlativa.getPlanDeEstudio().getCodigo());
                             correlativaRepo.save(correlativa);
                         }
 
                     }
-                    }
                 }
             }
         }
+    }
+
     // Metodo auxiliar para verificar filas vacías
     private boolean isEmptyRow(Row row) {
         for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
@@ -119,6 +180,40 @@ public class PlanEstudioService {
         }
         return true;
     }
+
+    private String checkCell(Cell cell){
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf((int)cell.getNumericCellValue());
+            case BLANK:
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de celda no soportado: " + cell.getCellType());
+        }
+        return "";
+    }
+
+
+        public void eliminarPlanDeEstudio(String codigoPlan) {
+            // Verificación de existencia con mensaje más descriptivo
+            if (!planRepo.existsById(codigoPlan)) {
+                throw new PlanEstudioException(
+                        String.format("El plan con código '%s' no existe", codigoPlan),
+                        HttpStatus.NOT_FOUND
+                );
+            }
+            try {
+                // Eliminación en cascada automática gracias a JPA
+                planRepo.deleteById(codigoPlan);
+            } catch (DataIntegrityViolationException e) {
+                throw new PlanEstudioException(
+                        "No se puede eliminar el plan porque tiene referencias activas",
+                        HttpStatus.CONFLICT
+                );
+            }
+        }
 
 }
 
