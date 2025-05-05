@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface PlanDeEstudioRepository extends JpaRepository<PlanDeEstudio, String> {
 
 
-
+    Optional<Object> findByPropuesta(String nombrePlan);
 }
 

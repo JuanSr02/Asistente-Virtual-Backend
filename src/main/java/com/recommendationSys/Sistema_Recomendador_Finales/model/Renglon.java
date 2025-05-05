@@ -36,6 +36,26 @@ public class Renglon {
 
     @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL)
     private Examen examen;
+
+    public Renglon(Long id, String fecha, String tipo, BigDecimal nota, String resultado, HistoriaAcademica historiaAcademica, Materia materia, Examen examen) {
+        this.id = id;
+        this.fecha = fecha;
+        this.tipo = tipo;
+        this.nota = nota;
+        this.resultado = resultado;
+        this.historiaAcademica = historiaAcademica;
+        this.materia = materia;
+        this.examen = examen;
+    }
+
+    public Renglon(String fecha, String tipo, BigDecimal nota, String resultado, HistoriaAcademica historiaAcademica, Materia materia) {
+        this.fecha = fecha;
+        this.tipo = tipo;
+        this.nota = nota;
+        this.resultado = resultado;
+        this.historiaAcademica = historiaAcademica;
+        this.materia = materia;
+    }
 }
 
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RenglonRepository extends JpaRepository<Renglon, Long> {
@@ -60,4 +61,8 @@ public interface RenglonRepository extends JpaRepository<Renglon, Long> {
     // Find records for a student
     @Query("SELECT r FROM Renglon r WHERE r.historiaAcademica.estudiante.id = :estudianteId")
     List<Renglon> findByEstudianteId(@Param("estudianteId") Long estudianteId);
+
+    boolean existsByMateriaCodigoAndHistoriaIdAndTipoAndNotaGreaterThanEqual(String codigo, Long id, String examen, double v);
+
+    Optional<Renglon> findByMateriaCodigoAndHistoriaIdAndTipoAndResultado(String codigo, Long id, String regularidad, String aprobado);
 }

@@ -82,7 +82,8 @@ public class PlanEstudioService {
         }
 
         String propuesta = planRow.getCell(0).getStringCellValue();
-        if (propuesta == null || propuesta.trim().isEmpty()) {
+        propuesta = propuesta.substring(0,propuesta.indexOf("(")).trim();
+        if (propuesta.trim().isEmpty()) {
             throw new PlanEstudioException(
                     "La propuesta del plan de estudios no puede estar vacía",
                     HttpStatus.BAD_REQUEST
@@ -110,7 +111,7 @@ public class PlanEstudioService {
 
         int lastRowWithData = 0;
         for (int i = 0; i <= sheet.getLastRowNum(); i++) {
-            if (sheet.getRow(i) != null && !isEmptyRow(sheet.getRow(i))) {
+            if (sheet.getRow(i) != null && !ServiceUtil.isEmptyRow(sheet.getRow(i))) {
                 lastRowWithData = i;
             }
         }
@@ -128,15 +129,13 @@ public class PlanEstudioService {
                 );
             }
 
-            String codigoMateria = checkCell(row.getCell(1));
+            String codigoMateria = ServiceUtil.checkCell(row.getCell(1));
             if (codigoMateria == null || codigoMateria.trim().isEmpty()) {
                 throw new PlanEstudioException(
                         String.format("Fila %d: El código de la materia no puede estar vacío", i+1),
                         HttpStatus.BAD_REQUEST
                 );
             }
-
-
 
             String nombreMateria = row.getCell(0).getStringCellValue();
 
@@ -149,7 +148,7 @@ public class PlanEstudioService {
 
             // Procesar correlativas
             Cell cell = row.getCell(5);
-            String correlativasStr = checkCell(cell);
+            String correlativasStr = ServiceUtil.checkCell(cell);
             if (!"No tiene".equalsIgnoreCase(correlativasStr)) {
                 String[] codigosCorrelativas = correlativasStr.split("-");
                 for (String codigoCorrelativa : codigosCorrelativas) {
@@ -170,30 +169,7 @@ public class PlanEstudioService {
         }
     }
 
-    // Metodo auxiliar para verificar filas vacías
-    private boolean isEmptyRow(Row row) {
-        for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
-            Cell cell = row.getCell(c);
-            if (cell != null && cell.getCellType() != CellType.BLANK) {
-                return false;
-            }
-        }
-        return true;
-    }
 
-    private String checkCell(Cell cell){
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                return String.valueOf((int)cell.getNumericCellValue());
-            case BLANK:
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo de celda no soportado: " + cell.getCellType());
-        }
-        return "";
-    }
 
 
         public void eliminarPlanDeEstudio(String codigoPlan) {

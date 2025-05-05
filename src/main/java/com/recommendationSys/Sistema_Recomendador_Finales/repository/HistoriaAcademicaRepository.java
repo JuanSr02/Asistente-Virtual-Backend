@@ -29,7 +29,4 @@ public interface HistoriaAcademicaRepository extends JpaRepository<HistoriaAcade
     // Count academic histories by study plan
     Long countByPlanDeEstudio(PlanDeEstudio planDeEstudio);
 
-    // Find academic histories with a specific number of records or more
-    @Query("SELECT ha FROM HistoriaAcademica ha WHERE SIZE(ha.renglones) >= :count")
-    List<HistoriaAcademica> findByRenglonesCountGreaterThanEqual(@Param("count") Integer count);
 }

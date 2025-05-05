@@ -46,7 +46,7 @@ CREATE TABLE Correlativa (
 CREATE TABLE HistoriaAcademica (
     id SERIAL PRIMARY KEY,
     Persona_id_estudiante INT UNIQUE,
-    PlanDeEstudio_codigo VARCHAR(8) NOT NULL,
+    PlanDeEstudio_codigo VARCHAR(9) NOT NULL,
     FOREIGN KEY (Persona_id_estudiante) REFERENCES Estudiante(Persona_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (PlanDeEstudio_codigo) REFERENCES PlanDeEstudio(codigo) ON DELETE CASCADE ON UPDATE CASCADE
 );

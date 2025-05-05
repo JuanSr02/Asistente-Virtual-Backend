@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -16,8 +17,7 @@ public class Examen {
     private Long id;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date fecha;
+    private String fecha;
 
     @Column(precision = 4, scale = 2)
     private BigDecimal nota;
@@ -28,5 +28,11 @@ public class Examen {
 
     @OneToOne(mappedBy = "examen", cascade = CascadeType.ALL)
     private Experiencia experiencia;
+
+    public Examen(String fecha, BigDecimal nota, Renglon renglon) {
+        this.fecha = fecha;
+        this.nota = nota;
+        this.renglon = renglon;
+    }
 }
 
