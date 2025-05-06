@@ -25,6 +25,49 @@ public class RegistroInscripcion {
     @ManyToOne
     @JoinColumn(name = "Persona_id_estudiante", nullable = false)
     private Estudiante estudiante;
+
+    public RegistroInscripcion() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Estudiante getEstudiante() {
+        return estudiante;
+    }
+
+    public void setEstudiante(Estudiante estudiante) {
+        this.estudiante = estudiante;
+    }
+
+    public Materia getMateria() {
+        return materia;
+    }
+
+    public void setMateria(Materia materia) {
+        this.materia = materia;
+    }
+
+    public Integer getAnio() {
+        return anio;
+    }
+
+    public void setAnio(Integer anio) {
+        this.anio = anio;
+    }
+
+    public String getTurno() {
+        return turno;
+    }
+
+    public void setTurno(String turno) {
+        this.turno = turno;
+    }
 }
 
 

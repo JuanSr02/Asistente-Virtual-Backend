@@ -17,12 +17,6 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     // Find by renglon
     Optional<Examen> findByRenglon(Renglon renglon);
 
-    // Find exams by date
-    List<Examen> findByFecha(Date fecha);
-
-    // Find exams in date range
-    List<Examen> findByFechaBetween(Date startDate, Date endDate);
-
     // Find exams with a specific grade or higher
     List<Examen> findByNotaGreaterThanEqual(BigDecimal nota);
 
@@ -35,7 +29,4 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     // Find exams without experience recorded
     List<Examen> findByExperienciaIsNull();
 
-    // Find average grade for all exams
-    @Query("SELECT AVG(e.nota) FROM Examen e")
-    BigDecimal findAverageGrade();
 }

@@ -3,6 +3,7 @@ package com.recommendationSys.Sistema_Recomendador_Finales.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -22,8 +23,8 @@ public class HistoriaAcademica {
     @JoinColumn(name = "PlanDeEstudio_codigo", nullable = false)
     private PlanDeEstudio planDeEstudio;
 
-    @OneToMany(mappedBy = "historiaAcademica", cascade = CascadeType.ALL)
-    private List<Renglon> renglones;
+    @OneToMany(mappedBy = "historiaAcademica", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Renglon> renglones = new ArrayList<>();
 
     public HistoriaAcademica() {
     }
@@ -65,6 +66,16 @@ public class HistoriaAcademica {
 
     public void setRenglones(List<Renglon> renglones) {
         this.renglones = renglones;
+    }
+
+    @Override
+    public String toString() {
+        return "HistoriaAcademica{" +
+                "id=" + id +
+                ", estudiante=" + estudiante +
+                ", planDeEstudio=" + planDeEstudio +
+                ", renglones=" + renglones +
+                '}';
     }
 }
 

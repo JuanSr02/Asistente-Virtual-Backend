@@ -81,7 +81,7 @@ public class PlanEstudioService {
             );
         }
 
-        String propuesta = planRow.getCell(0).getStringCellValue();
+        String propuesta = planRow.getCell(0).getStringCellValue().trim();
         propuesta = propuesta.substring(0,propuesta.indexOf("(")).trim();
         if (propuesta.trim().isEmpty()) {
             throw new PlanEstudioException(
@@ -91,7 +91,7 @@ public class PlanEstudioService {
         }
 
         // Validar formato de código de plan
-        String codigoPlan = planRow.getCell(1).getStringCellValue();
+        String codigoPlan = planRow.getCell(1).getStringCellValue().trim();
         if (codigoPlan == null || codigoPlan.trim().isEmpty()) {
             throw new PlanEstudioException(
                     "No se pudo encontrar el código del plan de estudios",
@@ -137,7 +137,7 @@ public class PlanEstudioService {
                 );
             }
 
-            String nombreMateria = row.getCell(0).getStringCellValue();
+            String nombreMateria = row.getCell(0).getStringCellValue().trim();
 
             Materia materia = materiaRepo.findById(codigoMateria)
                     .orElse(new Materia());

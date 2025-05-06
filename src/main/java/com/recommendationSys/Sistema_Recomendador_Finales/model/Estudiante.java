@@ -16,11 +16,14 @@ public class Estudiante extends Persona {
     @Column(name = "nroRegistro", nullable = false)
     private Integer nroRegistro;
 
-    @OneToOne(mappedBy = "estudiante", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
     private HistoriaAcademica historiaAcademica;
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
     private List<RegistroInscripcion> inscripciones;
+
+    public Estudiante() {
+    }
 
     public Integer getNroRegistro() {
         return nroRegistro;
@@ -44,5 +47,14 @@ public class Estudiante extends Persona {
 
     public void setInscripciones(List<RegistroInscripcion> inscripciones) {
         this.inscripciones = inscripciones;
+    }
+
+    @Override
+    public String toString() {
+        return "Estudiante{" +
+                "nroRegistro=" + nroRegistro +
+                ", historiaAcademica=" + historiaAcademica +
+                ", inscripciones=" + inscripciones +
+                '}';
     }
 }

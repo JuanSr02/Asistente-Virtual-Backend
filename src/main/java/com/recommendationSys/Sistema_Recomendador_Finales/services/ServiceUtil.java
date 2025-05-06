@@ -20,9 +20,9 @@ public class ServiceUtil {
     public static String checkCell(Cell cell){
         switch (cell.getCellType()) {
             case STRING:
-                return cell.getStringCellValue();
+                return cell.getStringCellValue().trim();
             case NUMERIC:
-                return String.valueOf((int)cell.getNumericCellValue());
+                return String.valueOf((int)cell.getNumericCellValue()).trim();
             case BLANK:
                 break;
             default:

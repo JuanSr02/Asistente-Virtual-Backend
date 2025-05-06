@@ -20,8 +20,7 @@ public class Renglon {
     @Column(nullable = false, length = 50)
     private String tipo;
 
-    @Column(precision = 4, scale = 2)
-    private BigDecimal nota;
+    private Double nota;
 
     @Column(nullable = false, length = 50)
     private String resultado;
@@ -34,10 +33,10 @@ public class Renglon {
     @JoinColumn(name = "materia_codigo", nullable = false)
     private Materia materia;
 
-    @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL,orphanRemoval = true)
     private Examen examen;
 
-    public Renglon(Long id, String fecha, String tipo, BigDecimal nota, String resultado, HistoriaAcademica historiaAcademica, Materia materia, Examen examen) {
+    public Renglon(Long id, String fecha, String tipo, Double nota, String resultado, HistoriaAcademica historiaAcademica, Materia materia, Examen examen) {
         this.id = id;
         this.fecha = fecha;
         this.tipo = tipo;
@@ -48,13 +47,80 @@ public class Renglon {
         this.examen = examen;
     }
 
-    public Renglon(String fecha, String tipo, BigDecimal nota, String resultado, HistoriaAcademica historiaAcademica, Materia materia) {
+    public Renglon(String fecha, String tipo, Double nota, String resultado, HistoriaAcademica historiaAcademica, Materia materia) {
         this.fecha = fecha;
         this.tipo = tipo;
         this.nota = nota;
         this.resultado = resultado;
         this.historiaAcademica = historiaAcademica;
         this.materia = materia;
+    }
+
+    public Renglon() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public Double getNota() {
+        return nota;
+    }
+
+    public void setNota(Double nota) {
+        this.nota = nota;
+    }
+
+    public String getResultado() {
+        return resultado;
+    }
+
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
+    }
+
+    public HistoriaAcademica getHistoriaAcademica() {
+        return historiaAcademica;
+    }
+
+    public void setHistoriaAcademica(HistoriaAcademica historiaAcademica) {
+        this.historiaAcademica = historiaAcademica;
+    }
+
+    public Materia getMateria() {
+        return materia;
+    }
+
+    public void setMateria(Materia materia) {
+        this.materia = materia;
+    }
+
+    public Examen getExamen() {
+        return examen;
+    }
+
+    public void setExamen(Examen examen) {
+        this.examen = examen;
     }
 }
 

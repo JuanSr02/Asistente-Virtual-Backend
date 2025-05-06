@@ -62,7 +62,11 @@ public interface RenglonRepository extends JpaRepository<Renglon, Long> {
     @Query("SELECT r FROM Renglon r WHERE r.historiaAcademica.estudiante.id = :estudianteId")
     List<Renglon> findByEstudianteId(@Param("estudianteId") Long estudianteId);
 
-    boolean existsByMateriaCodigoAndHistoriaIdAndTipoAndNotaGreaterThanEqual(String codigo, Long id, String examen, double v);
+    boolean existsByMateriaAndHistoriaAcademicaAndTipoAndNotaGreaterThanEqual(Materia materia,HistoriaAcademica historiaAcademica, String tipo, double nota);
 
-    Optional<Renglon> findByMateriaCodigoAndHistoriaIdAndTipoAndResultado(String codigo, Long id, String regularidad, String aprobado);
+    boolean existsByMateriaAndHistoriaAcademicaAndTipoAndResultado(Materia materia,HistoriaAcademica historiaAcademica, String Tipo,String resultado);
+
+    Optional<Renglon> findByMateriaAndHistoriaAcademicaAndTipoAndResultado(Materia materia, HistoriaAcademica historiaAcademica, String tipo, String resultado);
+
+    void deleteByTipoAndResultado(String Tipo,String Resultado);
 }

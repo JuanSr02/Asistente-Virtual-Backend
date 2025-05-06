@@ -39,4 +39,87 @@ public class Experiencia {
 
     @Column(length = 100)
     private String condiciones;
+
+    public Experiencia() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Examen getExamen() {
+        return examen;
+    }
+
+    public void setExamen(Examen examen) {
+        this.examen = examen;
+    }
+
+    public Integer getDificultad() {
+        return dificultad;
+    }
+
+    public void setDificultad(Integer dificultad) {
+        this.dificultad = dificultad;
+    }
+
+    public Integer getDiasEstudio() {
+        return diasEstudio;
+    }
+
+    public void setDiasEstudio(Integer diasEstudio) {
+        this.diasEstudio = diasEstudio;
+    }
+
+    public Integer getHorasDiarias() {
+        return horasDiarias;
+    }
+
+    public void setHorasDiarias(Integer horasDiarias) {
+        this.horasDiarias = horasDiarias;
+    }
+
+    public Integer getIntentosPrevios() {
+        return intentosPrevios;
+    }
+
+    public void setIntentosPrevios(Integer intentosPrevios) {
+        this.intentosPrevios = intentosPrevios;
+    }
+
+    public String getModalidad() {
+        return modalidad;
+    }
+
+    public void setModalidad(String modalidad) {
+        this.modalidad = modalidad;
+    }
+
+    public String getRecursos() {
+        return recursos;
+    }
+
+    public void setRecursos(String recursos) {
+        this.recursos = recursos;
+    }
+
+    public String getMotivacion() {
+        return motivacion;
+    }
+
+    public void setMotivacion(String motivacion) {
+        this.motivacion = motivacion;
+    }
+
+    public String getCondiciones() {
+        return condiciones;
+    }
+
+    public void setCondiciones(String condiciones) {
+        this.condiciones = condiciones;
+    }
 }

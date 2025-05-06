@@ -65,7 +65,7 @@ CREATE TABLE Renglon (
 
 CREATE TABLE Examen (
     id SERIAL PRIMARY KEY,
-    fecha DATE NOT NULL,
+    fecha VARCHAR(12) NOT NULL,
     nota DECIMAL(4,2),
     Renglon_id INT UNIQUE,
     FOREIGN KEY (Renglon_id) REFERENCES Renglon(id) ON DELETE CASCADE ON UPDATE CASCADE

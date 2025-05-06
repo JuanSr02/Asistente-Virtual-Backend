@@ -36,6 +36,9 @@ public class Persona {
     @Column(nullable = false, length = 15)
     private String tipo;
 
+    public Persona() {
+    }
+
     public Long getId() {
         return id;
     }

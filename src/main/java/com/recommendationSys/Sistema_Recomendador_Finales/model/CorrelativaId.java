@@ -25,4 +25,7 @@ public class CorrelativaId implements Serializable {
     public int hashCode() {
         return Objects.hash(materia, correlativa, planDeEstudio);
     }
+
+    public CorrelativaId() {
+    }
 }

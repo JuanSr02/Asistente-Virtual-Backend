@@ -3,10 +3,7 @@ package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.HistoriaAcademicaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -43,5 +40,24 @@ public class HistoriaAcademicaController {
             ));
         }
     }
+
+    @DeleteMapping("/eliminar-historia")
+    public ResponseEntity<?> eliminarHistoriaPorEstudiante(@RequestParam("estudianteId") Long estudianteId) {
+        try {
+            historiaService.eliminarHistoriaAcademica(estudianteId);
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "message", "Historia académica eliminada correctamente",
+                    "timestamp", LocalDateTime.now()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "success", false,
+                    "error", e.getMessage(),
+                    "timestamp", LocalDateTime.now()
+            ));
+        }
+    }
+
 }
 

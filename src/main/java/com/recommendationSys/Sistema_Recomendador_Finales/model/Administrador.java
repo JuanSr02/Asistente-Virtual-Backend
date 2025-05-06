@@ -21,6 +21,9 @@ public class Administrador extends Persona {
     public void setToken(Integer token) {
         this.token = token;
     }
+
+    public Administrador() {
+    }
 }
 
 
