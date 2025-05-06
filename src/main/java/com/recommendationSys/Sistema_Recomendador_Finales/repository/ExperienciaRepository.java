@@ -43,4 +43,6 @@ public interface ExperienciaRepository extends JpaRepository<Experiencia, Long> 
     // Find average study days
     @Query("SELECT AVG(e.diasEstudio) FROM Experiencia e")
     Double findAverageStudyDays();
+
+    boolean existsByExamen(Examen examen);
 }
