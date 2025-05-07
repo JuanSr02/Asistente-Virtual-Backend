@@ -1,6 +1,7 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services;
 
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -69,43 +73,46 @@ public class ExperienciaService {
     }
 
     // Update
-    public Experiencia actualizarExperiencia(Long id, ExperienciaDTO experienciaDTO) {
+    public Experiencia actualizarExperiencia(Long id, ActualizarExperienciaDTO dto) {
         Experiencia experiencia = experienciaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
 
-        if (experienciaDTO.getDificultad() != null) {
-            experiencia.setDificultad(experienciaDTO.getDificultad());
+        // Validar que al menos un campo viene en el DTO
+        if (Stream.of(
+                dto.getDificultad(),
+                dto.getDiasEstudio(),
+                dto.getHorasDiarias(),
+                dto.getIntentosPrevios(),
+                dto.getModalidad(),
+                dto.getRecursos(),
+                dto.getMotivacion(),
+                dto.getCondiciones()
+        ).allMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("Debe proporcionar al menos un campo para actualizar");
         }
-        if (experienciaDTO.getDiasEstudio() != null) {
-            experiencia.setDiasEstudio(experienciaDTO.getDiasEstudio());
-        }
-        if (experienciaDTO.getHorasDiarias() != null) {
-            experiencia.setHorasDiarias(experienciaDTO.getHorasDiarias());
-        }
-        if (experienciaDTO.getIntentosPrevios() != null) {
-            experiencia.setIntentosPrevios(experienciaDTO.getIntentosPrevios());
-        }
-        if (experienciaDTO.getModalidad() != null) {
-            experiencia.setModalidad(experienciaDTO.getModalidad());
-        }
-        if (experienciaDTO.getRecursos() != null) {
-            experiencia.setRecursos(experienciaDTO.getRecursos());
-        }
-        if (experienciaDTO.getMotivacion() != null) {
-            experiencia.setMotivacion(experienciaDTO.getMotivacion());
-        }
-        if (experienciaDTO.getCondiciones() != null) {
-            experiencia.setCondiciones(experienciaDTO.getCondiciones());
-        }
+
+        Optional.ofNullable(dto.getDificultad()).ifPresent(experiencia::setDificultad);
+        Optional.ofNullable(dto.getDiasEstudio()).ifPresent(experiencia::setDiasEstudio);
+        Optional.ofNullable(dto.getHorasDiarias()).ifPresent(experiencia::setHorasDiarias);
+        Optional.ofNullable(dto.getIntentosPrevios()).ifPresent(experiencia::setIntentosPrevios);
+        Optional.ofNullable(dto.getModalidad()).ifPresent(experiencia::setModalidad);
+        Optional.ofNullable(dto.getRecursos()).ifPresent(experiencia::setRecursos);
+        Optional.ofNullable(dto.getMotivacion()).ifPresent(experiencia::setMotivacion);
+        Optional.ofNullable(dto.getCondiciones()).ifPresent(experiencia::setCondiciones);
 
         return experienciaRepository.save(experiencia);
     }
-
     // Delete
+    @Transactional
     public void eliminarExperiencia(Long id) {
-        if (!experienciaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Experiencia no encontrada");
+        Experiencia experiencia = experienciaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
+
+        // Romper la relación bidireccional si existe
+        if (experiencia.getExamen() != null && experiencia.getExamen().getExperiencia() != null) {
+            experiencia.getExamen().setExperiencia(null);
         }
-        experienciaRepository.deleteById(id);
+
+        experienciaRepository.delete(experiencia);
     }
 }

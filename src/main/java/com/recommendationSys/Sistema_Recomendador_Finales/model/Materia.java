@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,15 +23,19 @@ public class Materia {
     private PlanDeEstudio planDeEstudio;
 
     @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
     private List<Correlativa> correlativas = new ArrayList<>();
 
     @OneToMany(mappedBy = "correlativa", cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
     private List<Correlativa> esCorrelavitaDe = new ArrayList<>();
 
     @OneToMany(mappedBy = "materia")
+    @JsonIgnore
     private List<Renglon> renglones;
 
     @OneToMany(mappedBy = "materia")
+    @JsonIgnore
     private List<RegistroInscripcion> inscripciones;
 
     public Materia() {

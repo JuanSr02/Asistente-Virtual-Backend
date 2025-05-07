@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,9 +18,11 @@ public class Estudiante extends Persona {
     private Integer nroRegistro;
 
     @OneToOne(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private HistoriaAcademica historiaAcademica;
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<RegistroInscripcion> inscripciones;
 
     public Estudiante() {

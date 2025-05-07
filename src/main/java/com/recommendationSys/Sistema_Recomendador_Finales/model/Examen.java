@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,9 +24,11 @@ public class Examen {
 
     @OneToOne
     @JoinColumn(name = "Renglon_id", unique = true)
+    @JsonIgnore
     private Renglon renglon;
 
-    @OneToOne(mappedBy = "examen", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "examen", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Experiencia experiencia;
 
     public Examen(String fecha, Double nota, Renglon renglon) {

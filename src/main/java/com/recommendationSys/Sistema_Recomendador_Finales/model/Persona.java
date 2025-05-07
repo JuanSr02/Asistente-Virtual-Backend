@@ -10,9 +10,9 @@ import java.util.List;
 @Table(name = "Persona")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Persona {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
     @Column(nullable = false)

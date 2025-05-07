@@ -1,11 +1,13 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.ExperienciaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,9 +23,9 @@ public class ExperienciaController {
     }
 
     @PostMapping
-    public ResponseEntity<Experiencia> crearExperiencia(@Valid @RequestBody ExperienciaDTO experienciaDTO) {
+    public ResponseEntity<Long> crearExperiencia(@Valid @RequestBody ExperienciaDTO experienciaDTO) {
         Experiencia nuevaExperiencia = experienciaService.crearExperiencia(experienciaDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaExperiencia);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaExperiencia.getId());
     }
 
     @GetMapping("/{id}")
@@ -44,8 +46,8 @@ public class ExperienciaController {
     @PutMapping("/{id}")
     public ResponseEntity<Experiencia> actualizarExperiencia(
             @PathVariable Long id,
-            @Valid @RequestBody ExperienciaDTO experienciaDTO) {
-        return ResponseEntity.ok(experienciaService.actualizarExperiencia(id, experienciaDTO));
+            @Valid @RequestBody ActualizarExperienciaDTO dto) {
+        return ResponseEntity.ok(experienciaService.actualizarExperiencia(id, dto));
     }
 
     @DeleteMapping("/{id}")
@@ -53,4 +55,7 @@ public class ExperienciaController {
         experienciaService.eliminarExperiencia(id);
         return ResponseEntity.noContent().build();
     }
+
+
+
 }

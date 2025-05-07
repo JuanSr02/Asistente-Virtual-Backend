@@ -1,5 +1,7 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -18,6 +20,7 @@ public class PlanDeEstudio {
     private String propuesta;
 
     @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Materia> materias = new ArrayList<>();
 
     public PlanDeEstudio(String codigo, String propuesta, List<Materia> materias) {

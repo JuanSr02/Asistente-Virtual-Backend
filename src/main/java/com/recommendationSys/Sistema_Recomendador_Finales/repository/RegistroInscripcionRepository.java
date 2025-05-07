@@ -25,14 +25,12 @@ public interface RegistroInscripcionRepository extends JpaRepository<RegistroIns
     // Find by shift
     List<RegistroInscripcion> findByTurno(String turno);
 
-    // Find by student and year
-    List<RegistroInscripcion> findByEstudianteAndAnio(Estudiante estudiante, Integer anio);
-
-    // Find by student and subject
-    List<RegistroInscripcion> findByEstudianteAndMateria(Estudiante estudiante, Materia materia);
-
     // Find by subject and year
     List<RegistroInscripcion> findByMateriaAndAnio(Materia materia, Integer anio);
+
+    // Find by materia,año y turno
+    List<RegistroInscripcion> findByMateriaAndAnioAndTurno(Materia materia, Integer anio,String turno);
+
 
     // Count registrations by subject
     Long countByMateria(Materia materia);

@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,16 +13,19 @@ public class Correlativa {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "materia_codigo", nullable = false)
+    @JsonIgnore
     private Materia materia;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "correlativa_codigo", nullable = false)
+    @JsonIgnore
     private Materia correlativa;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PlanDeEstudio_codigo", nullable = false)
+    @JsonIgnore
     private PlanDeEstudio planDeEstudio;
 
     // Getters, Setters, Constructor
