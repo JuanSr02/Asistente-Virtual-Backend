@@ -31,6 +31,8 @@ public interface RegistroInscripcionRepository extends JpaRepository<RegistroIns
     // Find by materia,año y turno
     List<RegistroInscripcion> findByMateriaAndAnioAndTurno(Materia materia, Integer anio,String turno);
 
+    // Exists by Materia and Estudiante
+    boolean existsByMateriaAndEstudianteAndAnio(Materia materia, Estudiante estudiante, Integer anio);
 
     // Count registrations by subject
     Long countByMateria(Materia materia);
