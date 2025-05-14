@@ -55,7 +55,7 @@ public class RegistroInscripcionService {
 
         RegistroInscripcion saved = inscripcionRepo.save(inscripcion);
 
-        notificarNuevaInscripcion(saved.getMateria(), saved.getAnio(), saved.getTurno(), saved.getEstudiante());
+        notificarCompaneros(saved);
         return mapToResponseDTO(saved);
     }
 
@@ -95,17 +95,19 @@ public class RegistroInscripcionService {
         return dto;
     }
 
-    private void notificarNuevaInscripcion(Materia materia, Integer anio, String turno, Estudiante nuevoInscripto) {
-        List<RegistroInscripcion> inscriptos = inscripcionRepo.findByMateriaAndAnioAndTurno(
-                materia, anio, turno);
+    private void notificarCompaneros(RegistroInscripcion nuevaInscripcion) {
+        List<RegistroInscripcion> companeros = inscripcionRepo
+                .findByMateriaAndAnioAndTurno(
+                        nuevaInscripcion.getMateria(),
+                        nuevaInscripcion.getAnio(),
+                        nuevaInscripcion.getTurno());
 
-        inscriptos.stream()
-                .filter(insc -> !insc.getEstudiante().getId().equals(nuevoInscripto.getId()))
-                .forEach(insc -> emailService.enviarEmailNotificacion(
+        companeros.stream()
+                .filter(insc -> !insc.getEstudiante().getId().equals(nuevaInscripcion.getEstudiante().getId()))
+                .forEach(insc -> emailService.enviarNotificacionNuevoInscripto(
                         insc.getEstudiante().getMail(),
-                        materia.getNombre(),
-                        turno));
+                        nuevaInscripcion.getMateria().getNombre(),
+                        nuevaInscripcion.getTurno()));
     }
-
-
 }
+
