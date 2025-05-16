@@ -4,7 +4,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
-public class ServiceUtil {
+public class ExcelServicesUtil {
 
     // Metodo auxiliar para verificar filas vacías
     public static boolean isEmptyRow(Row row) {

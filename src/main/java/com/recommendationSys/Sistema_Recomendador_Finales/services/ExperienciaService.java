@@ -6,8 +6,11 @@ import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExamenRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExperienciaRepository;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,16 +21,12 @@ import java.util.stream.Stream;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ExperienciaService {
 
     private final ExperienciaRepository experienciaRepository;
     private final ExamenRepository examenRepository;
-
-    public ExperienciaService(ExperienciaRepository experienciaRepository,
-                              ExamenRepository examenRepository) {
-        this.experienciaRepository = experienciaRepository;
-        this.examenRepository = examenRepository;
-    }
+    private final MateriaRepository materiaRepository;
 
     // Create
     public Experiencia crearExperiencia(ExperienciaDTO experienciaDTO) {
@@ -57,6 +56,14 @@ public class ExperienciaService {
         return experienciaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
     }
+
+    public List<Experiencia> obtenerExperienciasPorMateria(String codigoMateria) {
+        Materia materia = materiaRepository.findById(codigoMateria)
+                .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
+
+        return experienciaRepository.findByMateriaWithJoins(materia);
+    }
+
 
     // Read (All)
     public List<Experiencia> obtenerTodasLasExperiencias() {

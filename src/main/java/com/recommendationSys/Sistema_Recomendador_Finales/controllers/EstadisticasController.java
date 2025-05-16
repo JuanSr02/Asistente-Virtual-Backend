@@ -22,8 +22,8 @@ public class EstadisticasController {
     public ResponseEntity<EstadisticasMateriaDTO> getEstadisticasMateria(
             @PathVariable String codigoMateria) {
 
-        EstadisticasMateria stats = estadisticasService.obtenerEstadisticasMateria(codigoMateria);
-        return ResponseEntity.ok(convertToDTO(stats));
+        EstadisticasMateria stats = estadisticasService.calcularEstadisticasPorMateria(codigoMateria);
+        return ResponseEntity.ok(estadisticasService.convertToDTO(stats));
     }
 
     @GetMapping("/generales")
@@ -31,7 +31,5 @@ public class EstadisticasController {
         return ResponseEntity.ok(estadisticasService.obtenerEstadisticasGenerales());
     }
 
-    private EstadisticasMateriaDTO convertToDTO(EstadisticasMateria stats) {
-        // Conversión que incluye deserialización de distribuciones
-    }
+
 }

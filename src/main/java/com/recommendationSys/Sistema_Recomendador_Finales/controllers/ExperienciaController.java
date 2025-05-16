@@ -7,7 +7,6 @@ import com.recommendationSys.Sistema_Recomendador_Finales.services.ExperienciaSe
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,6 +54,16 @@ public class ExperienciaController {
         experienciaService.eliminarExperiencia(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/por-materia/{codigoMateria}")
+    public ResponseEntity<List<Experiencia>> getExperienciasPorMateria(
+            @PathVariable String codigoMateria) {
+
+        return ResponseEntity.ok(
+                experienciaService.obtenerExperienciasPorMateria(codigoMateria)
+        );
+    }
+
 
 
 

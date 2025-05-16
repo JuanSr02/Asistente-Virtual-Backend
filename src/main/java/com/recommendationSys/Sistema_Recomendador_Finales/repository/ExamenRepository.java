@@ -5,6 +5,7 @@ import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Renglon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -14,7 +15,10 @@ import java.util.Optional;
 @Repository
 public interface ExamenRepository extends JpaRepository<Examen, Long> {
 
-    List<Examen> findByMateria(Materia materia);
+    @Query("SELECT ex FROM Examen ex " +
+            "JOIN ex.renglon r " +
+            "WHERE r.materia = :materia")
+    List<Examen> findByMateriaWithJoins(@Param("materia") Materia materia);
 
     // Find by renglon
     Optional<Examen> findByRenglon(Renglon renglon);
@@ -31,14 +35,8 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     // Find exams without experience recorded
     List<Examen> findByExperienciaIsNull();
 
-    @Query("SELECT e.materia FROM Examen e GROUP BY e.materia")
+    @Query("SELECT DISTINCT r.materia FROM Examen e JOIN e.renglon r")
     List<Materia> findDistinctMaterias();
-
-    @Query("SELECT new com.tuapp.EstadisticasPorModalidadDTO("
-            + "e.modalidad, COUNT(e), AVG(e.nota)) "
-            + "FROM Examen e WHERE e.materia.codigo = :codigoMateria "
-            + "GROUP BY e.modalidad")
-    List<EstadisticasPorModalidadDTO> findEstadisticasPorModalidad(String codigoMateria);
 
     @Query(value = """
         SELECT m.codigo, m.nombre, 
@@ -52,4 +50,17 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
         """, nativeQuery = true)
     List<Object[]> findTop5MateriasAprobadas();
 
+    @Query(value = """
+        SELECT m.codigo, m.nombre, 
+               COUNT(*) as total,
+               SUM(CASE WHEN e.nota < 4 THEN 1 ELSE 0 END) as reprobados
+        FROM materias m
+        JOIN examenes e ON m.codigo = e.materia_codigo
+        GROUP BY m.codigo, m.nombre
+        ORDER BY (reprobados*1.0/total) DESC
+        LIMIT 5
+        """, nativeQuery = true)
+    List<Object[]> findTop5MateriasReprobadas();
+
+    long countByNotaGreaterThanEqual(double nota);
 }
