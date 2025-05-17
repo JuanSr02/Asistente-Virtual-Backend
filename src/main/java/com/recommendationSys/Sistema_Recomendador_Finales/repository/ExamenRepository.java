@@ -39,27 +39,29 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     List<Materia> findDistinctMaterias();
 
     @Query(value = """
-        SELECT m.codigo, m.nombre, 
-               COUNT(*) as total,
-               SUM(CASE WHEN e.nota >= 4 THEN 1 ELSE 0 END) as aprobados
-        FROM materias m
-        JOIN examenes e ON m.codigo = e.materia_codigo
-        GROUP BY m.codigo, m.nombre
-        ORDER BY (aprobados*1.0/total) DESC
-        LIMIT 5
-        """, nativeQuery = true)
+    SELECT m.codigo, m.nombre, 
+           COUNT(*) as total,
+           SUM(CASE WHEN e.nota >= 4 THEN 1 ELSE 0 END) as aprobados
+    FROM materia m
+    JOIN renglon r ON m.codigo = r.materia_codigo
+    JOIN examen e ON r.id = e.renglon_id
+    GROUP BY m.codigo, m.nombre
+    ORDER BY (SUM(CASE WHEN e.nota >= 4 THEN 1 ELSE 0 END)*1.0/COUNT(*)) DESC
+    LIMIT 5
+    """, nativeQuery = true)
     List<Object[]> findTop5MateriasAprobadas();
 
     @Query(value = """
-        SELECT m.codigo, m.nombre, 
-               COUNT(*) as total,
-               SUM(CASE WHEN e.nota < 4 THEN 1 ELSE 0 END) as reprobados
-        FROM materias m
-        JOIN examenes e ON m.codigo = e.materia_codigo
-        GROUP BY m.codigo, m.nombre
-        ORDER BY (reprobados*1.0/total) DESC
-        LIMIT 5
-        """, nativeQuery = true)
+    SELECT m.codigo, m.nombre, 
+           COUNT(*) as total,
+           SUM(CASE WHEN e.nota < 4 THEN 1 ELSE 0 END) as reprobados
+    FROM materia m
+    JOIN renglon r ON m.codigo = r.materia_codigo
+    JOIN examen e ON r.id = e.renglon_id
+    GROUP BY m.codigo, m.nombre
+    ORDER BY (SUM(CASE WHEN e.nota < 4 THEN 1 ELSE 0 END)*1.0/COUNT(*)) DESC
+    LIMIT 5
+    """, nativeQuery = true)
     List<Object[]> findTop5MateriasReprobadas();
 
     long countByNotaGreaterThanEqual(double nota);
