@@ -107,7 +107,24 @@ public class RegistroInscripcionService {
                 .forEach(insc -> emailService.enviarNotificacionNuevoInscripto(
                         insc.getEstudiante().getMail(),
                         nuevaInscripcion.getMateria().getNombre(),
-                        nuevaInscripcion.getTurno()));
+                        nuevaInscripcion.getTurno(),String.valueOf(nuevaInscripcion.getAnio()),nuevaInscripcion.getEstudiante()));
+    }
+
+    public void AvisarCompaneros(RegistroInscripcionDTO dto) {
+        Materia materia = materiaRepo.findById(dto.getMateriaCodigo())
+                .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
+
+        Estudiante estudiante = estudianteRepo.findById(dto.getEstudianteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
+
+        RegistroInscripcion inscripcion = new RegistroInscripcion();
+        inscripcion.setTurno(dto.getTurno());
+        inscripcion.setAnio(dto.getAnio());
+        inscripcion.setMateria(materia);
+        inscripcion.setEstudiante(estudiante);
+        notificarCompaneros(inscripcion);
     }
 }
+
+
 

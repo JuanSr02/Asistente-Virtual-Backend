@@ -1,6 +1,7 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.EmailException;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Estudiante;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.core.env.Environment;
@@ -21,7 +22,7 @@ public class EmailService {
     }
 
     @Async
-    public void enviarNotificacionNuevoInscripto(String emailDestinatario, String materiaNombre, String turno) {
+    public void enviarNotificacionNuevoInscripto(String emailDestinatario, String materiaNombre, String turno,String anio, Estudiante companero) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -29,7 +30,7 @@ public class EmailService {
             String asunto = String.format("[%s] Nuevo compañero en %s - Turno %s",
                     env.getProperty("app.name"), materiaNombre, turno);
 
-            String cuerpo = plantillaEmail(materiaNombre, turno);
+            String cuerpo = plantillaEmail(materiaNombre, turno,anio,companero.getNombreApellido(),companero.getMail());
 
             helper.setFrom("Sistema_Recomendador");
             helper.setTo(emailDestinatario);
@@ -42,7 +43,7 @@ public class EmailService {
         }
     }
 
-    private String plantillaEmail(String materia, String turno) {
+    private String plantillaEmail(String materia, String turno,String anio,String nombre,String mail) {
         return """
             <!DOCTYPE html>
             <html>
@@ -58,13 +59,16 @@ public class EmailService {
             <body>
                 <div class="container">
                     <div class="header">
-                        <h2>Nuevo estudiante que rendira</h2>
+                        <h2>Nuevo estudiante que va a rendir con vos</h2>
                     </div>
                     <div class="content">
-                        <p>Se ha inscrito un nuevo estudiante en:</p>
+                        <p>Se ha inscripto un nuevo estudiante en:</p>
                         <ul>
                             <li><strong>Materia:</strong> %s</li>
                             <li><strong>Turno:</strong> %s</li>
+                            <li><strong>Año:</strong> %s</li>
+                            <li><strong>Nombre compañero:</strong> %s</li>
+                            <li><strong>Mail:</strong> %s</li>
                         </ul>
                     </div>
                     <div class="footer">
@@ -73,7 +77,7 @@ public class EmailService {
                 </div>
             </body>
             </html>
-            """.formatted(materia, turno);
+            """.formatted(materia, turno,anio,nombre,mail);
     }
 
     public void enviarCorreoDePrueba(String destinatario) {

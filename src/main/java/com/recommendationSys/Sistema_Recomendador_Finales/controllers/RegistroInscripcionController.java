@@ -44,4 +44,10 @@ public class RegistroInscripcionController {
 
         return ResponseEntity.ok(inscripcionService.obtenerInscriptos(materia, anio, turno));
     }
+
+    @PostMapping("/avisar")
+    public ResponseEntity<Void> avisarRinde(@Valid @RequestBody RegistroInscripcionDTO dto){
+        inscripcionService.AvisarCompaneros(dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
