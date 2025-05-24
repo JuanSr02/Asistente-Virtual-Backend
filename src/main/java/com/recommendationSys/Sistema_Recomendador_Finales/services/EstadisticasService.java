@@ -69,6 +69,7 @@ public class EstadisticasService {
         // Cálculos de experiencia
         stats.setPromedioDiasEstudio(calcularPromedioDiasEstudio(experiencias));
         stats.setPromedioHorasDiarias(calcularPromedioHorasDiarias(experiencias));
+        stats.setPromedioDificultad(calcularPromedioDificultad(experiencias));
 
         // Distribuciones
         stats.setDistribucionDificultad(calcularDistribucionDificultad(experiencias));
@@ -76,6 +77,8 @@ public class EstadisticasService {
         stats.setDistribucionRecursos(calcularDistribucionRecursos(experiencias));
 
         stats.setUltimaActualizacion(LocalDateTime.now());
+
+        estadisticasRepo.save(stats);
 
         return stats;
     }
@@ -108,7 +111,7 @@ public class EstadisticasService {
 
     private double calcularPromedioDiasEstudio(List<Experiencia> experiencias) {
         return experiencias.stream()
-                .filter(e -> e.getDiasEstudio() != null)
+                .filter(e -> e.getDiasEstudio() != null && e.getExamen().getNota()>=4)
                 .mapToInt(Experiencia::getDiasEstudio)
                 .average()
                 .orElse(0.0);
@@ -116,7 +119,7 @@ public class EstadisticasService {
 
     private double calcularPromedioHorasDiarias(List<Experiencia> experiencias) {
         return experiencias.stream()
-                .filter(e -> e.getHorasDiarias() != null)
+                .filter(e -> e.getHorasDiarias() != null  && e.getExamen().getNota()>=4)
                 .mapToInt(Experiencia::getHorasDiarias)
                 .average()
                 .orElse(0.0);
@@ -140,6 +143,15 @@ public class EstadisticasService {
         } catch (JsonProcessingException e) {
             return "{}";
         }
+    }
+
+    private double calcularPromedioDificultad(List<Experiencia> experiencias) {
+       return experiencias.stream()
+                .filter(e -> e.getDificultad() != null)
+               .mapToInt(Experiencia::getDificultad)
+               .average()
+               .orElse(0.0);
+
     }
 
     private String calcularDistribucionRecursos(List<Experiencia> experiencias) {

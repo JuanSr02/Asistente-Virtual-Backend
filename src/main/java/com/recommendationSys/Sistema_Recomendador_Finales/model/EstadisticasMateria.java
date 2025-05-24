@@ -26,6 +26,8 @@ public class EstadisticasMateria {
     // Sobre estudio
     private Double promedioDiasEstudio;
     private Double promedioHorasDiarias;
+    private double promedioDificultad;
+
 
     // Distribuciones (guardadas como JSON)
     @Column(columnDefinition = "TEXT")

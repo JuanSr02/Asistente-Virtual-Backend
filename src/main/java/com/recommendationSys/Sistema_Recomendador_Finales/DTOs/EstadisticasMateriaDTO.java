@@ -16,6 +16,7 @@ public class EstadisticasMateriaDTO {
     private double promedioDiasEstudio;
     private double promedioHorasDiarias;
     private Map<Integer, Integer> distribucionDificultad;
+    private double promedioDificultad;
     private Map<String, Integer> distribucionModalidad;
     private Map<String, Integer> distribucionRecursos;
     private String ultimaActualizacion;

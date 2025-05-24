@@ -2,7 +2,6 @@ package com.recommendationSys.Sistema_Recomendador_Finales.services;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.EmailException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Estudiante;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -67,7 +66,7 @@ public class EmailService {
                             <li><strong>Materia:</strong> %s</li>
                             <li><strong>Turno:</strong> %s</li>
                             <li><strong>Año:</strong> %s</li>
-                            <li><strong>Nombre compañero:</strong> %s</li>
+                            <li><strong>Nombre:</strong> %s</li>
                             <li><strong>Mail:</strong> %s</li>
                         </ul>
                     </div>
@@ -77,23 +76,7 @@ public class EmailService {
                 </div>
             </body>
             </html>
-            """.formatted(materia, turno,anio,nombre,mail);
+            """.formatted(materia,turno,anio,nombre,mail);
     }
 
-    public void enviarCorreoDePrueba(String destinatario) {
-        try {
-            MimeMessage mensaje = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
-            helper.setTo(destinatario);
-            helper.setSubject("Correo de Prueba - Outlook SMTP");
-            helper.setText("Este es un correo de prueba enviado desde el Sistema Recomendador de Finales.", true);
-            helper.setFrom("TU_EMAIL@outlook.com");
-
-            mailSender.send(mensaje);
-            System.out.println("Correo de prueba enviado a: " + destinatario);
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            System.out.println("Error al enviar el correo de prueba: " + e.getMessage());
-        }
-    }
 }
