@@ -37,8 +37,6 @@ public class Experiencia {
     @Column(length = 100)
     private String motivacion;
 
-    @Column(length = 100)
-    private String condiciones;
 
     public Experiencia() {
     }

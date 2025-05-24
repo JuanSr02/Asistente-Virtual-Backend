@@ -46,7 +46,6 @@ public class ExperienciaService {
         experiencia.setModalidad(experienciaDTO.getModalidad());
         experiencia.setRecursos(experienciaDTO.getRecursos());
         experiencia.setMotivacion(experienciaDTO.getMotivacion());
-        experiencia.setCondiciones(experienciaDTO.getCondiciones());
 
         return experienciaRepository.save(experiencia);
     }
@@ -92,8 +91,7 @@ public class ExperienciaService {
                 dto.getIntentosPrevios(),
                 dto.getModalidad(),
                 dto.getRecursos(),
-                dto.getMotivacion(),
-                dto.getCondiciones()
+                dto.getMotivacion()
         ).allMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Debe proporcionar al menos un campo para actualizar");
         }
@@ -105,7 +103,6 @@ public class ExperienciaService {
         Optional.ofNullable(dto.getModalidad()).ifPresent(experiencia::setModalidad);
         Optional.ofNullable(dto.getRecursos()).ifPresent(experiencia::setRecursos);
         Optional.ofNullable(dto.getMotivacion()).ifPresent(experiencia::setMotivacion);
-        Optional.ofNullable(dto.getCondiciones()).ifPresent(experiencia::setCondiciones);
 
         return experienciaRepository.save(experiencia);
     }
