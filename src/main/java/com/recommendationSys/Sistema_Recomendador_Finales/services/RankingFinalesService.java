@@ -43,11 +43,11 @@ public class RankingFinalesService {
                     FinalDTO dto = new FinalDTO();
                     dto.setCodigoMateria(renglon.getMateria().getCodigo());
                     dto.setNombreMateria(renglon.getMateria().getNombre());
-                    dto.setFechaRegularidad(renglon.getFecha());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    dto.setFechaRegularidad(LocalDate.parse(renglon.getFecha(),formatter));
 
                     // Calcular vencimiento (2 años y 9 meses desde la fecha de regularidad)
-                    LocalDate fechaRegularidad = LocalDate.parse(renglon.getFecha(), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    dto.setFechaVencimiento(fechaRegularidad.plusYears(2).plusMonths(9));
+                    dto.setFechaVencimiento(dto.getFechaRegularidad().plusYears(2).plusMonths(9));
                     dto.setSemanasParaVencimiento(ChronoUnit.WEEKS.between(LocalDate.now(), dto.getFechaVencimiento()));
 
                     // Contar veces que es correlativa

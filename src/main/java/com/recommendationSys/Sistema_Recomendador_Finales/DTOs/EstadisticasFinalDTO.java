@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EstadisticasFinalDTO {
-    private double porcentajeAprobados;
-    private double promedioNotas;
-    private double promedioDiasEstudio;
-    private double promedioHorasDiarias;
-    private double promedioDificultad;
+    private Double porcentajeAprobados;
+    private Double promedioNotas;
+    private Double promedioDiasEstudio;
+    private Double promedioHorasDiarias;
+    private Double promedioDificultad;
 }

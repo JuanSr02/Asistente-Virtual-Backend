@@ -6,5 +6,5 @@ import lombok.Data;
 public class MateriaRankingDTO {
     private String codigoMateria;
     private String nombre;
-    private double porcentaje;
+    private Double porcentaje;
 }

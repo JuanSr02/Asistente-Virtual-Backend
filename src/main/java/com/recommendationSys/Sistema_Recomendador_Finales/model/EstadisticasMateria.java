@@ -42,5 +42,5 @@ public class EstadisticasMateria {
     // Otros campos estadísticos...
 
     @Column(name = "ultima_actualizacion")
-    private LocalDateTime ultimaActualizacion;
+    private LocalDateTime fechaUltimaActualizacion;
 }

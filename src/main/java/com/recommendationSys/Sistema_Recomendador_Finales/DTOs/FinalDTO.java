@@ -8,11 +8,15 @@ import java.time.LocalDate;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FinalDTO {
+
     private String codigoMateria;
     private String nombreMateria;
-    private String fechaRegularidad;
+
+    private LocalDate fechaRegularidad;
+
     private LocalDate fechaVencimiento;
     private long semanasParaVencimiento;
     private long vecesEsCorrelativa;
+
     private EstadisticasFinalDTO estadisticas;
 }

@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class EstadisticasService {
         stats.setDistribucionModalidad(calcularDistribucionModalidad(experiencias));
         stats.setDistribucionRecursos(calcularDistribucionRecursos(experiencias));
 
-        stats.setUltimaActualizacion(LocalDateTime.now());
+        stats.setFechaUltimaActualizacion(LocalDateTime.now());
 
         estadisticasRepo.save(stats);
 
@@ -270,9 +269,7 @@ public class EstadisticasService {
             System.out.println("Error deserializando distribuciones" + e);
         }
 
-        dto.setUltimaActualizacion(
-                stats.getUltimaActualizacion().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        );
+        dto.setFechaUltimaActualizacion(stats.getFechaUltimaActualizacion().toLocalDate());
 
         return dto;
     }

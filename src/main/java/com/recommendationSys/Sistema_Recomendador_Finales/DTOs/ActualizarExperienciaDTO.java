@@ -7,13 +7,16 @@ import lombok.Data;
 
 @Data
 public class ActualizarExperienciaDTO {
-    @Min(1) @Max(10)
+
+    @Min(1)
+    @Max(10)
     private Integer dificultad;
 
     @Min(0)
     private Integer diasEstudio;
 
-    @Min(0) @Max(24)
+    @Min(0)
+    @Max(24)
     private Integer horasDiarias;
 
     @Min(0)
