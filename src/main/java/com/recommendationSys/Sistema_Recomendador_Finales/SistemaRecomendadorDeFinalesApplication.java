@@ -5,9 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+/**
+ * Clase principal del sistema recomendador de finales.
+ * Inicia la aplicación Spring Boot.
+ */
 @SpringBootApplication
-@EntityScan(basePackages = {"com/recommendationSys/Sistema_Recomendador_Finales/model"})  // Escanear entidades en el paquete model
-@EnableJpaRepositories(basePackages = {"com/recommendationSys/Sistema_Recomendador_Finales/repository"})  // Escanear repositorios en el paquete repository
+@EntityScan(basePackages = "com.recommendationSys.Sistema_Recomendador_Finales.model")
+@EnableJpaRepositories(basePackages = "com.recommendationSys.Sistema_Recomendador_Finales.repository")
 public class SistemaRecomendadorDeFinalesApplication {
 
 	public static void main(String[] args) {

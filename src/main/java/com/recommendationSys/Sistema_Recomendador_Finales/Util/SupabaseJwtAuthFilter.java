@@ -1,4 +1,5 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.Util;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-// CAMBIAR ROLES CUANDO ESTE FRONTEND.
 @Configuration
 public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
 
@@ -23,8 +23,10 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
     private String jwtSecret;
 
     @Override
-    protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
-
+    protected void doFilterInternal(
+            jakarta.servlet.http.HttpServletRequest request,
+            jakarta.servlet.http.HttpServletResponse response,
+            jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
 
         String header = request.getHeader("Authorization");
 
@@ -41,7 +43,6 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
 
             String userId = jwt.getSubject();
             String role = jwt.getClaim("role").asString();
-            System.out.println(role);
 
             Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
@@ -54,8 +55,14 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid token");
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token inválido o expirado\"}");
         }
+    }
 
+    @Override
+    protected boolean shouldNotFilter(jakarta.servlet.http.HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/favicon.ico");
     }
 }
