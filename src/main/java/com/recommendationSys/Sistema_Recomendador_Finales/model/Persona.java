@@ -1,13 +1,19 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "Persona")
+@Table(name = "persona", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "mail"),
+        @UniqueConstraint(columnNames = "usuario")
+})
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Persona {
 
@@ -15,92 +21,36 @@ public class Persona {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Integer dni;
-
+    @NotBlank(message = "Nombre y apellido es obligatorio")
+    @Size(max = 50, message = "Nombre y apellido debe tener máximo 50 caracteres")
     @Column(name = "nombre_apellido", nullable = false, length = 50)
     private String nombreApellido;
 
-    @Column(nullable = false, length = 50)
+    @NotBlank(message = "Email es obligatorio")
+    @Email(message = "Email inválido")
+    @Size(max = 50, message = "Email debe tener máximo 50 caracteres")
+    @Column(nullable = false, unique = true, length = 50)
     private String mail;
 
+    @Size(max = 15, message = "Teléfono debe tener máximo 15 caracteres")
     @Column(length = 15)
     private String telefono;
 
+    @Size(max = 100, message = "Usuario debe tener máximo 100 caracteres")
     @Column(unique = true, length = 100)
     private String usuario;
 
+    @NotBlank(message = "Contraseña es obligatoria")
     @Column(nullable = false)
     private String contrasenia;
 
+    @NotNull(message = "Tipo es obligatorio")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
-    private String tipo;
+    private TipoPersona tipo;
 
-    public Persona() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getDni() {
-        return dni;
-    }
-
-    public void setDni(Integer dni) {
-        this.dni = dni;
-    }
-
-    public String getNombreApellido() {
-        return nombreApellido;
-    }
-
-    public void setNombreApellido(String nombreApellido) {
-        this.nombreApellido = nombreApellido;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
-    public String getContrasenia() {
-        return contrasenia;
-    }
-
-    public void setContrasenia(String contrasenia) {
-        this.contrasenia = contrasenia;
-    }
-
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
+    public enum TipoPersona {
+        ESTUDIANTE,
+        ADMINISTRADOR
     }
 }
-

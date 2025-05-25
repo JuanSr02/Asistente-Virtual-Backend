@@ -2,13 +2,14 @@ package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "Examen")
 public class Examen {
@@ -18,7 +19,7 @@ public class Examen {
     private Long id;
 
     @Column(nullable = false)
-    private String fecha;
+    private LocalDate fecha;
 
     private Double nota;
 
@@ -31,53 +32,9 @@ public class Examen {
     @JsonIgnore
     private Experiencia experiencia;
 
-    public Examen(String fecha, Double nota, Renglon renglon) {
+    public Examen(LocalDate fecha, Double nota, Renglon renglon) {
         this.fecha = fecha;
         this.nota = nota;
         this.renglon = renglon;
-    }
-
-    public Examen() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(String fecha) {
-        this.fecha = fecha;
-    }
-
-    public Double getNota() {
-        return nota;
-    }
-
-    public void setNota(Double nota) {
-        this.nota = nota;
-    }
-
-    public Renglon getRenglon() {
-        return renglon;
-    }
-
-    public void setRenglon(Renglon renglon) {
-        this.renglon = renglon;
-    }
-
-    public Experiencia getExperiencia() {
-        return experiencia;
-    }
-
-    public void setExperiencia(Experiencia experiencia) {
-        this.experiencia = experiencia;
     }
 }
-

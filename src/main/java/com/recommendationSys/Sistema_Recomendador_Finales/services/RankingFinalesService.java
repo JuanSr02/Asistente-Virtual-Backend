@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
@@ -43,8 +42,7 @@ public class RankingFinalesService {
                     FinalDTO dto = new FinalDTO();
                     dto.setCodigoMateria(renglon.getMateria().getCodigo());
                     dto.setNombreMateria(renglon.getMateria().getNombre());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    dto.setFechaRegularidad(LocalDate.parse(renglon.getFecha(),formatter));
+                    dto.setFechaRegularidad(renglon.getFecha());
 
                     // Calcular vencimiento (2 años y 9 meses desde la fecha de regularidad)
                     dto.setFechaVencimiento(dto.getFechaRegularidad().plusYears(2).plusMonths(9));

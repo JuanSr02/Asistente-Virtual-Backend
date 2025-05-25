@@ -1,73 +1,42 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "RegistroInscripcion")
+@Table(name = "registro_inscripcion")
 public class RegistroInscripcion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 50, message = "El turno no puede superar los 50 caracteres")
     @Column(length = 50)
     private String turno;
 
+    @NotNull(message = "El año es obligatorio")
+    @Min(value = 2012, message = "El año debe ser mayor o igual a 2012")
+    @Max(value = 2028, message = "El año no puede ser mayor o igual a 2028")
     @Column(nullable = false)
     private Integer anio;
 
+    @NotNull(message = "La materia es obligatoria")
     @ManyToOne
     @JoinColumn(name = "materia_codigo", nullable = false)
     private Materia materia;
 
+    @NotNull(message = "El estudiante es obligatorio")
     @ManyToOne
-    @JoinColumn(name = "Persona_id_estudiante", nullable = false)
+    @JoinColumn(name = "persona_id_estudiante", nullable = false)
     private Estudiante estudiante;
-
-    public RegistroInscripcion() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Estudiante getEstudiante() {
-        return estudiante;
-    }
-
-    public void setEstudiante(Estudiante estudiante) {
-        this.estudiante = estudiante;
-    }
-
-    public Materia getMateria() {
-        return materia;
-    }
-
-    public void setMateria(Materia materia) {
-        this.materia = materia;
-    }
-
-    public Integer getAnio() {
-        return anio;
-    }
-
-    public void setAnio(Integer anio) {
-        this.anio = anio;
-    }
-
-    public String getTurno() {
-        return turno;
-    }
-
-    public void setTurno(String turno) {
-        this.turno = turno;
-    }
 }
-
-

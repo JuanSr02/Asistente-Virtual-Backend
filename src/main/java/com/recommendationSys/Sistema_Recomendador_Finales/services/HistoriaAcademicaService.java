@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Transactional
@@ -70,7 +72,8 @@ public class HistoriaAcademicaService {
             Row row = sheet.getRow(i);
             String nombreMateria = row.getCell(0).getStringCellValue().trim();
             nombreMateria = nombreMateria.substring(0,nombreMateria.indexOf("(")).trim();
-            String fecha = row.getCell(1).getStringCellValue().trim();
+            String fechaStr = row.getCell(1).getStringCellValue().trim();
+            LocalDate fecha = LocalDate.parse(fechaStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             String tipo = row.getCell(2).getStringCellValue().trim();
             Double nota = null;
             if(!ExcelServicesUtil.checkCell(row.getCell(3)).trim().equalsIgnoreCase("")){

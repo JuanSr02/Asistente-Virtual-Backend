@@ -1,9 +1,12 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "Experiencia")
 public class Experiencia {
@@ -36,9 +39,4 @@ public class Experiencia {
 
     @Column(length = 100)
     private String motivacion;
-
-
-    public Experiencia() {
-    }
-
 }

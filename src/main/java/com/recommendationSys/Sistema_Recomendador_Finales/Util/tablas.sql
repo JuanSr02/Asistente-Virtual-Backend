@@ -1,7 +1,6 @@
 -- TABLA PERSONA
 CREATE TABLE Persona (
     id SERIAL PRIMARY KEY,
-    dni INT NOT NULL,
     nombre_apellido VARCHAR(50) NOT NULL,
     mail VARCHAR(50) NOT NULL UNIQUE,
     telefono VARCHAR(15),
@@ -13,7 +12,7 @@ CREATE TABLE Persona (
 
 -- TABLA ESTUDIANTE
 CREATE TABLE Estudiante (
-    nroRegistro INT NOT NULL,
+    nroRegistro INT UNIQUE,
     Persona_id INT PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
