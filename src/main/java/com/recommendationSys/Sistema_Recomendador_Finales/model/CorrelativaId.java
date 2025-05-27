@@ -9,6 +9,6 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class CorrelativaId implements Serializable {
     private String materia;
-    private String materiaCorrelativa;
+    private String correlativaCodigo;
     private String planDeEstudio;
 }

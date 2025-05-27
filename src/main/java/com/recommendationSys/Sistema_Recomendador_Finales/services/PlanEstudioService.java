@@ -158,7 +158,7 @@ public class PlanEstudioService {
                             Materia materiaCorrelativa = materiaRepo.findById(codigoTrimmed).get();
                             Correlativa correlativa = new Correlativa();
                             correlativa.setMateria(materia);
-                            correlativa.setMateriaCorrelativa(materiaCorrelativa);
+                            correlativa.setCorrelativaCodigo(materiaCorrelativa);
                             correlativa.setPlanDeEstudio(plan);
                             correlativaRepo.save(correlativa);
                         }

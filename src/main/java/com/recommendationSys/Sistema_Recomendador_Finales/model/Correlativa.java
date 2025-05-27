@@ -24,7 +24,7 @@ public class Correlativa {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "correlativa_codigo", nullable = false)
     @JsonIgnore
-    private Materia materiaCorrelativa;
+    private Materia correlativaCodigo;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)

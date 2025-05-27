@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CorrelativaRepository extends JpaRepository<Correlativa, CorrelativaId> {
 
-    @Query("SELECT COUNT(c) FROM Correlativa c WHERE c.correlativa.codigo = :codigoMateria")
+    @Query("SELECT COUNT(c) FROM Correlativa c WHERE c.correlativaCodigo.codigo = :codigoMateria")
     long countByCorrelativaCodigo(@Param("codigoMateria") String codigoMateria);
 }

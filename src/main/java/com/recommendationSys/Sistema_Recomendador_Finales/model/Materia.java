@@ -32,11 +32,6 @@ public class Materia {
     @ToString.Exclude
     private List<Correlativa> correlativas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "correlativa", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    @ToString.Exclude
-    private List<Correlativa> esCorrelativaDe = new ArrayList<>();
-
     @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL)
     @JsonIgnore
     @ToString.Exclude
