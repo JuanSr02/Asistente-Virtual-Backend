@@ -1,6 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
-import com.recommendationSys.Sistema_Recomendador_Finales.services.HistoriaAcademicaService;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.historiaAcademica.HistoriaAcademicaServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +14,9 @@ import java.util.Map;
 @RequestMapping("/api/public")
 public class HistoriaAcademicaController {
 
-    private final HistoriaAcademicaService historiaService;
+    private final HistoriaAcademicaServiceImpl historiaService;
 
-    public HistoriaAcademicaController(HistoriaAcademicaService historiaService) {
+    public HistoriaAcademicaController(HistoriaAcademicaServiceImpl historiaService) {
         this.historiaService = historiaService;
     }
 

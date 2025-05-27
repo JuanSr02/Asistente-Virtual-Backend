@@ -3,6 +3,7 @@ package com.recommendationSys.Sistema_Recomendador_Finales.services;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 /**
  * Utilidades para el procesamiento de archivos Excel.
@@ -85,4 +86,26 @@ public final class ExcelProcessingUtils {
             default -> "";
         };
     }
+
+    public static int obtenerUltimaFilaConDatos(Sheet sheet) {
+        int lastRow = 0;
+        for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+            if (!isEmptyRow(sheet.getRow(i))) {
+                lastRow = i;
+            }
+        }
+        return lastRow;
+    }
+
+    public static Double extraerNota(Cell cell) {
+        if (cell == null || cell.getCellType() == CellType.BLANK) {
+            return null;
+        }
+        try {
+            return Double.parseDouble(extractCellValue(cell).trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
 }

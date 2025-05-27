@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "plan_de_estudio")
+@Builder
 public class PlanDeEstudio {
 
     @Id

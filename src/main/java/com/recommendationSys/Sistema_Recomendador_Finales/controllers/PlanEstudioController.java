@@ -2,14 +2,12 @@ package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
 
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.PlanEstudioException;
-import com.recommendationSys.Sistema_Recomendador_Finales.services.PlanEstudioService;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio.PlanEstudioServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -18,17 +16,17 @@ import java.util.Map;
 @RequestMapping("/api/public")
 public class PlanEstudioController {
 
-    private final PlanEstudioService planEstudioService;
+    private final PlanEstudioServiceImpl planEstudioServiceImpl;
 
-    public PlanEstudioController(PlanEstudioService planEstudioService) {
-        this.planEstudioService = planEstudioService;
+    public PlanEstudioController(PlanEstudioServiceImpl planEstudioServiceImpl) {
+        this.planEstudioServiceImpl = planEstudioServiceImpl;
     }
 
 
     @PostMapping("/cargar-plan")
     public ResponseEntity<?> cargarPlanDesdeExcel(@RequestParam("file") MultipartFile file) {
         try {
-            planEstudioService.procesarArchivoExcel(file);
+            planEstudioServiceImpl.procesarArchivoExcel(file);
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "message", "Plan de estudios cargado exitosamente",
@@ -56,7 +54,7 @@ public class PlanEstudioController {
             @RequestParam("codigo") String codigoPlan) {
 
         try {
-            planEstudioService.eliminarPlanDeEstudio(codigoPlan);
+            planEstudioServiceImpl.eliminarPlanDeEstudio(codigoPlan);
             return ResponseEntity.ok(Map.of(
                     "status", "success",
                     "message", "Plan eliminado correctamente",
