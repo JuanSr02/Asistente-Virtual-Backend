@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.DTOs;
 
+import lombok.Builder;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -8,6 +9,7 @@ import java.util.Map;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class EstadisticasGeneralesDTO {
     private Integer totalMaterias;
     private Integer totalExamenesRendidos;

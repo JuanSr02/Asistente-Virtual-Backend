@@ -1,5 +1,4 @@
-package com.recommendationSys.Sistema_Recomendador_Finales.services;
-
+package com.recommendationSys.Sistema_Recomendador_Finales.services.experiencia;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaDTO;
@@ -11,51 +10,47 @@ import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExamenRepos
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExperienciaRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ExperienciaService {
+@Slf4j
+public class ExperienciaServiceImpl implements ExperienciaCRUDService, ExperienciaQueryService {
 
     private final ExperienciaRepository experienciaRepository;
     private final ExamenRepository examenRepository;
     private final MateriaRepository materiaRepository;
+    private final ExperienciaMapper experienciaMapper;
+    private final ExperienciaValidator experienciaValidator;
 
-    // Create
+    @Override
     public Experiencia crearExperiencia(ExperienciaDTO experienciaDTO) {
+        experienciaValidator.validarCreacionExperiencia(experienciaDTO);
+
         Examen examen = examenRepository.findById(experienciaDTO.getExamenId())
                 .orElseThrow(() -> new ResourceNotFoundException("Examen no encontrado"));
 
-        if (experienciaRepository.existsByExamen(examen)) {
-            throw new IllegalStateException("Ya existe una experiencia para este examen");
-        }
-
-        Experiencia experiencia = new Experiencia();
-        experiencia.setExamen(examen);
-        experiencia.setDificultad(experienciaDTO.getDificultad());
-        experiencia.setDiasEstudio(experienciaDTO.getDiasEstudio());
-        experiencia.setHorasDiarias(experienciaDTO.getHorasDiarias());
-        experiencia.setIntentosPrevios(experienciaDTO.getIntentosPrevios());
-        experiencia.setModalidad(experienciaDTO.getModalidad());
-        experiencia.setRecursos(experienciaDTO.getRecursos());
-        experiencia.setMotivacion(experienciaDTO.getMotivacion());
-
+        Experiencia experiencia = experienciaMapper.toEntity(experienciaDTO, examen);
         return experienciaRepository.save(experiencia);
     }
 
-    // Read (Single)
+    @Override
     public Experiencia obtenerExperienciaPorId(Long id) {
         return experienciaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
     }
 
+    @Override
+    public List<Experiencia> obtenerTodasLasExperiencias() {
+        return experienciaRepository.findAll();
+    }
+
+    @Override
     public List<Experiencia> obtenerExperienciasPorMateria(String codigoMateria) {
         Materia materia = materiaRepository.findById(codigoMateria)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
@@ -63,13 +58,7 @@ public class ExperienciaService {
         return experienciaRepository.findByMateriaWithJoins(materia);
     }
 
-
-    // Read (All)
-    public List<Experiencia> obtenerTodasLasExperiencias() {
-        return experienciaRepository.findAll();
-    }
-
-    // Read by Examen
+    @Override
     public Experiencia obtenerExperienciaPorExamen(Long examenId) {
         Examen examen = examenRepository.findById(examenId)
                 .orElseThrow(() -> new ResourceNotFoundException("Examen no encontrado"));
@@ -78,45 +67,26 @@ public class ExperienciaService {
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró experiencia para este examen"));
     }
 
-    // Update
+    @Override
     public Experiencia actualizarExperiencia(Long id, ActualizarExperienciaDTO dto) {
-        Experiencia experiencia = experienciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
+        experienciaValidator.validarActualizacionExperiencia(dto);
 
-        // Validar que al menos un campo viene en el DTO
-        if (Stream.of(
-                dto.getDificultad(),
-                dto.getDiasEstudio(),
-                dto.getHorasDiarias(),
-                dto.getIntentosPrevios(),
-                dto.getModalidad(),
-                dto.getRecursos(),
-                dto.getMotivacion()
-        ).allMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("Debe proporcionar al menos un campo para actualizar");
-        }
-
-        Optional.ofNullable(dto.getDificultad()).ifPresent(experiencia::setDificultad);
-        Optional.ofNullable(dto.getDiasEstudio()).ifPresent(experiencia::setDiasEstudio);
-        Optional.ofNullable(dto.getHorasDiarias()).ifPresent(experiencia::setHorasDiarias);
-        Optional.ofNullable(dto.getIntentosPrevios()).ifPresent(experiencia::setIntentosPrevios);
-        Optional.ofNullable(dto.getModalidad()).ifPresent(experiencia::setModalidad);
-        Optional.ofNullable(dto.getRecursos()).ifPresent(experiencia::setRecursos);
-        Optional.ofNullable(dto.getMotivacion()).ifPresent(experiencia::setMotivacion);
+        Experiencia experiencia = obtenerExperienciaPorId(id);
+        experienciaMapper.updateFromDto(dto, experiencia);
 
         return experienciaRepository.save(experiencia);
     }
-    // Delete
-    @Transactional
-    public void eliminarExperiencia(Long id) {
-        Experiencia experiencia = experienciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
 
-        // Romper la relación bidireccional si existe
+    @Override
+    public void eliminarExperiencia(Long id) {
+        Experiencia experiencia = obtenerExperienciaPorId(id);
+        desvincularExamen(experiencia);
+        experienciaRepository.delete(experiencia);
+    }
+
+    private void desvincularExamen(Experiencia experiencia) {
         if (experiencia.getExamen() != null && experiencia.getExamen().getExperiencia() != null) {
             experiencia.getExamen().setExperiencia(null);
         }
-
-        experienciaRepository.delete(experiencia);
     }
 }

@@ -3,7 +3,7 @@ package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasGeneralesDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasMateriaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.EstadisticasMateria;
-import com.recommendationSys.Sistema_Recomendador_Finales.services.EstadisticasService;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.estadisticas.EstadisticasServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,19 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class EstadisticasController {
 
-    private final EstadisticasService estadisticasService;
+    private final EstadisticasServiceImpl estadisticasServiceImpl;
 
     @GetMapping("/materia/{codigoMateria}")
     public ResponseEntity<EstadisticasMateriaDTO> getEstadisticasMateria(
             @PathVariable String codigoMateria) {
 
-        EstadisticasMateria stats = estadisticasService.calcularEstadisticasPorMateria(codigoMateria);
-        return ResponseEntity.ok(estadisticasService.convertToDTO(stats));
+        EstadisticasMateria stats = estadisticasServiceImpl.calcularEstadisticasPorMateria(codigoMateria);
+        return ResponseEntity.ok(estadisticasServiceImpl.convertToDTO(stats));
     }
 
     @GetMapping("/generales")
     public ResponseEntity<EstadisticasGeneralesDTO> getEstadisticasGenerales() {
-        return ResponseEntity.ok(estadisticasService.obtenerEstadisticasGenerales());
+        return ResponseEntity.ok(estadisticasServiceImpl.calcularEstadisticasGenerales());
     }
 
 

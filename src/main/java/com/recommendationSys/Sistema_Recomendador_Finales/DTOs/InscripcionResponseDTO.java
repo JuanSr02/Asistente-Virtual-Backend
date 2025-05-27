@@ -1,8 +1,10 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.DTOs;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class InscripcionResponseDTO {
     private Long id;
     private String turno;

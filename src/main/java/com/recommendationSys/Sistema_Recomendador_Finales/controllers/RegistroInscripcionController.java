@@ -2,7 +2,8 @@ package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.InscripcionResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.RegistroInscripcionDTO;
-import com.recommendationSys.Sistema_Recomendador_Finales.services.RegistroInscripcionService;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.RegistroInscripcion;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.inscripciones.RegistroInscripcionServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,9 @@ import java.util.List;
 @RequestMapping("/api/public/inscripciones")
 public class RegistroInscripcionController {
 
-    private final RegistroInscripcionService inscripcionService;
+    private final RegistroInscripcionServiceImpl inscripcionService;
 
-    public RegistroInscripcionController(RegistroInscripcionService inscripcionService) {
+    public RegistroInscripcionController(RegistroInscripcionServiceImpl inscripcionService) {
         this.inscripcionService = inscripcionService;
     }
 
@@ -46,8 +47,8 @@ public class RegistroInscripcionController {
     }
 
     @PostMapping("/avisar")
-    public ResponseEntity<Void> avisarRinde(@Valid @RequestBody RegistroInscripcionDTO dto){
-        inscripcionService.AvisarCompaneros(dto);
+    public ResponseEntity<Void> avisarRinde(@Valid @RequestBody RegistroInscripcion dto){
+        inscripcionService.notificarCompaneros(dto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

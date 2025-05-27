@@ -63,7 +63,7 @@ public class HistoriaAcademicaService {
 
         int lastRowWithData = 0;
         for (int i = 0; i <= sheet.getLastRowNum(); i++) {
-            if (sheet.getRow(i) != null && !ExcelServicesUtil.isEmptyRow(sheet.getRow(i))) {
+            if (sheet.getRow(i) != null && !ExcelProcessingUtils.isEmptyRow(sheet.getRow(i))) {
                 lastRowWithData = i;
             }
         }
@@ -76,7 +76,7 @@ public class HistoriaAcademicaService {
             LocalDate fecha = LocalDate.parse(fechaStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
             String tipo = row.getCell(2).getStringCellValue().trim();
             Double nota = null;
-            if(!ExcelServicesUtil.checkCell(row.getCell(3)).trim().equalsIgnoreCase("")){
+            if(!ExcelProcessingUtils.extractCellValue(row.getCell(3)).trim().equalsIgnoreCase("")){
                 nota = Double.parseDouble(row.getCell(3).getStringCellValue().trim());}
             String resultado = row.getCell(4).getStringCellValue().trim();
 

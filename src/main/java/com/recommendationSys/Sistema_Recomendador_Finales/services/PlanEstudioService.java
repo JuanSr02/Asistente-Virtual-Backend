@@ -111,7 +111,7 @@ public class PlanEstudioService {
 
         int lastRowWithData = 0;
         for (int i = 0; i <= sheet.getLastRowNum(); i++) {
-            if (sheet.getRow(i) != null && !ExcelServicesUtil.isEmptyRow(sheet.getRow(i))) {
+            if (sheet.getRow(i) != null && !ExcelProcessingUtils.isEmptyRow(sheet.getRow(i))) {
                 lastRowWithData = i;
             }
         }
@@ -129,7 +129,7 @@ public class PlanEstudioService {
                 );
             }
 
-            String codigoMateria = ExcelServicesUtil.checkCell(row.getCell(1));
+            String codigoMateria = ExcelProcessingUtils.extractCellValue(row.getCell(1));
             if (codigoMateria == null || codigoMateria.trim().isEmpty()) {
                 throw new PlanEstudioException(
                         String.format("Fila %d: El código de la materia no puede estar vacío", i+1),
@@ -148,7 +148,7 @@ public class PlanEstudioService {
 
             // Procesar correlativas
             Cell cell = row.getCell(5);
-            String correlativasStr = ExcelServicesUtil.checkCell(cell);
+            String correlativasStr = ExcelProcessingUtils.extractCellValue(cell);
             if (!"No tiene".equalsIgnoreCase(correlativasStr)) {
                 String[] codigosCorrelativas = correlativasStr.split("-");
                 for (String codigoCorrelativa : codigosCorrelativas) {
