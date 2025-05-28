@@ -11,6 +11,7 @@ import com.recommendationSys.Sistema_Recomendador_Finales.repository.Experiencia
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +23,11 @@ import java.util.List;
 @Slf4j
 public class ExperienciaServiceImpl implements ExperienciaCRUDService, ExperienciaQueryService {
 
+    @Autowired
     private final ExperienciaRepository experienciaRepository;
+    @Autowired
     private final ExamenRepository examenRepository;
+    @Autowired
     private final MateriaRepository materiaRepository;
     private final ExperienciaMapper experienciaMapper;
     private final ExperienciaValidator experienciaValidator;
@@ -52,7 +56,7 @@ public class ExperienciaServiceImpl implements ExperienciaCRUDService, Experienc
 
     @Override
     public List<Experiencia> obtenerExperienciasPorMateria(String codigoMateria) {
-        Materia materia = materiaRepository.findById(codigoMateria)
+        Materia materia = materiaRepository.findByCodigo(codigoMateria)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
         return experienciaRepository.findByMateriaWithJoins(materia);

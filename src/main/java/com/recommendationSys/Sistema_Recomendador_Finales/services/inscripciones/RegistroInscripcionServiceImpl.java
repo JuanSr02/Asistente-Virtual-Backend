@@ -33,7 +33,7 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
     public InscripcionResponseDTO crearInscripcion(RegistroInscripcionDTO dto) {
         inscripcionValidator.validarInscripcion(dto);
 
-        Materia materia = materiaRepo.findById(dto.getMateriaCodigo())
+        Materia materia = materiaRepo.findByCodigo(dto.getMateriaCodigo())
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
         Estudiante estudiante = estudianteRepo.findById(dto.getEstudianteId())
@@ -56,7 +56,7 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
 
     @Override
     public List<InscripcionResponseDTO> obtenerInscriptos(String materiaCodigo, Integer anio, String turno) {
-        Materia materia = materiaRepo.findById(materiaCodigo)
+        Materia materia = materiaRepo.findByCodigo(materiaCodigo)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
         List<RegistroInscripcion> inscriptos = inscripcionRepo.findByMateriaAndAnioAndTurno(materia, anio, turno);

@@ -31,16 +31,17 @@ CREATE TABLE Administrador (
 -- TABLA PLAN DE ESTUDIO
 CREATE TABLE PlanDeEstudio (
     codigo VARCHAR(9) PRIMARY KEY,
-    propuesta VARCHAR(30) NOT NULL,
+    propuesta VARCHAR(150) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- TABLA MATERIA
 CREATE TABLE Materia (
-    codigo VARCHAR(15) PRIMARY KEY,
+    codigo VARCHAR(15) NOT NULL,
     nombre VARCHAR(200) NOT NULL,
     PlanDeEstudio_codigo VARCHAR(9),
+    PRIMARY KEY(codigo,PlanDeEstudio_codigo),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (PlanDeEstudio_codigo) REFERENCES PlanDeEstudio(codigo) ON DELETE CASCADE ON UPDATE CASCADE

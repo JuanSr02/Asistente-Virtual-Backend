@@ -17,7 +17,7 @@ public class InscripcionValidator {
 
     public void validarInscripcion(RegistroInscripcionDTO dto) {
         if (inscripcionRepo.existsByMateriaAndEstudianteAndAnio(
-                materiaRepository.findById(dto.getMateriaCodigo()).orElseThrow(),
+                materiaRepository.findByCodigo(dto.getMateriaCodigo()).orElseThrow(),
                 estudianteRepository.findById(dto.getEstudianteId()).orElseThrow(),
                 dto.getAnio())) {
             throw new IntegrityException(

@@ -29,12 +29,11 @@ public class CorrelativaProcessor {
     }
 
     private void procesarCorrelativa(String codigoCorrelativa, Materia materia, PlanDeEstudio plan) {
-        materiaRepo.findById(codigoCorrelativa)
+        materiaRepo.findByCodigoAndPlanDeEstudio(codigoCorrelativa,plan)
                 .ifPresent(correlativa -> {
                     Correlativa nuevaCorrelativa = Correlativa.builder()
                             .materia(materia)
                             .correlativaCodigo(correlativa)
-                            .planDeEstudio(plan)
                             .build();
                     correlativaRepo.save(nuevaCorrelativa);
                 });

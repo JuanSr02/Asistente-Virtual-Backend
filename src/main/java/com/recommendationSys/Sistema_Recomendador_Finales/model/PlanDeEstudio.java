@@ -19,7 +19,7 @@ public class PlanDeEstudio {
     @Column(length = 9)
     private String codigo;
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 150)
     private String propuesta;
 
     @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

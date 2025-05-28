@@ -13,6 +13,7 @@ import java.util.List;
 @Entity
 @Table(name = "materia")
 @Builder
+@IdClass(MateriaId.class)
 public class Materia {
 
     @Id
@@ -25,7 +26,7 @@ public class Materia {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PlanDeEstudio_codigo", nullable = false)
     @ToString.Exclude
-    @JsonIgnore
+    @Id
     private PlanDeEstudio planDeEstudio;
 
     @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -33,12 +34,15 @@ public class Materia {
     @ToString.Exclude
     private List<Correlativa> correlativas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "correlativaCodigo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Correlativa> correlativasQueLaReferencian = new ArrayList<>();
+
+    @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
     private List<Renglon> renglones = new ArrayList<>();
 
-    @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
     private List<RegistroInscripcion> inscripciones = new ArrayList<>();

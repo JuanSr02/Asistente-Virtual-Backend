@@ -1,6 +1,5 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,12 +30,14 @@ public class Renglon {
 
     @ManyToOne
     @JoinColumn(name = "historia_id", nullable = false)
-    @JsonIgnore
     @ToString.Exclude
     private HistoriaAcademica historiaAcademica;
 
     @ManyToOne
-    @JoinColumn(name = "materia_codigo", nullable = false)
+    @JoinColumns({
+            @JoinColumn(name = "materia_codigo", referencedColumnName = "codigo",nullable = false),
+            @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo",nullable = false)
+    })
     private Materia materia;
 
     @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -48,14 +49,5 @@ public class Renglon {
         if (fecha != null && fecha.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("La fecha no puede ser posterior a la actual");
         }
-    }
-
-    public Renglon(LocalDate fecha, String tipo, Double nota, String resultado, HistoriaAcademica historiaAcademica, Materia materia) {
-        this.fecha = fecha;
-        this.tipo = tipo;
-        this.nota = nota;
-        this.resultado = resultado;
-        this.historiaAcademica = historiaAcademica;
-        this.materia = materia;
     }
 }

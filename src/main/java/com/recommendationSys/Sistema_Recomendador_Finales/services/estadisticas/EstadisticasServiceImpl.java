@@ -42,7 +42,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
 
     @Override
     public EstadisticasMateriaDTO obtenerEstadisticasMateria(String codigoMateria) {
-        Materia materia = materiaRepo.findById(codigoMateria)
+        Materia materia = materiaRepo.findByCodigo(codigoMateria)
                 .orElseThrow(() -> new ResourceNotFoundException("La materia de la que se quiere obtener estadisticas no existe."));
         return convertToDTO(calcularEstadisticas(materia));
     }

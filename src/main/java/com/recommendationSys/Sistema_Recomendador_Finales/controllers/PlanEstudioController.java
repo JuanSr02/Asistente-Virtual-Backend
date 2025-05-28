@@ -39,7 +39,7 @@ public class PlanEstudioController {
      * @param codigoPlan Código único del plan de estudio (no puede estar vacío)
      * @return Respuesta con el resultado de la operación
      */
-    @DeleteMapping("/{codigoPlan}")
+    @DeleteMapping
     public ResponseEntity<?> eliminarPlanDeEstudio(
             @RequestParam("codigo") @NotBlank String codigoPlan) {
 

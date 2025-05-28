@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @NoArgsConstructor
 @EqualsAndHashCode
-public class CorrelativaId implements Serializable {
-    private Materia materia;
-    private Materia correlativaCodigo;
+public class MateriaId implements Serializable {
+    private String codigo;
+    private PlanDeEstudio planDeEstudio;
 }

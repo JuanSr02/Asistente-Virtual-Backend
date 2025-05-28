@@ -34,7 +34,10 @@ public class RegistroInscripcion {
 
     @NotNull(message = "La materia es obligatoria")
     @ManyToOne
-    @JoinColumn(name = "materia_codigo", nullable = false)
+    @JoinColumns({
+            @JoinColumn(name = "materia_codigo", referencedColumnName = "codigo",nullable = false),
+            @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo",nullable = false)
+    })
     private Materia materia;
 
     @NotNull(message = "El estudiante es obligatorio")

@@ -25,7 +25,6 @@ public class HistoriaAcademica {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_de_estudio_codigo", nullable = false)
-    @JsonIgnore
     @ToString.Exclude
     private PlanDeEstudio planDeEstudio;
 
