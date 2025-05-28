@@ -1,63 +1,54 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
-import com.recommendationSys.Sistema_Recomendador_Finales.services.historiaAcademica.HistoriaAcademicaServiceImpl;
-import org.springframework.http.HttpStatus;
+import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.historiaAcademica.HistoriaAcademicaService;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Map;
 
+@Slf4j
+@Validated
 @RestController
-@RequestMapping("/api/public")
+@RequiredArgsConstructor
+@RequestMapping("/api/public/historia-academica/{estudianteId}")
 public class HistoriaAcademicaController {
 
-    private final HistoriaAcademicaServiceImpl historiaService;
+    private final HistoriaAcademicaService historiaAcademicaService;
 
-    public HistoriaAcademicaController(HistoriaAcademicaServiceImpl historiaService) {
-        this.historiaService = historiaService;
-    }
-
-    @PostMapping("/cargar-historia")
+    /**
+     * Carga la historia académica desde un archivo Excel
+     * @param file Archivo Excel con los datos
+     * @param estudianteId id del estudiante (no puede ser nulo)
+     * @return Respuesta con el resultado de la operación
+     * @throws ResourceNotFoundException si no encuentra el estudiante
+     * @throws IOException si hay error cargando el excel
+     */
+    @PostMapping("/carga")
     public ResponseEntity<?> cargarHistoriaDesdeExcel(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("estudianteId") Long estudianteId) {
-
-        try {
-            historiaService.cargarHistoriaAcademica(file, estudianteId);
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Historia académica cargada correctamente",
-                    "timestamp", LocalDateTime.now()
-            ));
-        } catch (RuntimeException | IOException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                    "success", false,
-                    "error", e.getMessage(),
-                    "timestamp", LocalDateTime.now()
-            ));
-        }
+            @RequestParam("file") @NotNull MultipartFile file,
+            @PathVariable @NotNull Long estudianteId) throws IOException {
+        log.info("Iniciando carga de historia académica para estudiante ID: {}", estudianteId);
+        historiaAcademicaService.cargarHistoriaAcademica(file, estudianteId);
+        return ResponseEntity.ok("Historia académica cargada correctamente");
     }
-
-    @DeleteMapping("/eliminar-historia")
-    public ResponseEntity<?> eliminarHistoriaPorEstudiante(@RequestParam("estudianteId") Long estudianteId) {
-        try {
-            historiaService.eliminarHistoriaAcademica(estudianteId);
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Historia académica eliminada correctamente",
-                    "timestamp", LocalDateTime.now()
-            ));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                    "success", false,
-                    "error", e.getMessage(),
-                    "timestamp", LocalDateTime.now()
-            ));
-        }
+    /**
+     * Elimina la historia académica de un estudiante
+     * @param estudianteId id del estudiante (no puede ser nulo)
+     * @return Respuesta con el resultado de la operación
+     * @throws ResourceNotFoundException si no se encuentra la historiaAcademica
+     */
+    @DeleteMapping
+    public ResponseEntity<?> eliminarHistoriaAcademica(
+            @PathVariable @NotNull Long estudianteId) {
+        log.info("Eliminando historia académica para estudiante ID: {}", estudianteId);
+        historiaAcademicaService.eliminarHistoriaAcademica(estudianteId);
+        return ResponseEntity.ok("Historia académica eliminada correctamente");
     }
 
 }
-

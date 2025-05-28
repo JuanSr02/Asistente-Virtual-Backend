@@ -1,8 +1,7 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.estadisticas;
 
-import com.recommendationSys.Sistema_Recomendador_Finales.model.EstadisticasMateria;
-import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasMateriaDTO;
 
 public interface EstadisticasCalculator {
-    EstadisticasMateria calcularEstadisticas(Materia materia);
+    public EstadisticasMateriaDTO obtenerEstadisticasMateria(String materia);
 }

@@ -1,80 +1,50 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
-
-import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.PlanEstudioException;
-import com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio.PlanEstudioServiceImpl;
-import org.springframework.http.HttpStatus;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio.PlanEstudioService;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Map;
+import java.io.IOException;
 
+@Slf4j
+@Validated
 @RestController
-@RequestMapping("/api/public")
+@RequiredArgsConstructor
+@RequestMapping("/api/public/planes-estudio")
 public class PlanEstudioController {
 
-    private final PlanEstudioServiceImpl planEstudioServiceImpl;
+    private final PlanEstudioService planEstudioService;
 
-    public PlanEstudioController(PlanEstudioServiceImpl planEstudioServiceImpl) {
-        this.planEstudioServiceImpl = planEstudioServiceImpl;
+    /**
+     * Carga un plan de estudio desde un archivo Excel
+     * @param file Archivo Excel con los datos del plan de estudio
+     * @return Respuesta con el resultado de la operación
+     */
+    @PostMapping("/carga")
+    public ResponseEntity<?> cargarPlanDesdeExcel(
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+        log.info("Iniciando carga de plan de estudio desde archivo: {}", file.getOriginalFilename());
+        planEstudioService.procesarArchivoExcel(file);
+        return ResponseEntity.ok("Plan de estudio cargado correctamente");
     }
 
+    /**
+     * Elimina un plan de estudio
+     * @param codigoPlan Código único del plan de estudio (no puede estar vacío)
+     * @return Respuesta con el resultado de la operación
+     */
+    @DeleteMapping("/{codigoPlan}")
+    public ResponseEntity<?> eliminarPlanDeEstudio(
+            @RequestParam("codigo") @NotBlank String codigoPlan) {
 
-    @PostMapping("/cargar-plan")
-    public ResponseEntity<?> cargarPlanDesdeExcel(@RequestParam("file") MultipartFile file) {
-        try {
-            planEstudioServiceImpl.procesarArchivoExcel(file);
-            return ResponseEntity.ok(Map.of(
-                    "success", true,
-                    "message", "Plan de estudios cargado exitosamente",
-                    "timestamp", LocalDateTime.now()
-            ));
-        } catch (PlanEstudioException e) {
-            return ResponseEntity.status(e.getStatus()).body(Map.of(
-                    "success", false,
-                    "error", e.getMessage(),
-                    "status", e.getStatus().value(),
-                    "timestamp", LocalDateTime.now()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "success", false,
-                    "error", "Error interno del servidor: " + e.getMessage(),
-                    "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    "timestamp", LocalDateTime.now()
-            ));
-        }
+        log.info("Eliminando plan de estudio con código: {}", codigoPlan);
+        planEstudioService.eliminarPlanDeEstudio(codigoPlan);
+        return ResponseEntity.ok("Plan de estudio eliminado correctamente");
     }
-
-    @DeleteMapping
-    public ResponseEntity<Map<String, Object>> eliminarPlanDeEstudio(
-            @RequestParam("codigo") String codigoPlan) {
-
-        try {
-            planEstudioServiceImpl.eliminarPlanDeEstudio(codigoPlan);
-            return ResponseEntity.ok(Map.of(
-                    "status", "success",
-                    "message", "Plan eliminado correctamente",
-                    "codigo", codigoPlan,
-                    "timestamp", Instant.now()
-            ));
-        } catch (PlanEstudioException e) {
-            return ResponseEntity.status(e.getStatus())
-                    .body(errorResponse(e.getMessage(), e.getStatus(), codigoPlan));
-        }
-    }
-
-    private Map<String, Object> errorResponse(String message, HttpStatus status, String codigo) {
-        return Map.of(
-                "status", "error",
-                "message", message,
-                "codigo", codigo,
-                "httpStatus", status.value(),
-                "timestamp", Instant.now()
-        );
-    }
-
 }

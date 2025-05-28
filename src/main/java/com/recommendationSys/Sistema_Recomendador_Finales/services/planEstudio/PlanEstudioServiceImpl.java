@@ -1,11 +1,11 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio;
 
-import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.PlanEstudioException;
+import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.IntegrityException;
+import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.PlanDeEstudioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,16 +30,14 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
     @Override
     public void eliminarPlanDeEstudio(String codigoPlan) {
         PlanDeEstudio plan = planRepo.findById(codigoPlan)
-                .orElseThrow(() -> new PlanEstudioException(
-                        String.format("El plan con código '%s' no existe", codigoPlan),
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("El plan con código '%s' no existe", codigoPlan)));
 
         try {
             planRepo.delete(plan);
         } catch (DataIntegrityViolationException e) {
-            throw new PlanEstudioException(
-                    "No se puede eliminar el plan porque tiene referencias activas",
-                    HttpStatus.CONFLICT);
+            throw new IntegrityException(
+                    "No se puede eliminar el plan porque tiene referencias activas");
         }
     }
 }

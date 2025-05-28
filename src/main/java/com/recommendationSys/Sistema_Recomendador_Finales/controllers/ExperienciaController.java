@@ -2,69 +2,119 @@ package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaDTO;
+import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
-import com.recommendationSys.Sistema_Recomendador_Finales.services.experiencia.ExperienciaServiceImpl;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.experiencia.ExperienciaCRUDService;
+import com.recommendationSys.Sistema_Recomendador_Finales.services.experiencia.ExperienciaQueryService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
+@Validated
 @RestController
-@RequestMapping("/api/public/exp")
+@RequiredArgsConstructor
+@RequestMapping("/api/public/experiencias")
 public class ExperienciaController {
 
-    private final ExperienciaServiceImpl experienciaServiceImpl;
+    private final ExperienciaCRUDService experienciaService;
+    private final ExperienciaQueryService experienciaQueryService;
 
-    public ExperienciaController(ExperienciaServiceImpl experienciaServiceImpl) {
-        this.experienciaServiceImpl = experienciaServiceImpl;
-    }
-
+    /**
+     * Crea una nueva experiencia de estudio
+     * @param experienciaDTO Datos de la experiencia a crear
+     * @return ResponseEntity con el ID de la experiencia creada
+     */
     @PostMapping
     public ResponseEntity<Long> crearExperiencia(@Valid @RequestBody ExperienciaDTO experienciaDTO) {
-        Experiencia nuevaExperiencia = experienciaServiceImpl.crearExperiencia(experienciaDTO);
+        log.info("Creando nueva experiencia para examen: {}", experienciaDTO.getExamenId());
+        Experiencia nuevaExperiencia = experienciaService.crearExperiencia(experienciaDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaExperiencia.getId());
     }
 
+    /**
+     * Obtiene una experiencia por su ID
+     * @param id de la experiencia (no puede ser nulo)
+     * @return ResponseEntity con la experiencia encontrada
+     * @throws ResourceNotFoundException si no se encuentra la experiencia
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<Experiencia> obtenerExperiencia(@PathVariable Long id) {
-        return ResponseEntity.ok(experienciaServiceImpl.obtenerExperienciaPorId(id));
+    public ResponseEntity<Experiencia> obtenerExperiencia(
+            @PathVariable @NotNull(message = "El ID no puede ser nulo") Long id) {
+        log.info("Obteniendo experiencia con ID: {}", id);
+        return ResponseEntity.ok(experienciaService.obtenerExperienciaPorId(id));
     }
 
+    /**
+     * Obtiene la experiencia asociada a un examen
+     * @param examenId ID del examen (no puede ser nulo)
+     * @return ResponseEntity con la experiencia encontrada
+     * @throws ResourceNotFoundException si no se encuentra la experiencia
+     */
     @GetMapping("/por-examen/{examenId}")
-    public ResponseEntity<Experiencia> obtenerExperienciaPorExamen(@PathVariable Long examenId) {
-        return ResponseEntity.ok(experienciaServiceImpl.obtenerExperienciaPorExamen(examenId));
+    public ResponseEntity<Experiencia> obtenerExperienciaPorExamen(
+            @PathVariable @NotNull(message = "El ID de examen no puede ser nulo") Long examenId) {
+        log.info("Obteniendo experiencia para examen ID: {}", examenId);
+        return ResponseEntity.ok(experienciaQueryService.obtenerExperienciaPorExamen(examenId));
     }
 
+    /**
+     * Obtiene todas las experiencias registradas
+     * @return ResponseEntity con la lista de experiencias
+     */
     @GetMapping
     public ResponseEntity<List<Experiencia>> obtenerTodasLasExperiencias() {
-        return ResponseEntity.ok(experienciaServiceImpl.obtenerTodasLasExperiencias());
+        log.info("Obteniendo todas las experiencias");
+        return ResponseEntity.ok(experienciaService.obtenerTodasLasExperiencias());
     }
 
+    /**
+     * Actualiza una experiencia existente
+     * @param id de la experiencia a actualizar (no puede ser nulo)
+     * @param dto Datos actualizados de la experiencia
+     * @return ResponseEntity con la experiencia actualizada
+     * @throws ResourceNotFoundException si no se encuentra la experiencia
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Experiencia> actualizarExperiencia(
-            @PathVariable Long id,
+            @PathVariable @NotNull(message = "El ID no puede ser nulo") Long id,
             @Valid @RequestBody ActualizarExperienciaDTO dto) {
-        return ResponseEntity.ok(experienciaServiceImpl.actualizarExperiencia(id, dto));
+        log.info("Actualizando experiencia ID: {}", id);
+        return ResponseEntity.ok(experienciaService.actualizarExperiencia(id, dto));
     }
 
+    /**
+     * Elimina una experiencia
+     * @param id de la experiencia a eliminar (no puede ser nulo)
+     * @return ResponseEntity sin contenido
+     * @throws ResourceNotFoundException si no se encuentra la experiencia
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarExperiencia(@PathVariable Long id) {
-        experienciaServiceImpl.eliminarExperiencia(id);
+    public ResponseEntity<Void> eliminarExperiencia(
+            @PathVariable @NotNull(message = "El ID no puede ser nulo") Long id) {
+        log.info("Eliminando experiencia ID: {}", id);
+        experienciaService.eliminarExperiencia(id);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Obtiene experiencias por materia
+     * @param codigoMateria Código de la materia (no puede estar vacío)
+     * @return ResponseEntity con la lista de experiencias
+     * @throws ResourceNotFoundException si no se encuentra la materia
+     */
     @GetMapping("/por-materia/{codigoMateria}")
-    public ResponseEntity<List<Experiencia>> getExperienciasPorMateria(
-            @PathVariable String codigoMateria) {
-
-        return ResponseEntity.ok(
-                experienciaServiceImpl.obtenerExperienciasPorMateria(codigoMateria)
-        );
+    public ResponseEntity<List<Experiencia>> obtenerExperienciasPorMateria(
+            @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria) {
+        log.info("Obteniendo experiencias para materia: {}", codigoMateria);
+        return ResponseEntity.ok(experienciaQueryService.obtenerExperienciasPorMateria(codigoMateria));
     }
-
-
-
-
 }

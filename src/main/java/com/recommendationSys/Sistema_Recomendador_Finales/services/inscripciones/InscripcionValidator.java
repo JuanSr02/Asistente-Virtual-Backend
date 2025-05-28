@@ -16,10 +16,6 @@ public class InscripcionValidator {
     private final EstudianteRepository estudianteRepository;
 
     public void validarInscripcion(RegistroInscripcionDTO dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("El DTO de inscripción no puede ser nulo");
-        }
-
         if (inscripcionRepo.existsByMateriaAndEstudianteAndAnio(
                 materiaRepository.findById(dto.getMateriaCodigo()).orElseThrow(),
                 estudianteRepository.findById(dto.getEstudianteId()).orElseThrow(),

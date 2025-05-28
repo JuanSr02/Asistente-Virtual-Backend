@@ -13,9 +13,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(), 404), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(PlanEstudioException.class)
-    public ResponseEntity<ApiExceptionResponse> handlePlanError(PlanEstudioException ex) {
-        return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(), ex.getStatus().value()), ex.getStatus());
+    @ExceptionHandler(PlanEstudioValidationException.class)
+    public ResponseEntity<ApiExceptionResponse> handlePlanValidationError(PlanEstudioValidationException ex) {
+        return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(),500),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(IntegrityException.class)

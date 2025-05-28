@@ -40,13 +40,13 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     }
 
 
-    public EstadisticasMateria calcularEstadisticasPorMateria(String codigoMateria) {
+    @Override
+    public EstadisticasMateriaDTO obtenerEstadisticasMateria(String codigoMateria) {
         Materia materia = materiaRepo.findById(codigoMateria)
-                .orElseThrow(() -> new ResourceNotFoundException(codigoMateria));
-        return calcularEstadisticas(materia);
+                .orElseThrow(() -> new ResourceNotFoundException("La materia de la que se quiere obtener estadisticas no existe."));
+        return convertToDTO(calcularEstadisticas(materia));
     }
 
-    @Override
     public EstadisticasMateria calcularEstadisticas(Materia materia) {
         List<Examen> examenes = examenRepo.findByMateriaWithJoins(materia);
         List<Experiencia> experiencias = experienciaRepo.findByMateriaWithJoins(materia);
@@ -69,7 +69,8 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     }
 
     @Override
-    public EstadisticasGeneralesDTO calcularEstadisticasGenerales() {
+    public EstadisticasGeneralesDTO obtenerEstadisticasGenerales() {
+        actualizarEstadisticas();
         List<Object[]> topAprobadas = examenRepo.findTop5MateriasAprobadas();
         List<Object[]> topReprobadas = examenRepo.findTop5MateriasReprobadas();
 
@@ -118,4 +119,5 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         EstadisticasMateria stats = calcularEstadisticas(materia);
         estadisticasRepo.save(stats);
     }
+
 }
