@@ -5,9 +5,11 @@ import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.RegistroInscripci
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Estudiante;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.RegistroInscripcion;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.EstudianteRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.PlanDeEstudioRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.RegistroInscripcionRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.email.EmailNotificationService;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +30,14 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
     private final EstudianteRepository estudianteRepo;
     private final InscripcionMapper inscripcionMapper;
     private final InscripcionValidator inscripcionValidator;
+    private final PlanDeEstudioRepository planDeEstudioRepository;
 
     @Override
     public InscripcionResponseDTO crearInscripcion(RegistroInscripcionDTO dto) {
         inscripcionValidator.validarInscripcion(dto);
-
-        Materia materia = materiaRepo.findByCodigo(dto.getMateriaCodigo())
+        PlanDeEstudio plan = planDeEstudioRepository.findById(dto.getMateriaPlan())
+                .orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
+        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(),plan)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
         Estudiante estudiante = estudianteRepo.findById(dto.getEstudianteId())
@@ -55,8 +59,9 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
     }
 
     @Override
-    public List<InscripcionResponseDTO> obtenerInscriptos(String materiaCodigo, Integer anio, String turno) {
-        Materia materia = materiaRepo.findByCodigo(materiaCodigo)
+    public List<InscripcionResponseDTO> obtenerInscriptos(String materiaCodigo, Integer anio, String turno,String codigoPlan) {
+        PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan).orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
+        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(materiaCodigo,plan)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
         List<RegistroInscripcion> inscriptos = inscripcionRepo.findByMateriaAndAnioAndTurno(materia, anio, turno);

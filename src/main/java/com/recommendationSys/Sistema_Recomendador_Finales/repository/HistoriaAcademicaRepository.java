@@ -13,4 +13,6 @@ public interface HistoriaAcademicaRepository extends JpaRepository<HistoriaAcade
     // Find by student
     Optional<HistoriaAcademica> findByEstudiante(Estudiante estudiante);
 
+    boolean existsByEstudiante(Estudiante estudiante);
+
 }

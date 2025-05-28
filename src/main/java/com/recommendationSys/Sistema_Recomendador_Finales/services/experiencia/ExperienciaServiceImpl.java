@@ -6,9 +6,11 @@ import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNot
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExamenRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExperienciaRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.PlanDeEstudioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ public class ExperienciaServiceImpl implements ExperienciaCRUDService, Experienc
     private final MateriaRepository materiaRepository;
     private final ExperienciaMapper experienciaMapper;
     private final ExperienciaValidator experienciaValidator;
+    private final PlanDeEstudioRepository planDeEstudioRepository;
 
     @Override
     public Experiencia crearExperiencia(ExperienciaDTO experienciaDTO) {
@@ -55,21 +58,14 @@ public class ExperienciaServiceImpl implements ExperienciaCRUDService, Experienc
     }
 
     @Override
-    public List<Experiencia> obtenerExperienciasPorMateria(String codigoMateria) {
-        Materia materia = materiaRepository.findByCodigo(codigoMateria)
+    public List<Experiencia> obtenerExperienciasPorMateria(String codigoMateria,String codigoPlan) {
+        PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan).orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
+        Materia materia = materiaRepository.findByCodigoAndPlanDeEstudio(codigoMateria,plan)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
         return experienciaRepository.findByMateriaWithJoins(materia);
     }
 
-    @Override
-    public Experiencia obtenerExperienciaPorExamen(Long examenId) {
-        Examen examen = examenRepository.findById(examenId)
-                .orElseThrow(() -> new ResourceNotFoundException("Examen no encontrado"));
-
-        return experienciaRepository.findByExamen(examen)
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró experiencia para este examen"));
-    }
 
     @Override
     public Experiencia actualizarExperiencia(Long id, ActualizarExperienciaDTO dto) {

@@ -23,7 +23,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/inscripciones")
+@RequestMapping("/api/public/inscripciones")
 public class RegistroInscripcionController {
 
     private final InscripcionService inscripcionService;
@@ -34,7 +34,7 @@ public class RegistroInscripcionController {
      * @param dto Datos de la inscripción
      * @return Inscripción creada con status 201
      * @throws ResourceNotFoundException si no encuentra el estudiante o la materia
-     * @throws IntegrityException si el estudiante ya esta inscripto a esta materia y año.
+     * @throws IntegrityException si el estudiante ya está inscripto a esta materia y año.
      */
     @PostMapping
     public ResponseEntity<?> crearInscripcion(
@@ -70,11 +70,12 @@ public class RegistroInscripcionController {
     public ResponseEntity<?> obtenerInscriptos(
             @RequestParam @NotBlank String codigoMateria,
             @RequestParam @NotNull Integer anio,
-            @RequestParam @NotBlank String turno) {
+            @RequestParam @NotBlank String turno,
+            @RequestParam @NotBlank String plan) {
         log.info("Consultando inscriptos a materia: {} año: {} turno: {}",
                 codigoMateria, anio, turno);
         List<InscripcionResponseDTO> inscriptos = inscripcionService
-                .obtenerInscriptos(codigoMateria, anio, turno);
+                .obtenerInscriptos(codigoMateria, anio, turno,plan);
         return ResponseEntity.ok(inscriptos);
     }
 

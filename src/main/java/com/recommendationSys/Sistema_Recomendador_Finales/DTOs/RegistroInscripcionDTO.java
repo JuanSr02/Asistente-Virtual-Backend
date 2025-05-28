@@ -24,6 +24,10 @@ public class RegistroInscripcionDTO {
     @Size(max = 15, message = "El código de materia no puede exceder los 15 caracteres")
     private String materiaCodigo;
 
+    @NotBlank(message = "El plan de la materia es obligatorio")
+    @Size(max = 15, message = "El plan de la materia no puede exceder los 15 caracteres")
+    private String materiaPlan;
+
     @NotNull(message = "El ID de estudiante es obligatorio")
     private Long estudianteId;
 

@@ -32,18 +32,22 @@ public class Materia {
     @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
+    @Builder.Default
     private List<Correlativa> correlativas = new ArrayList<>();
 
     @OneToMany(mappedBy = "correlativaCodigo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Correlativa> correlativasQueLaReferencian = new ArrayList<>();
 
     @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
+    @Builder.Default
     private List<Renglon> renglones = new ArrayList<>();
 
     @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
+    @Builder.Default
     private List<RegistroInscripcion> inscripciones = new ArrayList<>();
 }

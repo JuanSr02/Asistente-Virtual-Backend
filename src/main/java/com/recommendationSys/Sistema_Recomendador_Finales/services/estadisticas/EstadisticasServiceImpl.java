@@ -5,14 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasGeneralesDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasMateriaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
-import com.recommendationSys.Sistema_Recomendador_Finales.model.EstadisticasMateria;
-import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
-import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
-import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
-import com.recommendationSys.Sistema_Recomendador_Finales.repository.EstadisticasMateriaRepository;
-import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExamenRepository;
-import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExperienciaRepository;
-import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.*;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,6 +24,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     private final MateriaRepository materiaRepo;
     private final ObjectMapper objectMapper;
     private final EstadisticasHelper estadisticasHelper;
+    private final PlanDeEstudioRepository planDeEstudioRepository;
 
 
     @Scheduled(cron = "0 0 2 * * ?")
@@ -41,8 +36,9 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
 
 
     @Override
-    public EstadisticasMateriaDTO obtenerEstadisticasMateria(String codigoMateria) {
-        Materia materia = materiaRepo.findByCodigo(codigoMateria)
+    public EstadisticasMateriaDTO obtenerEstadisticasMateria(String codigoMateria,String codigoPlan) {
+        PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan).orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
+        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(codigoMateria,plan)
                 .orElseThrow(() -> new ResourceNotFoundException("La materia de la que se quiere obtener estadisticas no existe."));
         return convertToDTO(calcularEstadisticas(materia));
     }

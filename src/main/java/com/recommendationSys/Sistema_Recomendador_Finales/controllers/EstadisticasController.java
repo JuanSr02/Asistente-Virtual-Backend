@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Validated
@@ -33,9 +30,9 @@ public class EstadisticasController {
      */
     @GetMapping("/materia/{codigoMateria}")
     public ResponseEntity<EstadisticasMateriaDTO> obtenerEstadisticasMateria(
-            @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria) {
-        log.info("Solicitando estadísticas para materia: {}", codigoMateria);
-        EstadisticasMateriaDTO estadisticas = estadisticasService.obtenerEstadisticasMateria(codigoMateria);
+            @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria, @RequestParam("codigoPlan") @NotBlank String codigoPlan) {
+        log.info("Solicitando estadísticas para materia: {} {}", codigoMateria,codigoPlan);
+        EstadisticasMateriaDTO estadisticas = estadisticasService.obtenerEstadisticasMateria(codigoMateria,codigoPlan);
         return ResponseEntity.ok(estadisticas);
     }
 

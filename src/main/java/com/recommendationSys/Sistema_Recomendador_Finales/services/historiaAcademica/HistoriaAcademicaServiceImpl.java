@@ -30,6 +30,7 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
     @Override
     public void cargarHistoriaAcademica(MultipartFile file, Long estudianteId) throws IOException {
         validator.validarEstudiante(estudianteId);
+        validator.validarHistoria(estudianteId);
         excelProcessingService.procesarArchivoExcel(file, estudianteId);
     }
 

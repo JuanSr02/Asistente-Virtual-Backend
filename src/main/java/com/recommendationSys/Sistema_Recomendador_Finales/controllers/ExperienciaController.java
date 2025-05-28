@@ -34,10 +34,10 @@ public class ExperienciaController {
      * @return ResponseEntity con el ID de la experiencia creada
      */
     @PostMapping
-    public ResponseEntity<Long> crearExperiencia(@Valid @RequestBody ExperienciaDTO experienciaDTO) {
+    public ResponseEntity<?> crearExperiencia(@Valid @RequestBody ExperienciaDTO experienciaDTO) {
         log.info("Creando nueva experiencia para examen: {}", experienciaDTO.getExamenId());
         Experiencia nuevaExperiencia = experienciaService.crearExperiencia(experienciaDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaExperiencia.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body("Experiencia creada correctamente.");
     }
 
     /**
@@ -53,18 +53,6 @@ public class ExperienciaController {
         return ResponseEntity.ok(experienciaService.obtenerExperienciaPorId(id));
     }
 
-    /**
-     * Obtiene la experiencia asociada a un examen
-     * @param examenId ID del examen (no puede ser nulo)
-     * @return ResponseEntity con la experiencia encontrada
-     * @throws ResourceNotFoundException si no se encuentra la experiencia
-     */
-    @GetMapping("/por-examen/{examenId}")
-    public ResponseEntity<Experiencia> obtenerExperienciaPorExamen(
-            @PathVariable @NotNull(message = "El ID de examen no puede ser nulo") Long examenId) {
-        log.info("Obteniendo experiencia para examen ID: {}", examenId);
-        return ResponseEntity.ok(experienciaQueryService.obtenerExperienciaPorExamen(examenId));
-    }
 
     /**
      * Obtiene todas las experiencias registradas
@@ -113,8 +101,8 @@ public class ExperienciaController {
      */
     @GetMapping("/por-materia/{codigoMateria}")
     public ResponseEntity<List<Experiencia>> obtenerExperienciasPorMateria(
-            @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria) {
-        log.info("Obteniendo experiencias para materia: {}", codigoMateria);
-        return ResponseEntity.ok(experienciaQueryService.obtenerExperienciasPorMateria(codigoMateria));
+            @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria, @RequestParam("codigoPlan") @NotBlank String codigoPlan) {
+        log.info("Obteniendo experiencias para materia: {} {}", codigoMateria,codigoPlan);
+        return ResponseEntity.ok(experienciaQueryService.obtenerExperienciasPorMateria(codigoMateria,codigoPlan));
     }
 }
