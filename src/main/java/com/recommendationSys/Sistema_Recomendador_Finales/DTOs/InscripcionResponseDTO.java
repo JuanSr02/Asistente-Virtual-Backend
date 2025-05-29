@@ -11,6 +11,7 @@ public class InscripcionResponseDTO {
     private Integer anio;
     private String materiaNombre;
     private String materiaCodigo;
+    private String materiaPlan;
     private String estudianteNombre;
     private Long estudianteId;
     private Integer estudianteNroRegistro;

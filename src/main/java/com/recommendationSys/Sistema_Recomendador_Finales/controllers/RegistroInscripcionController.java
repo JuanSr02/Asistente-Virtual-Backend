@@ -4,7 +4,6 @@ import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.InscripcionRespon
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.RegistroInscripcionDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.IntegrityException;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
-import com.recommendationSys.Sistema_Recomendador_Finales.model.RegistroInscripcion;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.inscripciones.InscripcionNotificationService;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.inscripciones.InscripcionService;
 import jakarta.validation.Valid;
@@ -86,9 +85,9 @@ public class RegistroInscripcionController {
      */
     @PostMapping("/notificaciones")
     public ResponseEntity<?> notificarCompaneros(
-            @Valid @RequestBody RegistroInscripcion dto) {
+            @Valid @RequestBody RegistroInscripcionDTO dto) {
         log.info("Notificando compañeros de nueva inscripción");
-        inscripcionNotificationService.notificarCompaneros(dto);
+        inscripcionNotificationService.notificarCompanerosDTO(dto);
         return ResponseEntity.ok().build();
     }
 }

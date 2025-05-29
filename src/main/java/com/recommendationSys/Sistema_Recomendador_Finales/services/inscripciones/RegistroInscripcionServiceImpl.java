@@ -36,13 +36,11 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
     public InscripcionResponseDTO crearInscripcion(RegistroInscripcionDTO dto) {
         inscripcionValidator.validarInscripcion(dto);
         PlanDeEstudio plan = planDeEstudioRepository.findById(dto.getMateriaPlan())
-                .orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Plan de estudios no encontrado"));
         Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(),plan)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
-
         Estudiante estudiante = estudianteRepo.findById(dto.getEstudianteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
-
         RegistroInscripcion inscripcion = inscripcionMapper.toEntity(dto, materia, estudiante);
         RegistroInscripcion saved = inscripcionRepo.save(inscripcion);
 
@@ -84,6 +82,18 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
                         nuevaInscripcion.getEstudiante()
                 )
         );
+    }
+
+    @Override
+    public void notificarCompanerosDTO(RegistroInscripcionDTO dto) {
+        PlanDeEstudio plan = planDeEstudioRepository.findById(dto.getMateriaPlan())
+                .orElseThrow(() -> new ResourceNotFoundException("Plan de estudios no encontrado"));
+        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(),plan)
+                .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
+        Estudiante estudiante = estudianteRepo.findById(dto.getEstudianteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
+        RegistroInscripcion inscripcion = inscripcionMapper.toEntity(dto, materia, estudiante);
+        notificarCompaneros(inscripcion);
     }
 
     private List<RegistroInscripcion> obtenerCompaneros(RegistroInscripcion inscripcion) {

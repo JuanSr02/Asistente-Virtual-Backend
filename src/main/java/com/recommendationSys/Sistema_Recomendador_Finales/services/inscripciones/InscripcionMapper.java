@@ -26,6 +26,7 @@ public class InscripcionMapper {
                 .anio(inscripcion.getAnio())
                 .materiaCodigo(inscripcion.getMateria().getCodigo())
                 .materiaNombre(inscripcion.getMateria().getNombre())
+                .materiaPlan(inscripcion.getMateria().getPlanDeEstudio().getCodigo())
                 .estudianteId(inscripcion.getEstudiante().getId())
                 .estudianteNombre(inscripcion.getEstudiante().getNombreApellido())
                 .estudianteNroRegistro(inscripcion.getEstudiante().getNroRegistro())

@@ -3,6 +3,8 @@ package com.recommendationSys.Sistema_Recomendador_Finales.services.inscripcione
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.RegistroInscripcionDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.IntegrityException;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Estudiante;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.EstudianteRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
@@ -21,13 +23,12 @@ public class InscripcionValidator {
 
     public void validarInscripcion(RegistroInscripcionDTO dto) {
         PlanDeEstudio plan = planDeEstudioRepository.findById(dto.getMateriaPlan())
-                .orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
-        if (inscripcionRepo.existsByMateriaAndEstudianteAndAnio(
-                materiaRepository.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(),plan).orElseThrow(),
-                estudianteRepository.findById(dto.getEstudianteId()).orElseThrow(),
-                dto.getAnio())) {
+                .orElseThrow(() -> new ResourceNotFoundException("Plan de estudios no encontrado"));
+        Materia materia = materiaRepository.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(),plan).orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
+        Estudiante estudiante = estudianteRepository.findById(dto.getEstudianteId()).orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
+        if (inscripcionRepo.existsByMateriaAndEstudianteAndAnioAndTurno(materia,estudiante,dto.getAnio(),dto.getTurno())){
             throw new IntegrityException(
-                    String.format("El estudiante ya está inscripto en esta materia para el año %d", dto.getAnio()));
+                    String.format("El estudiante ya está inscripto en esta materia para el año %d y el turno %s", dto.getAnio(),dto.getTurno()));
         }
     }
 }

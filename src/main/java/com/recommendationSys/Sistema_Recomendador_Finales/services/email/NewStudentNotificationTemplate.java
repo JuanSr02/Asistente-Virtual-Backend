@@ -71,7 +71,8 @@ public class NewStudentNotificationTemplate implements EmailTemplateGenerator {
                     }
                     .info-item {
                         margin: 10px 0;
-                        display: flex;
+                        display: grid;
+                        grid-template-columns: 130px 1fr;
                         align-items: center;
                     }
                     .info-label {

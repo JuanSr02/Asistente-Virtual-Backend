@@ -27,7 +27,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     private final PlanDeEstudioRepository planDeEstudioRepository;
 
 
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 1 0 * ?")
     @Transactional
     public void actualizarEstadisticas() {
         List<Materia> materias = examenRepo.findDistinctMaterias();

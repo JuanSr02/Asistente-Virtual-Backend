@@ -36,6 +36,7 @@ public class Persona {
     @Column(length = 15)
     private String telefono;
 
+    @NotBlank(message = "Usuario es obligatorio")
     @Size(max = 100, message = "Usuario debe tener máximo 100 caracteres")
     @Column(nullable = false, unique = true, length = 100)
     private String usuario;

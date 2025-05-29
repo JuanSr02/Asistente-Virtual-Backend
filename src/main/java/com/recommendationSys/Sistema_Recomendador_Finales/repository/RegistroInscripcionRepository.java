@@ -15,6 +15,6 @@ public interface RegistroInscripcionRepository extends JpaRepository<RegistroIns
     List<RegistroInscripcion> findByMateriaAndAnioAndTurno(Materia materia, Integer anio,String turno);
 
     // Exists by Materia and Estudiante
-    boolean existsByMateriaAndEstudianteAndAnio(Materia materia, Estudiante estudiante, Integer anio);
+    boolean existsByMateriaAndEstudianteAndAnioAndTurno(Materia materia, Estudiante estudiante, Integer anio,String turno);
 
     }
