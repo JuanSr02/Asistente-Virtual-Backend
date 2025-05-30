@@ -69,12 +69,11 @@ public class RegistroInscripcionController {
     public ResponseEntity<?> obtenerInscriptos(
             @RequestParam @NotBlank String codigoMateria,
             @RequestParam @NotNull Integer anio,
-            @RequestParam @NotBlank String turno,
-            @RequestParam @NotBlank String plan) {
+            @RequestParam @NotBlank String turno) {
         log.info("Consultando inscriptos a materia: {} año: {} turno: {}",
                 codigoMateria, anio, turno);
         List<InscripcionResponseDTO> inscriptos = inscripcionService
-                .obtenerInscriptos(codigoMateria, anio, turno,plan);
+                .obtenerInscriptos(codigoMateria, anio, turno);
         return ResponseEntity.ok(inscriptos);
     }
 

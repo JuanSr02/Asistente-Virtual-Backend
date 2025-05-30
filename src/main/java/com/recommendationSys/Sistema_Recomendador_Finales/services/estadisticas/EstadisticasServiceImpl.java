@@ -1,7 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.estadisticas;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasGeneralesDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasMateriaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
@@ -22,7 +21,6 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     private final ExamenRepository examenRepo;
     private final EstadisticasMateriaRepository estadisticasRepo;
     private final MateriaRepository materiaRepo;
-    private final ObjectMapper objectMapper;
     private final EstadisticasHelper estadisticasHelper;
     private final PlanDeEstudioRepository planDeEstudioRepository;
 
@@ -73,9 +71,16 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         long totalExamenes = examenRepo.count();
         long totalAprobados = examenRepo.countByNotaGreaterThanEqual(4.0);
 
+        String materiaMasRendida = examenRepo.findCodigoMateriaMasRendida();
+        String materiaMasRendidaNombre = materiaRepo.findFirstNombreByCodigo(materiaMasRendida);
+        long cantMateriaMasRendida = examenRepo.countExamenesByCodigoMateria(materiaMasRendida);
+        long cantAprobadosMateriaMasRendida = examenRepo.countExamenesAprobadosByCodigoMateria(materiaMasRendida);
+
         return EstadisticasGeneralesDTO.builder()
                 .totalMaterias((int) materiaRepo.count())
                 .totalExamenesRendidos((int) totalExamenes)
+                .materiaMasRendida(estadisticasHelper.calcularMateriaMasRendida(materiaMasRendida,materiaMasRendidaNombre,cantMateriaMasRendida,cantAprobadosMateriaMasRendida))
+                .cantidadMateriaMasRendida(cantMateriaMasRendida)
                 .porcentajeAprobadosGeneral(estadisticasHelper.calcularPorcentaje(totalAprobados, totalExamenes))
                 .top5Aprobadas(estadisticasHelper.mapToMateriaRankingDTO(topAprobadas))
                 .top5Reprobadas(estadisticasHelper.mapToMateriaRankingDTO(topReprobadas))

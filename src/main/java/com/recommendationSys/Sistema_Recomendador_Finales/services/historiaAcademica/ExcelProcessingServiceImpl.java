@@ -76,8 +76,12 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
         DatosFilaExcel datos = extraerDatosFila(row);
         if (debeOmitirFila(datos)) return;
 
-        Materia materia = obtenerMateria(datos.nombreMateria(), plan);
-        procesarRenglonSegunTipo(datos, historia, materia);
+        try {
+            Materia materia = obtenerMateria(datos.nombreMateria(), plan);
+            procesarRenglonSegunTipo(datos, historia, materia);
+        } catch (ResourceNotFoundException e) {
+            log.warn("Fila salteada - Materia no encontrada: '{}'. Detalle: {}", datos.nombreMateria(), e.getMessage());
+        }
     }
 
     private DatosFilaExcel extraerDatosFila(Row row) {
@@ -98,7 +102,8 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
         return "En curso".equalsIgnoreCase(datos.tipo()) ||
                 ("Regularidad".equalsIgnoreCase(datos.tipo()) &&
                         ("Reprobado".equalsIgnoreCase(datos.resultado()) ||
-                                "Ausente".equalsIgnoreCase(datos.resultado())));
+                                "Ausente".equalsIgnoreCase(datos.resultado()))) || ("Examen".equalsIgnoreCase(datos.tipo()) && ("Ausente".equalsIgnoreCase(datos.resultado())))
+                ;
     }
 
     private Materia obtenerMateria(String nombreMateria, PlanDeEstudio plan) {

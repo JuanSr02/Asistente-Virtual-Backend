@@ -14,6 +14,8 @@ public class EstadisticasGeneralesDTO {
     private Integer totalMaterias;
     private Integer totalExamenesRendidos;
     private Double porcentajeAprobadosGeneral;
+    private MateriaRankingDTO materiaMasRendida;
+    private Long cantidadMateriaMasRendida;
     private List<MateriaRankingDTO> top5Aprobadas;
     private List<MateriaRankingDTO> top5Reprobadas;
     private Map<String, Double> promedioNotasPorMateria;

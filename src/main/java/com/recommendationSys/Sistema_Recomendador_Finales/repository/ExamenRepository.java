@@ -48,4 +48,33 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     List<Object[]> findTop5MateriasReprobadas();
 
     long countByNotaGreaterThanEqual(double nota);
+
+    @Query("""
+    SELECT r.materia.codigo
+    FROM Examen e
+    JOIN e.renglon r
+    GROUP BY r.materia.codigo
+    ORDER BY COUNT(e) DESC
+    LIMIT 1
+""")
+    String findCodigoMateriaMasRendida();
+
+    @Query("""
+    SELECT COUNT(e)
+    FROM Examen e
+    JOIN e.renglon r
+    WHERE r.materia.codigo = :codigoMateria
+    AND e.nota >= 4
+""")
+    long countExamenesAprobadosByCodigoMateria(@Param("codigoMateria") String codigoMateria);
+
+    @Query("""
+    SELECT COUNT(e)
+    FROM Examen e
+    JOIN e.renglon r
+    WHERE r.materia.codigo = :codigoMateria
+""")
+    long countExamenesByCodigoMateria(@Param("codigoMateria") String codigoMateria);
+
+
 }

@@ -44,6 +44,15 @@ public class EstadisticasHelper {
                 .orElse(0.0);
     }
 
+    public MateriaRankingDTO calcularMateriaMasRendida(String codigoMateria,String nombre,long cantidad,long aprobados){
+        MateriaRankingDTO rendida = new MateriaRankingDTO();
+        rendida.setCodigoMateria(codigoMateria);
+        rendida.setNombre(nombre);
+        Double porcentaje = calcularPorcentaje(aprobados,cantidad);
+        rendida.setPorcentaje(porcentaje);
+        return rendida;
+    }
+
     public double calcularPorcentaje(long parcial, long total) {
         return total > 0 ? (double) parcial / total * 100 : 0.0;
     }
