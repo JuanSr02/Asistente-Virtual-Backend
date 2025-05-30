@@ -41,6 +41,56 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         return convertToDTO(calcularEstadisticas(materia));
     }
 
+    @Override
+    public EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String codigoMateria) {
+        // Modo agrupado por código
+        List<Materia> materiasConMismoCodigo = materiaRepo.findByCodigo(codigoMateria);
+
+        if (materiasConMismoCodigo == null || materiasConMismoCodigo.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron materias con el código: " + codigoMateria);
+        }
+
+        if(materiasConMismoCodigo.size() == 1){
+            return obtenerEstadisticasMateria(codigoMateria,materiasConMismoCodigo.getFirst().getPlanDeEstudio().getCodigo());
+        }
+
+        List<Examen> todosLosExamenes = materiasConMismoCodigo.stream()
+                .flatMap(m -> m.getRenglones().stream())
+                .map(Renglon::getExamen)
+                .filter(e -> e != null)
+                .toList();
+
+        List<Experiencia> todasLasExperiencias = todosLosExamenes.stream()
+                .map(Examen::getExperiencia)
+                .filter(e -> e != null)
+                .toList();
+
+        int totalRendidos = todosLosExamenes.size();
+        int aprobados = estadisticasHelper.calcularAprobados(todosLosExamenes);
+        double promedio = estadisticasHelper.calcularPromedioNotas(todosLosExamenes);
+        double promedioDias = estadisticasHelper.calcularPromedioDiasEstudio(todasLasExperiencias);
+        double promedioHoras = estadisticasHelper.calcularPromedioHorasDiarias(todasLasExperiencias);
+        double promedioDificultad = estadisticasHelper.calcularPromedioDificultad(todasLasExperiencias);
+
+        EstadisticasMateria stats = new EstadisticasMateria();
+        stats.setCodigoMateria(codigoMateria);
+        stats.setNombreMateria(materiasConMismoCodigo.getFirst().getNombre());
+        stats.setTotalRendidos(totalRendidos);
+        stats.setAprobados(aprobados);
+        stats.setReprobados(totalRendidos-aprobados);
+        stats.setPromedioNotas(promedio);
+        stats.setPromedioDiasEstudio(promedioDias);
+        stats.setPromedioHorasDiarias(promedioHoras);
+        stats.setPromedioDificultad(promedioDificultad);
+        stats.setDistribucionDificultad(estadisticasHelper.calcularDistribucionDificultad(todasLasExperiencias));
+        stats.setDistribucionModalidad(estadisticasHelper.calcularDistribucionModalidad(todasLasExperiencias));
+        stats.setDistribucionRecursos(estadisticasHelper.calcularDistribucionRecursos(todasLasExperiencias));
+        stats.setFechaUltimaActualizacion(LocalDateTime.now());
+
+        return convertToDTO(stats);
+    }
+
+
     public EstadisticasMateria calcularEstadisticas(Materia materia) {
         List<Examen> examenes = examenRepo.findByMateriaWithJoins(materia);
         List<Experiencia> experiencias = experienciaRepo.findByMateriaWithJoins(materia);

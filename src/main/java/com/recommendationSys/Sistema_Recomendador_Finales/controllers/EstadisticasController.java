@@ -30,9 +30,9 @@ public class EstadisticasController {
      */
     @GetMapping("/materia/{codigoMateria}")
     public ResponseEntity<EstadisticasMateriaDTO> obtenerEstadisticasMateria(
-            @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria, @RequestParam("codigoPlan") @NotBlank String codigoPlan) {
-        log.info("Solicitando estadísticas para materia: {} {}", codigoMateria,codigoPlan);
-        EstadisticasMateriaDTO estadisticas = estadisticasService.obtenerEstadisticasMateria(codigoMateria,codigoPlan);
+            @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria) {
+        log.info("Solicitando estadísticas para materia: {}", codigoMateria);
+        EstadisticasMateriaDTO estadisticas = estadisticasService.obtenerEstadisticasSuperMateria(codigoMateria);
         return ResponseEntity.ok(estadisticas);
     }
 
