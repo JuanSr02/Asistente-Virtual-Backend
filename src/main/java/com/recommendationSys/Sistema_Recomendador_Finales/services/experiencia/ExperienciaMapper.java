@@ -2,8 +2,10 @@ package com.recommendationSys.Sistema_Recomendador_Finales.services.experiencia;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaDTO;
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,5 +36,25 @@ public class ExperienciaMapper {
         Optional.ofNullable(dto.getModalidad()).ifPresent(experiencia::setModalidad);
         Optional.ofNullable(dto.getRecursos()).ifPresent(experiencia::setRecursos);
         Optional.ofNullable(dto.getMotivacion()).ifPresent(experiencia::setMotivacion);
+    }
+    public ExperienciaResponseDTO mapToExperienciaResponseDTO(Experiencia experiencia) {
+        if (experiencia == null || experiencia.getExamen() == null || experiencia.getExamen().getRenglon() == null)
+            return null;
+
+        Materia materia = experiencia.getExamen().getRenglon().getMateria();
+        return ExperienciaResponseDTO.builder()
+                .id(experiencia.getId())
+                .dificultad(experiencia.getDificultad())
+                .diasEstudio(experiencia.getDiasEstudio())
+                .horasDiarias(experiencia.getHorasDiarias())
+                .intentosPrevios(experiencia.getIntentosPrevios())
+                .modalidad(experiencia.getModalidad())
+                .recursos(experiencia.getRecursos())
+                .motivacion(experiencia.getMotivacion())
+                .fechaExamen(experiencia.getExamen().getFecha())
+                .nota(experiencia.getExamen().getNota())
+                .codigoMateria(materia.getCodigo())
+                .nombreMateria(materia.getNombre())
+                .build();
     }
 }

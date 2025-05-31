@@ -45,13 +45,4 @@ public class Persona {
     @Column(nullable = false)
     private String contrasenia;
 
-    @NotNull(message = "Tipo es obligatorio")
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 15)
-    private TipoPersona tipo;
-
-    public enum TipoPersona {
-        ESTUDIANTE,
-        ADMINISTRADOR
     }
-}

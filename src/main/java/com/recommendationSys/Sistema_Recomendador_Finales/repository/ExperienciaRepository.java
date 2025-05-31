@@ -22,6 +22,18 @@ public interface ExperienciaRepository extends JpaRepository<Experiencia, Long> 
             "JOIN ex.renglon r " +
             "WHERE r.materia = :materia")
     List<Experiencia> findByMateriaWithJoins(@Param("materia") Materia materia);
+    @Query("""
+        SELECT e FROM Experiencia e
+        WHERE e.examen.renglon.materia.codigo = :codigoMateria
+    """)
+    List<Experiencia> findAllByCodigoMateria(@Param("codigoMateria") String codigoMateria);
+
+    @Query("""
+    SELECT e FROM Experiencia e
+    WHERE e.examen.renglon.historiaAcademica.estudiante.id = :estudianteId
+""")
+    List<Experiencia> findAllByEstudianteId(@Param("estudianteId") Long estudianteId);
+
 
     boolean existsByExamen(Examen examen);
 }

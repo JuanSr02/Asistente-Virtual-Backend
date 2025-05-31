@@ -8,6 +8,6 @@ import java.util.List;
 public interface InscripcionService {
     InscripcionResponseDTO crearInscripcion(RegistroInscripcionDTO dto);
     void eliminarInscripcion(Long id);
-    List<InscripcionResponseDTO> obtenerInscriptos(String materiaCodigo, Integer anio, String turno,String codigoPlan);
+    List<InscripcionResponseDTO> obtenerInscriptos(String materiaCodigo, Integer anio, String turno);
 }
 

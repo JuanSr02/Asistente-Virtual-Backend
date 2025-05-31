@@ -2,21 +2,22 @@ package com.recommendationSys.Sistema_Recomendador_Finales.services.experiencia;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarExperienciaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaDTO;
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ExperienciaResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
-import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.EstudianteRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExamenRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.ExperienciaRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
-import com.recommendationSys.Sistema_Recomendador_Finales.repository.PlanDeEstudioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,55 +32,72 @@ public class ExperienciaServiceImpl implements ExperienciaCRUDService, Experienc
     private final ExamenRepository examenRepository;
     @Autowired
     private final MateriaRepository materiaRepository;
+    @Autowired
+    private final EstudianteRepository estudianteRepository;
     private final ExperienciaMapper experienciaMapper;
     private final ExperienciaValidator experienciaValidator;
-    private final PlanDeEstudioRepository planDeEstudioRepository;
 
     @Override
-    public Experiencia crearExperiencia(ExperienciaDTO experienciaDTO) {
+    public ExperienciaResponseDTO crearExperiencia(ExperienciaDTO experienciaDTO) {
         experienciaValidator.validarCreacionExperiencia(experienciaDTO);
 
         Examen examen = examenRepository.findById(experienciaDTO.getExamenId())
                 .orElseThrow(() -> new ResourceNotFoundException("Examen no encontrado"));
 
         Experiencia experiencia = experienciaMapper.toEntity(experienciaDTO, examen);
-        return experienciaRepository.save(experiencia);
+        return experienciaMapper.mapToExperienciaResponseDTO(experienciaRepository.save(experiencia));
     }
 
     @Override
-    public Experiencia obtenerExperienciaPorId(Long id) {
-        return experienciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
+    public ExperienciaResponseDTO obtenerExperienciaPorId(Long id) {
+        return experienciaMapper.mapToExperienciaResponseDTO(experienciaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada")));
     }
 
     @Override
-    public List<Experiencia> obtenerTodasLasExperiencias() {
-        return experienciaRepository.findAll();
+    public List<ExperienciaResponseDTO> obtenerTodasLasExperiencias() {
+        List<Experiencia> experiencias = experienciaRepository.findAll();
+        return listToExperienciaResponseDTO(experiencias);
+    }
+
+    public List<ExperienciaResponseDTO> listToExperienciaResponseDTO(List<Experiencia> experiencias){
+        List<ExperienciaResponseDTO> mapeadas = new ArrayList<ExperienciaResponseDTO>();
+        for(Experiencia e : experiencias){
+            mapeadas.add(experienciaMapper.mapToExperienciaResponseDTO(e));
+        }
+        return mapeadas;
     }
 
     @Override
-    public List<Experiencia> obtenerExperienciasPorMateria(String codigoMateria,String codigoPlan) {
-        PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan).orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
-        Materia materia = materiaRepository.findByCodigoAndPlanDeEstudio(codigoMateria,plan)
+    public List<ExperienciaResponseDTO> obtenerExperienciasPorMateria(String codigoMateria) {
+        Materia materia = materiaRepository.findFirstByCodigo(codigoMateria)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
-        return experienciaRepository.findByMateriaWithJoins(materia);
+        return listToExperienciaResponseDTO(experienciaRepository.findAllByCodigoMateria(codigoMateria));
+    }
+
+    @Override
+    public List<ExperienciaResponseDTO> obtenerExperienciasPorEstudiante(Long idEstudiante) {
+        if(!estudianteRepository.existsById(idEstudiante)){
+            throw new ResourceNotFoundException("Estudiante no encontrado");
+        }
+        return listToExperienciaResponseDTO(experienciaRepository.findAllByEstudianteId(idEstudiante));
     }
 
 
     @Override
-    public Experiencia actualizarExperiencia(Long id, ActualizarExperienciaDTO dto) {
+    public ExperienciaResponseDTO actualizarExperiencia(Long id, ActualizarExperienciaDTO dto) {
         experienciaValidator.validarActualizacionExperiencia(dto);
 
-        Experiencia experiencia = obtenerExperienciaPorId(id);
+        Experiencia experiencia = experienciaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
         experienciaMapper.updateFromDto(dto, experiencia);
 
-        return experienciaRepository.save(experiencia);
+        return experienciaMapper.mapToExperienciaResponseDTO(experienciaRepository.save(experiencia));
     }
 
     @Override
     public void eliminarExperiencia(Long id) {
-        Experiencia experiencia = obtenerExperienciaPorId(id);
+        Experiencia experiencia = experienciaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
         desvincularExamen(experiencia);
         experienciaRepository.delete(experiencia);
     }

@@ -12,8 +12,7 @@ import java.util.List;
 public interface RegistroInscripcionRepository extends JpaRepository<RegistroInscripcion, Long> {
 
     // Find by materia,año y turno
-    List<RegistroInscripcion> findByMateriaAndAnioAndTurno(Materia materia, Integer anio,String turno);
-
+    List<RegistroInscripcion> findByMateria_CodigoAndAnioAndTurno(String codigo, Integer anio, String turno);
     // Exists by Materia and Estudiante
     boolean existsByMateriaAndEstudianteAndAnioAndTurno(Materia materia, Estudiante estudiante, Integer anio,String turno);
 

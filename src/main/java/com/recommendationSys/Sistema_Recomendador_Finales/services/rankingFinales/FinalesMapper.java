@@ -26,7 +26,7 @@ public class FinalesMapper {
                 .fechaRegularidad(renglon.getFecha())
                 .fechaVencimiento(calcularFechaVencimiento(renglon.getFecha()))
                 .semanasParaVencimiento(calcularSemanasParaVencimiento(renglon.getFecha()))
-                .vecesEsCorrelativa(contarCorrelativas(renglon.getMateria().getCodigo()))
+                .vecesEsCorrelativa(contarCorrelativas(renglon.getMateria().getCodigo(),renglon.getMateria().getPlanDeEstudio().getCodigo()))
                 .estadisticas(mapearEstadisticas(renglon.getMateria().getCodigo()))
                 .build();
     }
@@ -39,8 +39,8 @@ public class FinalesMapper {
         return ChronoUnit.WEEKS.between(LocalDate.now(), calcularFechaVencimiento(fechaRegularidad));
     }
 
-    private long contarCorrelativas(String codigoMateria) {
-        return correlativaRepo.countByCorrelativaCodigo(codigoMateria);
+    private long contarCorrelativas(String codigoMateria,String codigoPlan) {
+        return correlativaRepo.countByCorrelativaCodigo_CodigoAndCorrelativaCodigo_PlanDeEstudio_Codigo(codigoMateria,codigoPlan);
     }
 
     private EstadisticasFinalDTO mapearEstadisticas(String codigoMateria) {

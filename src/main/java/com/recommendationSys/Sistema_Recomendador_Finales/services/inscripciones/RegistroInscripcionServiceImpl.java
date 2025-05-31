@@ -57,12 +57,11 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
     }
 
     @Override
-    public List<InscripcionResponseDTO> obtenerInscriptos(String materiaCodigo, Integer anio, String turno,String codigoPlan) {
-        PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan).orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
-        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(materiaCodigo,plan)
+    public List<InscripcionResponseDTO> obtenerInscriptos(String materiaCodigo, Integer anio, String turno) {
+        Materia materia = materiaRepo.findFirstByCodigo(materiaCodigo)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
 
-        List<RegistroInscripcion> inscriptos = inscripcionRepo.findByMateriaAndAnioAndTurno(materia, anio, turno);
+        List<RegistroInscripcion> inscriptos = inscripcionRepo.findByMateria_CodigoAndAnioAndTurno(materiaCodigo, anio, turno);
 
         return inscriptos.stream()
                 .map(inscripcionMapper::toResponseDTO)
@@ -97,8 +96,8 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
     }
 
     private List<RegistroInscripcion> obtenerCompaneros(RegistroInscripcion inscripcion) {
-        return inscripcionRepo.findByMateriaAndAnioAndTurno(
-                        inscripcion.getMateria(),
+        return inscripcionRepo.findByMateria_CodigoAndAnioAndTurno(
+                        inscripcion.getMateria().getCodigo(),
                         inscripcion.getAnio(),
                         inscripcion.getTurno())
                 .stream()

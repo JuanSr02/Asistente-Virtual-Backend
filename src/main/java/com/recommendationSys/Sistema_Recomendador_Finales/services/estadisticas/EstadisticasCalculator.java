@@ -4,4 +4,6 @@ import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasMater
 
 public interface EstadisticasCalculator {
     public EstadisticasMateriaDTO obtenerEstadisticasMateria(String materia,String plan);
+    public EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String materia);
+
 }
