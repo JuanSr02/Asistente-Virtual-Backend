@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.PlanEstudioResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio.PlanEstudioService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,8 @@ public class PlanEstudioController {
             @RequestParam("file") MultipartFile file) throws IOException {
 
         log.info("Iniciando carga de plan de estudio desde archivo: {}", file.getOriginalFilename());
-        planEstudioService.procesarArchivoExcel(file);
-        return ResponseEntity.ok("Plan de estudio cargado correctamente");
+        PlanEstudioResponseDTO planCargado = planEstudioService.procesarArchivoExcel(file);
+        return ResponseEntity.ok(planCargado);
     }
 
     /**
@@ -45,6 +46,6 @@ public class PlanEstudioController {
 
         log.info("Eliminando plan de estudio con código: {}", codigoPlan);
         planEstudioService.eliminarPlanDeEstudio(codigoPlan);
-        return ResponseEntity.ok("Plan de estudio eliminado correctamente");
+        return ResponseEntity.noContent().build();
     }
 }

@@ -25,6 +25,9 @@ public interface MateriaRepository extends JpaRepository<Materia, String> {
     LIMIT 1
 """)
     String findFirstNombreByCodigo(@Param("codigo") String codigo);
+    @Query("SELECT COUNT(m) FROM Materia m WHERE m.planDeEstudio.codigo = :codigoPlan")
+    Long ContarByPlanCodigo(@Param("codigoPlan") String codigoPlan);
+
 
 }
 

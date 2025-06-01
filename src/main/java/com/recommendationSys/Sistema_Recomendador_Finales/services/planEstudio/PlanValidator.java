@@ -7,4 +7,5 @@ public interface PlanValidator {
     void validarArchivo(MultipartFile file);
     void validarFilaPlan(Row planRow);
     void validarFilaMateria(Row row, int rowNum);
+    void validarPlan(String codigoPlan);
 }

@@ -69,7 +69,7 @@ public class ExperienciaController {
      * @return ResponseEntity con la experiencia actualizada
      * @throws ResourceNotFoundException si no se encuentra la experiencia
      */
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> actualizarExperiencia(
             @PathVariable @NotNull(message = "El ID no puede ser nulo") Long id,
             @Valid @RequestBody ActualizarExperienciaDTO dto) {

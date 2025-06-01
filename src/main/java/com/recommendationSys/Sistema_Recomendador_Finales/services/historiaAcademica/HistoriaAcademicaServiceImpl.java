@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.historiaAcademica;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.HistoriaAcademicaResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Estudiante;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.HistoriaAcademica;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 @Service
 @Transactional
@@ -19,20 +21,38 @@ import java.io.IOException;
 public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
 
     private final HistoriaAcademicaRepository historiaRepo;
-    private final EstudianteRepository estudianteRepo;
-    private final PlanDeEstudioRepository planRepo;
-    private final MateriaRepository materiaRepo;
     private final RenglonRepository renglonRepo;
-    private final ExamenRepository examenRepo;
+    private final EstudianteRepository estudianteRepo;
     private final ExcelProcessingService excelProcessingService;
     private final HistoriaAcademicaValidator validator;
 
     @Override
-    public void cargarHistoriaAcademica(MultipartFile file, Long estudianteId) throws IOException {
+    public HistoriaAcademicaResponseDTO cargarHistoriaAcademica(MultipartFile file, Long estudianteId) throws IOException {
         validator.validarEstudiante(estudianteId);
         validator.validarHistoria(estudianteId);
-        excelProcessingService.procesarArchivoExcel(file, estudianteId);
+        HistoriaAcademica historia = excelProcessingService.procesarArchivoExcel(file, estudianteId);
+        Long renglonesCargados = renglonRepo.countByHistoriaAcademica(historia);
+        return HistoriaAcademicaResponseDTO.builder()
+                .nombreCompleto(historia.getEstudiante().getNombreApellido())
+                .codigoPlan(historia.getPlanDeEstudio().getCodigo())
+                .fechaUltimaActualizacion(LocalDate.now())
+                .renglonesCargados(renglonesCargados)
+                .build();
     }
+    @Override
+    public HistoriaAcademicaResponseDTO actualizarHistoriaAcademica(MultipartFile file, Long estudianteId) throws IOException {
+        validator.validarEstudiante(estudianteId);
+        Long renglonesOriginales = renglonRepo.countByHistoriaAcademica(historiaRepo.findByEstudiante(estudianteRepo.findById(estudianteId).orElseThrow()).orElseThrow());
+        HistoriaAcademica historia = excelProcessingService.procesarArchivoExcelActualizacion(file, estudianteId);
+        Long renglonesCargados = renglonRepo.countByHistoriaAcademica(historia);
+        return HistoriaAcademicaResponseDTO.builder()
+                .nombreCompleto(historia.getEstudiante().getNombreApellido())
+                .codigoPlan(historia.getPlanDeEstudio().getCodigo())
+                .fechaUltimaActualizacion(LocalDate.now())
+                .renglonesCargados(renglonesCargados-renglonesOriginales)
+                .build();
+    }
+
 
     @Override
     public void eliminarHistoriaAcademica(Long estudianteId) {

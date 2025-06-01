@@ -1,13 +1,18 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.PlanEstudioResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.ExcelProcessingUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PlanMapper {
+    private final MateriaRepository materiaRepo;
 
     public PlanDeEstudio mapearPlanDesdeFila(Row planRow) {
         String propuesta = ExcelProcessingUtils.extractCellValue(planRow.getCell(0));
@@ -29,4 +34,12 @@ public class PlanMapper {
                 .planDeEstudio(plan)
                 .build();
     }
+    public PlanEstudioResponseDTO toResponseDTO(PlanDeEstudio plan) {
+        return PlanEstudioResponseDTO.builder()
+                .codigo(plan.getCodigo())
+                .propuesta(plan.getPropuesta())
+                .cantidadMateriasCargadas(materiaRepo.ContarByPlanCodigo(plan.getCodigo()))
+                .build();
+    }
+
 }

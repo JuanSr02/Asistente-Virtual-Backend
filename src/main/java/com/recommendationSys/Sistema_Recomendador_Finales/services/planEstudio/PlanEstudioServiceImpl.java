@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.PlanEstudioResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.IntegrityException;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
@@ -20,11 +21,13 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
     private final ExcelPlanProcessor excelPlanProcessor;
     private final PlanDeEstudioRepository planRepo;
     private final PlanValidator planValidator;
+    private final PlanMapper planMapper;
 
     @Override
-    public void procesarArchivoExcel(MultipartFile file) throws IOException {
+    @Transactional
+    public PlanEstudioResponseDTO procesarArchivoExcel(MultipartFile file) throws IOException {
         planValidator.validarArchivo(file);
-        excelPlanProcessor.procesarContenidoPlan(file);
+        return planMapper.toResponseDTO(excelPlanProcessor.procesarContenidoPlan(file));
     }
 
     @Override

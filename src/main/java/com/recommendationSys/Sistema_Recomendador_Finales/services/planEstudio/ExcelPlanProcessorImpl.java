@@ -26,7 +26,7 @@ public class ExcelPlanProcessorImpl implements ExcelPlanProcessor {
     private final CorrelativaProcessor correlativaProcessor;
 
     @Override
-    public void procesarContenidoPlan(MultipartFile file) throws IOException {
+    public PlanDeEstudio procesarContenidoPlan(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
@@ -46,6 +46,7 @@ public class ExcelPlanProcessorImpl implements ExcelPlanProcessor {
             planValidator.validarFilaMateria(row, i);
             procesarFilaMateria(row, plan);
         }
+        return plan;
     }
 
     private void procesarFilaMateria(Row row, PlanDeEstudio plan) {

@@ -7,4 +7,5 @@ import java.io.IOException;
 
 public interface ExcelProcessingService {
     HistoriaAcademica procesarArchivoExcel(MultipartFile file, Long estudianteId) throws IOException;
+    HistoriaAcademica procesarArchivoExcelActualizacion(MultipartFile file, Long estudianteId) throws IOException;
 }

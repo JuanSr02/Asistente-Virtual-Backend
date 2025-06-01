@@ -1,9 +1,10 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.estadisticas;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasMateriaDTO;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.EstadisticasMateria;
 
 public interface EstadisticasCalculator {
-    public EstadisticasMateriaDTO obtenerEstadisticasMateria(String materia,String plan);
-    public EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String materia);
+    EstadisticasMateria obtenerEstadisticasMateriaUnica(String materia, String plan);
+    EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String materia);
 
 }

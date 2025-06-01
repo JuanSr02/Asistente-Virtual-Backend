@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.HistoriaAcademicaResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.historiaAcademica.HistoriaAcademicaService;
 import jakarta.validation.constraints.NotNull;
@@ -34,9 +35,24 @@ public class HistoriaAcademicaController {
             @RequestParam("file") @NotNull MultipartFile file,
             @PathVariable @NotNull Long estudianteId) throws IOException {
         log.info("Iniciando carga de historia académica para estudiante ID: {}", estudianteId);
-        historiaAcademicaService.cargarHistoriaAcademica(file, estudianteId);
-        return ResponseEntity.ok("Historia académica cargada correctamente");
+        HistoriaAcademicaResponseDTO response = historiaAcademicaService.cargarHistoriaAcademica(file, estudianteId);
+        return ResponseEntity.ok(response);    }
+    /**
+     * Actualiza la historia académica cargando únicamente renglones nuevos desde Excel
+     * @param file Archivo Excel con los datos
+     * @param estudianteId ID del estudiante
+     * @return DTO con la historia académica actualizada
+     * @throws IOException en caso de error leyendo el archivo
+     */
+    @PatchMapping("/actualizacion")
+    public ResponseEntity<HistoriaAcademicaResponseDTO> actualizarHistoriaDesdeExcel(
+            @RequestParam("file") @NotNull MultipartFile file,
+            @PathVariable @NotNull Long estudianteId) throws IOException {
+        log.info("Iniciando actualización de historia académica para estudiante ID: {}", estudianteId);
+        HistoriaAcademicaResponseDTO response = historiaAcademicaService.actualizarHistoriaAcademica(file, estudianteId);
+        return ResponseEntity.ok(response);
     }
+
     /**
      * Elimina la historia académica de un estudiante
      * @param estudianteId id del estudiante (no puede ser nulo)
@@ -48,7 +64,7 @@ public class HistoriaAcademicaController {
             @PathVariable @NotNull Long estudianteId) {
         log.info("Eliminando historia académica para estudiante ID: {}", estudianteId);
         historiaAcademicaService.eliminarHistoriaAcademica(estudianteId);
-        return ResponseEntity.ok("Historia académica eliminada correctamente");
+        return ResponseEntity.noContent().build();
     }
 
 }

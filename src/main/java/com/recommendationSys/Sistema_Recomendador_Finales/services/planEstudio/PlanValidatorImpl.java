@@ -2,7 +2,9 @@ package com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.PlanEstudioValidationException;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.PlanDeEstudioRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.ExcelProcessingUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,7 +13,10 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PlanValidatorImpl implements PlanValidator {
+
+    private final PlanDeEstudioRepository planDeEstudioRepo;
 
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("xls", "xlsx");
 
@@ -47,6 +52,14 @@ public class PlanValidatorImpl implements PlanValidator {
         if (codigoPlan == null || codigoPlan.trim().isEmpty()) {
             throw new ResourceNotFoundException(
                     "No se pudo encontrar el código del plan de estudios");
+        }
+        validarPlan(codigoPlan);
+    }
+
+    @Override
+    public void validarPlan (String codigoPlan){
+        if(planDeEstudioRepo.existsById(codigoPlan)){
+            throw new PlanEstudioValidationException("El plan de estudios con codigo" + codigoPlan + "ya esta cargado");
         }
     }
 

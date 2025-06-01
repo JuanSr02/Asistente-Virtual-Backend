@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,21 +29,30 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     @Scheduled(cron = "0 0 1 0 * ?")
     @Transactional
     public void actualizarEstadisticas() {
-        List<Materia> materias = examenRepo.findDistinctMaterias();
+        List<String> codigoMaterias = examenRepo.findDistinctMateriasPorCodigo();
+        List<Materia> materias = new ArrayList<>();
+        for (String cod : codigoMaterias){
+            materias.add(materiaRepo.findFirstByCodigo(cod).orElseThrow());
+        }
         materias.forEach(this::calcularYGuardarEstadisticas);
     }
 
 
     @Override
-    public EstadisticasMateriaDTO obtenerEstadisticasMateria(String codigoMateria,String codigoPlan) {
+    public EstadisticasMateria obtenerEstadisticasMateriaUnica(String codigoMateria,String codigoPlan) {
         PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan).orElseThrow(() -> new ResourceNotFoundException("Plan no encontrado"));
         Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(codigoMateria,plan)
                 .orElseThrow(() -> new ResourceNotFoundException("La materia de la que se quiere obtener estadisticas no existe."));
-        return convertToDTO(calcularEstadisticas(materia));
+        return calcularEstadisticas(materia);
     }
 
     @Override
-    public EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String codigoMateria) {
+    public EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String codigoMateria){
+        actualizarEstadisticas();
+        return convertToDTO(obtenerEstadisticasMateria(codigoMateria));
+    }
+
+    public EstadisticasMateria obtenerEstadisticasMateria(String codigoMateria) {
         // Modo agrupado por código
         List<Materia> materiasConMismoCodigo = materiaRepo.findByCodigo(codigoMateria);
 
@@ -51,7 +61,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         }
 
         if(materiasConMismoCodigo.size() == 1){
-            return obtenerEstadisticasMateria(codigoMateria,materiasConMismoCodigo.getFirst().getPlanDeEstudio().getCodigo());
+            return obtenerEstadisticasMateriaUnica(codigoMateria,materiasConMismoCodigo.getFirst().getPlanDeEstudio().getCodigo());
         }
 
         List<Examen> todosLosExamenes = materiasConMismoCodigo.stream()
@@ -87,7 +97,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         stats.setDistribucionRecursos(estadisticasHelper.calcularDistribucionRecursos(todasLasExperiencias));
         stats.setFechaUltimaActualizacion(LocalDateTime.now());
 
-        return convertToDTO(stats);
+        return stats;
     }
 
 
@@ -167,7 +177,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         return dto;
     }
     private void calcularYGuardarEstadisticas(Materia materia) {
-        EstadisticasMateria stats = calcularEstadisticas(materia);
+        EstadisticasMateria stats = obtenerEstadisticasMateria(materia.getCodigo());
         estadisticasRepo.save(stats);
     }
 

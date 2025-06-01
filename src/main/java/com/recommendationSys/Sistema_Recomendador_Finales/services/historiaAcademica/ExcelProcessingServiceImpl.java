@@ -170,4 +170,47 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
                 materia, historia, "Regularidad", "Aprobado"
         ).ifPresent(renglonRepo::delete);
     }
+    @Override
+    public HistoriaAcademica procesarArchivoExcelActualizacion(MultipartFile file, Long estudianteId) throws IOException {
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+
+        PlanDeEstudio plan = obtenerPlanDeEstudio(sheet);
+        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
+        HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
+                .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
+
+        procesarFilasExcelConChequeo(sheet, historia, plan);
+        renglonRepo.deleteByTipoAndResultado("Promocion","Promocionado");
+
+        return historia;
+    }
+
+    private void procesarFilasExcelConChequeo(Sheet sheet, HistoriaAcademica historia, PlanDeEstudio plan) {
+        int lastRow = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
+
+        for (int i = 6; i <= lastRow; i++) {
+            Row row = sheet.getRow(i);
+            if (row == null || ExcelProcessingUtils.isEmptyRow(row)) continue;
+
+            DatosFilaExcel datos = extraerDatosFila(row);
+            if (debeOmitirFila(datos)) continue;
+
+            Materia materia;
+            try {
+                materia = obtenerMateria(datos.nombreMateria(), plan);
+            } catch (ResourceNotFoundException e) {
+                log.warn("Materia no encontrada en actualización: {}", datos.nombreMateria());
+                continue;
+            }
+
+            boolean yaExiste = renglonRepo.existsByMateriaAndHistoriaAcademicaAndTipoAndFechaAndResultado(
+                    materia, historia, datos.tipo(), datos.fecha(), datos.resultado());
+
+            if (yaExiste) continue;
+
+            procesarRenglonSegunTipo(datos, historia, materia);
+        }
+    }
+
 }

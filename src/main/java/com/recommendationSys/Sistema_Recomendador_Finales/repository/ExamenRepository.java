@@ -18,8 +18,17 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     List<Examen> findByMateriaWithJoins(@Param("materia") Materia materia);
 
 
-    @Query("SELECT DISTINCT r.materia FROM Examen e JOIN e.renglon r")
-    List<Materia> findDistinctMaterias();
+    @Query(
+            value = """
+        SELECT m.codigo
+        FROM materia m
+        JOIN renglon r ON m.codigo = r.materia_codigo AND m.plan_de_estudio_codigo = r.materia_plan_codigo
+        JOIN examen e ON r.id = e.renglon_id
+        GROUP BY m.codigo
+        """,
+            nativeQuery = true
+    )
+    List<String> findDistinctMateriasPorCodigo();
 
     @Query(value = """
     SELECT m.codigo, m.nombre, 
