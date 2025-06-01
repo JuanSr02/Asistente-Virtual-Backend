@@ -17,10 +17,12 @@ public class PlanMapper {
     public PlanDeEstudio mapearPlanDesdeFila(Row planRow) {
         String propuesta = ExcelProcessingUtils.extractCellValue(planRow.getCell(0));
         String codigoPlan = ExcelProcessingUtils.extractCellValue(planRow.getCell(1));
-
+        if(propuesta.contains("(")){
+            propuesta = propuesta.substring(0, propuesta.indexOf("(")).trim();
+        }
         return PlanDeEstudio.builder()
                 .codigo(codigoPlan)
-                .propuesta(propuesta.substring(0, propuesta.indexOf("(")).trim())
+                .propuesta(propuesta)
                 .build();
     }
 

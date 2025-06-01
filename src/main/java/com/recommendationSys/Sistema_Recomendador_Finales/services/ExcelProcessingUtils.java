@@ -55,7 +55,7 @@ public final class ExcelProcessingUtils {
         return switch (cell.getCellType()) {
             case STRING -> cell.getStringCellValue().trim();
             case NUMERIC -> formatNumericValue(cell.getNumericCellValue());
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue()).trim();
             case FORMULA -> handleFormulaCell(cell);
             default -> throw new IllegalArgumentException(
                     String.format("Tipo de celda no soportado: %s en posición [%d,%d]",
@@ -72,7 +72,7 @@ public final class ExcelProcessingUtils {
         if (numericValue == Math.floor(numericValue)) {
             return String.valueOf((long) numericValue);
         }
-        return String.valueOf(numericValue);
+        return String.valueOf(numericValue).trim();
     }
 
     /**
