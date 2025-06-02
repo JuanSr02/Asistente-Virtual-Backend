@@ -1,7 +1,9 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarAdministradorDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.AdministradorDto;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.administradores.AdministradorService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class AdministradorController {
      * @return El administrador creado.
      */
     @PostMapping
-    public ResponseEntity<?> crearAdministrador(@RequestBody AdministradorDto dto) {
+    public ResponseEntity<?> crearAdministrador(@RequestBody @Valid AdministradorDto dto) {
         return ResponseEntity.ok(administradorService.crearAdministrador(dto));
     }
 
@@ -56,7 +58,7 @@ public class AdministradorController {
      * @return Administrador actualizado.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody AdministradorDto dto) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody ActualizarAdministradorDTO dto) {
         return ResponseEntity.ok(administradorService.actualizarAdministrador(id, dto));
     }
 

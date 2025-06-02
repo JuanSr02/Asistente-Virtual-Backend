@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.administradores;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarAdministradorDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.AdministradorDto;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.AdministradorResponseDTO;
 
@@ -9,7 +10,7 @@ public interface AdministradorService {
     AdministradorResponseDTO crearAdministrador(AdministradorDto dto);
     AdministradorResponseDTO obtenerPorId(Long id);
     List<AdministradorResponseDTO> obtenerTodos();
-    AdministradorResponseDTO actualizarAdministrador(Long id, AdministradorDto dto);
+    AdministradorResponseDTO actualizarAdministrador(Long id, ActualizarAdministradorDTO dto);
     void eliminarAdministrador(Long id);
 }
 

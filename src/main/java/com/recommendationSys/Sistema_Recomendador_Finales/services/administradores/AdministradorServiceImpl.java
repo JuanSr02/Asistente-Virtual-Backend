@@ -1,10 +1,12 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.administradores;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarAdministradorDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.AdministradorDto;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.AdministradorResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Administrador;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.AdministradorRepository;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.PersonaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.List;
 public class AdministradorServiceImpl implements AdministradorService {
 
     private final AdministradorRepository administradorRepository;
+    private final PersonaRepository personaRepository;
 
     @Override
     public AdministradorResponseDTO crearAdministrador(AdministradorDto dto) {
@@ -44,14 +47,29 @@ public class AdministradorServiceImpl implements AdministradorService {
     }
 
     @Override
-    public AdministradorResponseDTO actualizarAdministrador(Long id, AdministradorDto dto) {
+    public AdministradorResponseDTO actualizarAdministrador(Long id, ActualizarAdministradorDTO dto) {
         Administrador existente = administradorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Administrador no encontrado con ID: " + id));
-        existente.setNombreApellido(dto.getNombreApellido());
-        existente.setMail(dto.getMail());
-        existente.setTelefono(dto.getTelefono());
-        return AdministradorResponseDTO.fromEntity(administradorRepository.save(existente));
+
+        if (dto.getNombreApellido() != null) {
+            existente.setNombreApellido(dto.getNombreApellido());
+        }
+        if (dto.getMail() != null) {
+            boolean mailExistente = personaRepository.existsByMail(dto.getMail());
+            // Evitar conflicto con el mismo estudiante (es decir, si no cambió su propio mail)
+            if (mailExistente && !dto.getMail().equals(existente.getMail())) {
+                throw new IllegalArgumentException("Ya existe una persona con ese correo electrónico.");
+            }
+            existente.setMail(dto.getMail());
+        }
+        if (dto.getTelefono() != null) {
+            existente.setTelefono(dto.getTelefono());
+        }
+
+        Administrador actualizado = administradorRepository.save(existente);
+        return AdministradorResponseDTO.fromEntity(actualizado);
     }
+
 
     @Override
     public void eliminarAdministrador(Long id) {

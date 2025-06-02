@@ -1,10 +1,12 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.estudiante;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarEstudianteDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstudianteDto;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstudianteResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Estudiante;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.EstudianteRepository;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.PersonaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.List;
 public class EstudianteServiceImpl implements EstudianteService {
 
     private final EstudianteRepository estudianteRepository;
+    private final PersonaRepository personaRepository;
 
     @Override
     public EstudianteResponseDTO crearEstudiante(EstudianteDto dto) {
@@ -45,15 +48,29 @@ public class EstudianteServiceImpl implements EstudianteService {
     }
 
     @Override
-    public EstudianteResponseDTO actualizarEstudiante(Long id, EstudianteDto dto) {
+    public EstudianteResponseDTO actualizarEstudiante(Long id, ActualizarEstudianteDTO dto) {
         Estudiante existente = estudianteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + id));
-        existente.setNombreApellido(dto.getNombreApellido());
-        existente.setMail(dto.getMail());
-        existente.setTelefono(dto.getTelefono());
-        existente.setNroRegistro(dto.getNroRegistro());
-        return EstudianteResponseDTO.fromEntity(estudianteRepository.save(existente));
+
+        if (dto.getNombreApellido() != null) {
+            existente.setNombreApellido(dto.getNombreApellido());
+        }
+        if (dto.getMail() != null) {
+            boolean mailExistente = personaRepository.existsByMail(dto.getMail());
+            // Evitar conflicto con el mismo estudiante (es decir, si no cambió su propio mail)
+            if (mailExistente && !dto.getMail().equals(existente.getMail())) {
+                throw new IllegalArgumentException("Ya existe una persona con ese correo electrónico.");
+            }
+            existente.setMail(dto.getMail());
+        }
+        if (dto.getTelefono() != null) {
+            existente.setTelefono(dto.getTelefono());
+        }
+
+        Estudiante actualizado = estudianteRepository.save(existente);
+        return EstudianteResponseDTO.fromEntity(actualizado);
     }
+
 
     @Override
     public void eliminarEstudiante(Long id) {

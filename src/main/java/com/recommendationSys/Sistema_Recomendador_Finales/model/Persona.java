@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "persona", uniqueConstraints = {
         @UniqueConstraint(columnNames = "mail"),
-        @UniqueConstraint(columnNames = "usuario")
+        @UniqueConstraint(columnNames = "supabaseUserId")
 })
 @Inheritance(strategy = InheritanceType.JOINED)
 @SuperBuilder
@@ -40,5 +40,8 @@ public abstract class Persona {
     @Column(length = 15)
     private String telefono;
 
+    @NotBlank(message = "SupabaseUserId es obligatorio")
+    @Column(nullable = false, unique = true)
     private String supabaseUserId;
+
     }

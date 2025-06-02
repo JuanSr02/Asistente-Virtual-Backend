@@ -1,7 +1,9 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.ActualizarEstudianteDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstudianteDto;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.estudiante.EstudianteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,7 @@ public class EstudianteController {
      * @return El estudiante creado.
      */
     @PostMapping
-    public ResponseEntity<?> crearEstudiante(@RequestBody EstudianteDto dto) {
+    public ResponseEntity<?> crearEstudiante(@RequestBody @Valid EstudianteDto dto) {
         return ResponseEntity.ok(estudianteService.crearEstudiante(dto));
     }
 
@@ -56,7 +58,7 @@ public class EstudianteController {
      * @return Estudiante actualizado.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody EstudianteDto dto) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody ActualizarEstudianteDTO dto) {
         return ResponseEntity.ok(estudianteService.actualizarEstudiante(id, dto));
     }
 
