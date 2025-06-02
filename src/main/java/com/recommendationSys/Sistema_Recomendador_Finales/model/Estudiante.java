@@ -3,10 +3,8 @@ package com.recommendationSys.Sistema_Recomendador_Finales.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
@@ -17,6 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "estudiante")
 @PrimaryKeyJoinColumn(name = "persona_id")
+@SuperBuilder
 public class Estudiante extends Persona {
 
     @NotNull(message = "El número de registro es obligatorio")
