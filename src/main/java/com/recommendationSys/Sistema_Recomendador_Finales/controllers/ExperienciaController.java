@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/public/experiencias")
+@RequestMapping("/api/shared/experiencias")
 public class ExperienciaController {
 
     private final ExperienciaCRUDService experienciaService;

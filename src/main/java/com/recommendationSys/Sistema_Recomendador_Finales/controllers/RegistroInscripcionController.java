@@ -22,7 +22,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/public/inscripciones")
+@RequestMapping("/api/shared/inscripciones")
 public class RegistroInscripcionController {
 
     private final InscripcionService inscripcionService;

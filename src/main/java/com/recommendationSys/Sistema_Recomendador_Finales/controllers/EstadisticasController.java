@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Validated
 @RestController
-@RequestMapping("/api/public/estadisticas")
+@RequestMapping("/api/shared/estadisticas")
 @RequiredArgsConstructor
 public class EstadisticasController {
 

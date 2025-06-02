@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * Controlador REST para manejar operaciones sobre administradores.
  */
 @RestController
-@RequestMapping("/api/public/administradores")
+@RequestMapping("/api/admin/administradores")
 @RequiredArgsConstructor
 public class AdministradorController {
 

@@ -16,7 +16,7 @@ import java.io.IOException;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/public/planes-estudio")
+@RequestMapping("/api/admin/planes-estudio")
 public class PlanEstudioController {
 
     private final PlanEstudioService planEstudioService;

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * Controlador REST para manejar operaciones sobre estudiantes.
  */
 @RestController
-@RequestMapping("/api/public/estudiantes")
+@RequestMapping("/api/shared/estudiantes")
 @RequiredArgsConstructor
 public class EstudianteController {
 

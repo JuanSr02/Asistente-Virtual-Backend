@@ -3,6 +3,7 @@ package com.recommendationSys.Sistema_Recomendador_Finales.config;
 import com.recommendationSys.Sistema_Recomendador_Finales.Util.SupabaseJwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final SupabaseJwtAuthFilter jwtAuthFilter;
@@ -31,10 +33,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()  // frontend login/registro
-                        .requestMatchers("/api/test/public", "/api/public/**").permitAll()
+                        .requestMatchers("/api/test/**", "/api/public/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
-                        .requestMatchers("/api/student/**").hasRole("ESTUDIANTE")
+                        .requestMatchers("/api/shared/**").hasAnyRole("ADMINISTRADOR", "ESTUDIANTE")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -46,7 +47,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:3000"));  // Cambiar al dominio React en producción
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

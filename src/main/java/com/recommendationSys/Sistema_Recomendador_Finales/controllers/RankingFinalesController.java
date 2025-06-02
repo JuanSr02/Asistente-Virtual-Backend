@@ -17,7 +17,7 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/public/finales/{estudianteId}")
+@RequestMapping("/api/shared/finales/{estudianteId}")
 public class RankingFinalesController {
 
     private final RankingFinalesService rankingFinalesService;

@@ -17,7 +17,7 @@ import java.io.IOException;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/public/historia-academica/{estudianteId}")
+@RequestMapping("/api/shared/historia-academica/{estudianteId}")
 public class HistoriaAcademicaController {
 
     private final HistoriaAcademicaService historiaAcademicaService;
