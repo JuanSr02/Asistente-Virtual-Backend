@@ -23,10 +23,7 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
     private String jwtSecret;
 
     @Override
-    protected void doFilterInternal(
-            jakarta.servlet.http.HttpServletRequest request,
-            jakarta.servlet.http.HttpServletResponse response,
-            jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
+    protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,jakarta.servlet.http.HttpServletResponse response,jakarta.servlet.FilterChain filterChain) throws jakarta.servlet.ServletException, IOException {
 
         String header = request.getHeader("Authorization");
 

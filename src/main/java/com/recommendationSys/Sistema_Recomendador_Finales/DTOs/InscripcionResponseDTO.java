@@ -14,5 +14,4 @@ public class InscripcionResponseDTO {
     private String materiaPlan;
     private String estudianteNombre;
     private Long estudianteId;
-    private Integer estudianteNroRegistro;
 }

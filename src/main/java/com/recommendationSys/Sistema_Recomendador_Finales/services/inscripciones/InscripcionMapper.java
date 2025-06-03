@@ -29,7 +29,6 @@ public class InscripcionMapper {
                 .materiaPlan(inscripcion.getMateria().getPlanDeEstudio().getCodigo())
                 .estudianteId(inscripcion.getEstudiante().getId())
                 .estudianteNombre(inscripcion.getEstudiante().getNombreApellido())
-                .estudianteNroRegistro(inscripcion.getEstudiante().getNroRegistro())
                 .build();
     }
 }

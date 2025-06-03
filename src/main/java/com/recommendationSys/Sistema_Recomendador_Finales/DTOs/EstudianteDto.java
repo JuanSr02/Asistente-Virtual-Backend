@@ -2,9 +2,11 @@ package com.recommendationSys.Sistema_Recomendador_Finales.DTOs;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -27,6 +29,7 @@ public class EstudianteDto {
     @NotBlank(message = "SupabaseUserId es obligatorio")
     private String supabaseUserId;
 
-    @NotNull(message = "El número de registro es obligatorio")
-    private Integer nroRegistro;
+    @NotBlank(message = "Role es obligatorio")
+    private String role;
+
 }

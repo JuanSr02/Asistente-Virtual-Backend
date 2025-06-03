@@ -27,7 +27,7 @@ public class EstudianteServiceImpl implements EstudianteService {
                 .mail(dto.getMail())
                 .telefono(dto.getTelefono())
                 .supabaseUserId(dto.getSupabaseUserId())
-                .nroRegistro(dto.getNroRegistro())
+                .role(dto.getRole())
                 .build();
         return EstudianteResponseDTO.fromEntity(estudianteRepository.save(estudiante));
     }

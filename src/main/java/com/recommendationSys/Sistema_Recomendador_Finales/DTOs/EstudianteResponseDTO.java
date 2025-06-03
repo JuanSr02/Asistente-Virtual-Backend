@@ -19,7 +19,6 @@ public class EstudianteResponseDTO {
     private String mail;
     private String telefono;
     private String supabaseUserId;
-    private Integer nroRegistro;
 
     /**
      * Convierte una entidad Estudiante a su correspondiente DTO de respuesta.
@@ -34,7 +33,6 @@ public class EstudianteResponseDTO {
                 .mail(estudiante.getMail())
                 .telefono(estudiante.getTelefono())
                 .supabaseUserId(estudiante.getSupabaseUserId())
-                .nroRegistro(estudiante.getNroRegistro())
                 .build();
     }
 }

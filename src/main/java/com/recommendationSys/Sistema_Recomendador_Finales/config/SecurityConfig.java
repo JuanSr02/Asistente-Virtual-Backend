@@ -1,6 +1,7 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.config;
 
 import com.recommendationSys.Sistema_Recomendador_Finales.Util.SupabaseJwtAuthFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -18,13 +19,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final SupabaseJwtAuthFilter jwtAuthFilter;
-
-    public SecurityConfig(SupabaseJwtAuthFilter jwtAuthFilter) {
-        this.jwtAuthFilter = jwtAuthFilter;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
