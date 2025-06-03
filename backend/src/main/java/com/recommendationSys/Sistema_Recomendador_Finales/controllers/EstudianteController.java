@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * Controlador REST para manejar operaciones sobre estudiantes.
  */
 @RestController
-@RequestMapping("/api/shared/estudiantes")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class EstudianteController {
 
@@ -24,7 +24,7 @@ public class EstudianteController {
      * @param dto Datos del estudiante a crear.
      * @return El estudiante creado.
      */
-    @PostMapping
+    @PostMapping("/public/estudiantes")
     public ResponseEntity<?> crearEstudiante(@RequestBody @Valid EstudianteDto dto) {
         return ResponseEntity.ok(estudianteService.crearEstudiante(dto));
     }
@@ -35,7 +35,7 @@ public class EstudianteController {
      * @param id ID del estudiante.
      * @return El estudiante encontrado.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/shared/estudiantes/{id}")
     public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.obtenerPorId(id));
     }
@@ -45,7 +45,7 @@ public class EstudianteController {
      *
      * @return Lista de todos los estudiantes registrados.
      */
-    @GetMapping
+    @GetMapping("/shared/estudiantes")
     public ResponseEntity<?> obtenerTodos() {
         return ResponseEntity.ok(estudianteService.obtenerTodos());
     }
@@ -57,7 +57,7 @@ public class EstudianteController {
      * @param dto Nuevos datos del estudiante.
      * @return Estudiante actualizado.
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/shared/estudiantes/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody ActualizarEstudianteDTO dto) {
         return ResponseEntity.ok(estudianteService.actualizarEstudiante(id, dto));
     }
@@ -68,7 +68,7 @@ public class EstudianteController {
      * @param id ID del estudiante a eliminar.
      * @return Respuesta sin contenido.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/shared/estudiantes/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         estudianteService.eliminarEstudiante(id);
         return ResponseEntity.noContent().build();
