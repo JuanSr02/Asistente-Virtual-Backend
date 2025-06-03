@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="62dcc2ac-5be0-4d84-b19a-9b7397c2dbd1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/compose.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/Abogacia UCC 2018.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/ING C. 28_12.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/ING. 26_12.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/ING. 26_12.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/LIC. 32_12.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/LIC. 32_12.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia-gino.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_bian.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_emi.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_franco_sarubbi.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_ivan.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_juan.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_juan.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_lu.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_maxi.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_pol.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/ActualizarAdministradorDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/ActualizarEstudianteDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/ActualizarExperienciaDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/AdministradorDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/AdministradorResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/EstadisticasFinalDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/EstadisticasGeneralesDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/EstadisticasMateriaDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/EstudianteDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/EstudianteResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/ExperienciaDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/ExperienciaResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/FinalDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/HistoriaAcademicaResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/InscripcionResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/MateriaDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/MateriaRankingDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/OrdenFinales.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/PlanEstudioResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/DTOs/RegistroInscripcionDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/SistemaRecomendadorDeFinalesApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/Util/SupabaseJwtAuthFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/Util/tablas.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/config/JacksonConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/config/SecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/AdministradorController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/EstadisticasController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/EstudianteController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/ExperienciaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/HistoriaAcademicaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/PlanEstudioController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/RankingFinalesController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/RegistroInscripcionController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/exceptions/ApiExceptionResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/exceptions/EmailException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/exceptions/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/exceptions/IntegrityException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/exceptions/PlanEstudioValidationException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/exceptions/ResourceNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Administrador.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Correlativa.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/CorrelativaId.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/EstadisticasMateria.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Estudiante.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Examen.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Experiencia.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/HistoriaAcademica.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Materia.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/MateriaId.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Persona.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/PlanDeEstudio.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/RegistroInscripcion.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/Renglon.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/AdministradorRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/CorrelativaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/EstadisticasMateriaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/EstudianteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/ExamenRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/ExperienciaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/HistoriaAcademicaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/MateriaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/PersonaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/PlanDeEstudioRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/RegistroInscripcionRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/RenglonRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/ExcelProcessingUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/administradores/AdministradorService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/administradores/AdministradorServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/email/EmailNotificationService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/email/EmailTemplateGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/email/NewStudentNotificationTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/email/NotificationData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/estadisticas/EstadisticasCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/estadisticas/EstadisticasGeneralCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/estadisticas/EstadisticasHelper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/estadisticas/EstadisticasMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/estadisticas/EstadisticasServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/estudiante/EstudianteService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/estudiante/EstudianteServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/experiencia/ExperienciaCRUDService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/experiencia/ExperienciaMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/experiencia/ExperienciaQueryService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/experiencia/ExperienciaServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/experiencia/ExperienciaValidator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/DatosFilaExcel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/ExcelProcessingService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/ExcelProcessingServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/HistoriaAcademicaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/HistoriaAcademicaServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/HistoriaAcademicaValidator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/RenglonFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/inscripciones/InscripcionMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/inscripciones/InscripcionNotificationService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/inscripciones/InscripcionService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/inscripciones/InscripcionValidator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/inscripciones/RegistroInscripcionServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/CorrelativaProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/ExcelPlanProcessor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/ExcelPlanProcessorImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/PlanEstudioService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/PlanEstudioServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/PlanMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/PlanValidator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/PlanValidatorImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/rankingFinales/FinalesCalculator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/rankingFinales/FinalesCalculatorImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/rankingFinales/FinalesMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/rankingFinales/FinalesSorter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/rankingFinales/FinalesSorterImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/rankingFinales/RankingFinalesService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/rankingFinales/RankingFinalesServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "JuanSr02"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/JuanSr02/Sistema_Recomendador_Finales.git",
+    "accountId": "89a32127-7565-4070-8656-29cc270f2695"
+  }
+}]]></component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 7
+}]]></component>
+  <component name="ProjectId" id="2y13hTcHGX2IJW6NdrtCsu3X1Mv" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="62dcc2ac-5be0-4d84-b19a-9b7397c2dbd1" name="Changes" comment="" />
+      <created>1748988373566</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1748988373566</updated>
+    </task>
+    <servers />
+  </component>
+</project>
