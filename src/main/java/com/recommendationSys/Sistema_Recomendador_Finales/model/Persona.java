@@ -44,8 +44,8 @@ public abstract class Persona {
     @Column(nullable = false, unique = true)
     private String supabaseUserId;
 
-    @NotBlank(message = "Role es obligatorio")
+    @NotBlank(message = "rol usuario es obligatorio")
     @Column(nullable = false)
-    private String role;
+    private String rol_usuario;
 
     }

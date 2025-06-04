@@ -39,7 +39,7 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
             DecodedJWT jwt = verifier.verify(token);
 
             String userId = jwt.getSubject();
-            String role = jwt.getClaim("role").asString();
+            String role = jwt.getClaim("rol_usuario").asString();
 
             Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
