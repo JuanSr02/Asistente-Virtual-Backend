@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -47,5 +48,16 @@ public class PlanEstudioController {
         log.info("Eliminando plan de estudio con código: {}", codigoPlan);
         planEstudioService.eliminarPlanDeEstudio(codigoPlan);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Obtiene todos los planes de estudio disponibles.
+     *
+     * @return una lista de {@link PlanEstudioResponseDTO} que representa los planes de estudio existentes.
+     */
+    @GetMapping
+    public ResponseEntity<List<PlanEstudioResponseDTO>> obtenerTodosLosPlanes() {
+        List<PlanEstudioResponseDTO> planes = planEstudioService.obtenerPlanes();
+        return ResponseEntity.ok(planes);
     }
 }

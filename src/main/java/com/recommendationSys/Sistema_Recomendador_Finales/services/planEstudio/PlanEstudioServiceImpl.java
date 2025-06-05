@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -43,4 +45,13 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
                     "No se puede eliminar el plan porque tiene referencias activas");
         }
     }
+    @Override
+    public List<PlanEstudioResponseDTO> obtenerPlanes(){
+        List<PlanEstudioResponseDTO> planes = new ArrayList<>();
+        for (PlanDeEstudio p : planRepo.findAll()){
+            planes.add(planMapper.toResponseDTO(p));
+        }
+        return planes;
+    }
+
 }
