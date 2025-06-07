@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     private final MateriaRepository materiaRepo;
     private final EstadisticasHelper estadisticasHelper;
     private final PlanDeEstudioRepository planDeEstudioRepository;
+    private final HistoriaAcademicaRepository historiaRepo;
 
 
     @Scheduled(cron = "0 0 1 0 * ?")
@@ -130,11 +132,17 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
 
         long totalExamenes = examenRepo.count();
         long totalAprobados = examenRepo.countByNotaGreaterThanEqual(4.0);
+        List<Examen> todosLosExamenes = examenRepo.findAll();
 
         String materiaMasRendida = examenRepo.findCodigoMateriaMasRendida();
         String materiaMasRendidaNombre = materiaRepo.findFirstNombreByCodigo(materiaMasRendida);
         long cantMateriaMasRendida = examenRepo.countExamenesByCodigoMateria(materiaMasRendida);
         long cantAprobadosMateriaMasRendida = examenRepo.countExamenesAprobadosByCodigoMateria(materiaMasRendida);
+
+        List<HistoriaAcademica> historias = historiaRepo.findAll(); // Asegurate de tener este repo
+        Map<String, Integer> distEstudiantes = estadisticasHelper.calcularDistribucionEstudiantesPorCarrera(historias);
+        Map<String, Integer> distExamenes = estadisticasHelper.calcularDistribucionExamenesPorMateria(todosLosExamenes);
+
 
         return EstadisticasGeneralesDTO.builder()
                 .totalMaterias((int) materiaRepo.count())
@@ -145,6 +153,10 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
                 .top5Aprobadas(estadisticasHelper.mapToMateriaRankingDTO(topAprobadas))
                 .top5Reprobadas(estadisticasHelper.mapToMateriaRankingDTO(topReprobadas))
                 .promedioNotasPorMateria(estadisticasHelper.obtenerPromediosPorMateria())
+                .estudiantesActivos(estadisticasHelper.calcularEstudiantes())
+                .promedioGeneral(estadisticasHelper.calcularPromedioNotas(todosLosExamenes))
+                .distribucionEstudiantesPorCarrera(distEstudiantes)
+                .distribucionExamenesPorMateria(distExamenes)
                 .build();
     }
 

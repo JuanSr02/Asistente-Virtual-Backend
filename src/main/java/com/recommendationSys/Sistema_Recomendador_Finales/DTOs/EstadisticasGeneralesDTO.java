@@ -11,9 +11,13 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 public class EstadisticasGeneralesDTO {
+    private Long estudiantesActivos;
     private Integer totalMaterias;
     private Integer totalExamenesRendidos;
     private Double porcentajeAprobadosGeneral;
+    private Double promedioGeneral;
+    private Map<String,Integer> distribucionEstudiantesPorCarrera;
+    private Map<String,Integer> distribucionExamenesPorMateria;
     private MateriaRankingDTO materiaMasRendida;
     private Long cantidadMateriaMasRendida;
     private List<MateriaRankingDTO> top5Aprobadas;

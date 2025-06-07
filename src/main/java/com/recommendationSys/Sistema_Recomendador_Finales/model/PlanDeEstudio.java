@@ -20,7 +20,7 @@ public class PlanDeEstudio {
     private String codigo;
 
     @Column(nullable = false, length = 150)
-    private String propuesta;
+    private String propuesta; // nombre de la carrera
 
     @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore

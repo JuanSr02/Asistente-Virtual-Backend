@@ -8,7 +8,9 @@ import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.MateriaRankingDTO
 import com.recommendationSys.Sistema_Recomendador_Finales.model.EstadisticasMateria;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Examen;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Experiencia;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.HistoriaAcademica;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.EstadisticasMateriaRepository;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.EstudianteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,34 @@ import java.util.stream.Collectors;
 public class EstadisticasHelper {
     private final ObjectMapper objectMapper;
     private final EstadisticasMateriaRepository estadisticasRepo;
+    private final EstudianteRepository estudianteRepository;
+
+    public Long calcularEstudiantes(){
+        return estudianteRepository.count();
+    }
+
+    public Map<String, Integer> calcularDistribucionEstudiantesPorCarrera(List<HistoriaAcademica> historias) {
+        if (historias == null || historias.isEmpty()) return Collections.emptyMap();
+
+        return historias.stream()
+                .map(h -> h.getPlanDeEstudio().getPropuesta())
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.reducing(0, e -> 1, Integer::sum)
+                ));
+    }
+
+    public Map<String, Integer> calcularDistribucionExamenesPorMateria(List<Examen> examenes) {
+        if (examenes == null || examenes.isEmpty()) return Collections.emptyMap();
+
+        return examenes.stream()
+                .filter(e -> e.getRenglon() != null && e.getRenglon().getMateria() != null)
+                .map(e -> e.getRenglon().getMateria().getNombre())
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.reducing(0, e -> 1, Integer::sum)
+                ));
+    }
 
 
     public Integer calcularAprobados(List<Examen> examenes) {
