@@ -28,6 +28,7 @@ public interface MateriaRepository extends JpaRepository<Materia, String> {
     @Query("SELECT COUNT(m) FROM Materia m WHERE m.planDeEstudio.codigo = :codigoPlan")
     Long ContarByPlanCodigo(@Param("codigoPlan") String codigoPlan);
 
+    List<Materia> findByPlanDeEstudio_Codigo(String codigoPlan);
 
 }
 

@@ -1,5 +1,6 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.controllers;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.MateriaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.PlanEstudioResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio.PlanEstudioService;
 import jakarta.validation.constraints.NotBlank;
@@ -59,5 +60,16 @@ public class PlanEstudioController {
     public ResponseEntity<List<PlanEstudioResponseDTO>> obtenerTodosLosPlanes() {
         List<PlanEstudioResponseDTO> planes = planEstudioService.obtenerPlanes();
         return ResponseEntity.ok(planes);
+    }
+
+    /**
+     * Obtiene todas las materias de un plan dado.
+     *
+     * @return una lista de Materias (Codigo y su nombre) de un plan dado.
+     */
+    @GetMapping("/materias")
+    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorPlan(@RequestParam("codigoPlan") @NotBlank String codigoPlan){
+        List<MateriaDTO> materias = planEstudioService.obtenerMateriasPorPlan(codigoPlan);
+        return ResponseEntity.ok(materias);
     }
 }

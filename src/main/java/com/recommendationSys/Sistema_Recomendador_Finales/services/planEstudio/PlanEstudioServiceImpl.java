@@ -1,9 +1,12 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio;
 
+import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.MateriaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.PlanEstudioResponseDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.IntegrityException;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
+import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
+import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.PlanDeEstudioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,6 +27,7 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
     private final PlanDeEstudioRepository planRepo;
     private final PlanValidator planValidator;
     private final PlanMapper planMapper;
+    private final MateriaRepository materiaRepo;
 
     @Override
     @Transactional
@@ -52,6 +56,15 @@ public class PlanEstudioServiceImpl implements PlanEstudioService {
             planes.add(planMapper.toResponseDTO(p));
         }
         return planes;
+    }
+
+    @Override
+    public List<MateriaDTO> obtenerMateriasPorPlan(String codigoPlan){
+        List<MateriaDTO> materiaDTOList = new ArrayList<>();
+        for(Materia m : materiaRepo.findByPlanDeEstudio_Codigo(codigoPlan)){
+            materiaDTOList.add(MateriaDTO.toMateriaDTO(m));
+        }
+        return materiaDTOList;
     }
 
 }
