@@ -4,4 +4,5 @@ import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasGener
 
 public interface EstadisticasGeneralCalculator {
     EstadisticasGeneralesDTO obtenerEstadisticasGenerales();
+    EstadisticasGeneralesDTO calcularEstadisticasGenerales();
 }

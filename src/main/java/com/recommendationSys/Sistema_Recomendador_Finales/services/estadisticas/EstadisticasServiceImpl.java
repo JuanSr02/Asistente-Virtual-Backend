@@ -1,13 +1,14 @@
 package com.recommendationSys.Sistema_Recomendador_Finales.services.estadisticas;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasGeneralesDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.DTOs.EstadisticasMateriaDTO;
 import com.recommendationSys.Sistema_Recomendador_Finales.exceptions.ResourceNotFoundException;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.*;
 import com.recommendationSys.Sistema_Recomendador_Finales.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EstadisticasServiceImpl implements EstadisticasCalculator, EstadisticasGeneralCalculator, EstadisticasMapper {
     private final ExperienciaRepository experienciaRepo;
     private final ExamenRepository examenRepo;
@@ -26,9 +28,11 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     private final EstadisticasHelper estadisticasHelper;
     private final PlanDeEstudioRepository planDeEstudioRepository;
     private final HistoriaAcademicaRepository historiaRepo;
+    private final ObjectMapper objectMapper;
+    private final EstadisticasGeneralesRepository estadisticasGeneralesRepo;
 
 
-    @Scheduled(cron = "0 0 1 0 * ?")
+
     @Transactional
     public void actualizarEstadisticas() {
         List<String> codigoMaterias = examenRepo.findDistinctMateriasPorCodigo();
@@ -102,6 +106,31 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         return stats;
     }
 
+    @Transactional
+    public void guardarEstadisticasGenerales(EstadisticasGeneralesDTO dto) {
+        try {
+            EstadisticasGenerales stats = EstadisticasGenerales.builder()
+                    .estudiantesActivos(dto.getEstudiantesActivos())
+                    .totalMaterias(dto.getTotalMaterias())
+                    .totalExamenesRendidos(dto.getTotalExamenesRendidos())
+                    .porcentajeAprobadosGeneral(dto.getPorcentajeAprobadosGeneral())
+                    .promedioGeneral(dto.getPromedioGeneral())
+                    .distribucionEstudiantesPorCarrera(objectMapper.writeValueAsString(dto.getDistribucionEstudiantesPorCarrera()))
+                    .distribucionExamenesPorMateria(objectMapper.writeValueAsString(dto.getDistribucionExamenesPorMateria()))
+                    .top5Aprobadas(objectMapper.writeValueAsString(dto.getTop5Aprobadas()))
+                    .top5Reprobadas(objectMapper.writeValueAsString(dto.getTop5Reprobadas()))
+                    .promedioNotasPorMateria(objectMapper.writeValueAsString(dto.getPromedioNotasPorMateria()))
+                    .materiaMasRendida(objectMapper.writeValueAsString(dto.getMateriaMasRendida()))
+                    .cantidadMateriaMasRendida(dto.getCantidadMateriaMasRendida())
+                    .fechaUltimaActualizacion(LocalDateTime.now())
+                    .build();
+
+            estadisticasGeneralesRepo.save(stats);
+        } catch (JsonProcessingException e) {
+            log.error("Error al serializar estadísticas generales", e);
+        }
+    }
+
 
     public EstadisticasMateria calcularEstadisticas(Materia materia) {
         List<Examen> examenes = examenRepo.findByMateriaWithJoins(materia);
@@ -126,6 +155,13 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
 
     @Override
     public EstadisticasGeneralesDTO obtenerEstadisticasGenerales() {
+        EstadisticasGeneralesDTO dto = calcularEstadisticasGenerales();
+        guardarEstadisticasGenerales(dto);
+        return dto;
+    }
+
+    @Override
+    public EstadisticasGeneralesDTO calcularEstadisticasGenerales() {
         actualizarEstadisticas();
         List<Object[]> topAprobadas = examenRepo.findTop5MateriasAprobadas();
         List<Object[]> topReprobadas = examenRepo.findTop5MateriasReprobadas();
@@ -175,6 +211,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         dto.setPromedioNotas(stats.getPromedioNotas());
         dto.setPromedioDiasEstudio(stats.getPromedioDiasEstudio());
         dto.setPromedioHorasDiarias(stats.getPromedioHorasDiarias());
+        dto.setPromedioDificultad(stats.getPromedioDificultad());
         dto.setPorcentajeAprobados(estadisticasHelper.calcularPorcentajeAprobados(stats));
 
         try {
