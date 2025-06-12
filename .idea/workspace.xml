@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1add405-9a18-4322-a4a0-09dfd323088b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/PlanEstudioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/PlanEstudioController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/PlanDeEstudio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/PlanDeEstudio.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/CorrelativaProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/CorrelativaProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/ExcelPlanProcessorImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/ExcelPlanProcessorImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +147,7 @@
       <workItem from="1749646878467" duration="6338000" />
       <workItem from="1749656979609" duration="139000" />
       <workItem from="1749691237325" duration="271000" />
-      <workItem from="1749752787702" duration="9092000" />
+      <workItem from="1749752787702" duration="9499000" />
     </task>
     <servers />
   </component>
