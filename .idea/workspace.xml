@@ -5,9 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1add405-9a18-4322-a4a0-09dfd323088b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/TestConnection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/PlanEstudioController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/PlanEstudioController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/PlanDeEstudio.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/model/PlanDeEstudio.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/CorrelativaProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/CorrelativaProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/ExcelPlanProcessorImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/ExcelPlanProcessorImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,7 +99,7 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.TestConnection">
+  <component name="RunManager" selected="Spring Boot.SistemaRecomendadorDeFinalesApplication">
     <configuration name="SistemaRecomendadorDeFinalesApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.recommendationSys.Sistema_Recomendador_Finales.SistemaRecomendadorDeFinalesApplication" />
       <module name="Sistema_Recomendador_Finales" />
@@ -130,6 +134,14 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26094.121" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-IU-251.26094.121" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -138,7 +150,10 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1742247405586</updated>
-      <workItem from="1749646878467" duration="6115000" />
+      <workItem from="1749646878467" duration="6338000" />
+      <workItem from="1749656979609" duration="139000" />
+      <workItem from="1749691237325" duration="271000" />
+      <workItem from="1749752787702" duration="9092000" />
     </task>
     <servers />
   </component>
@@ -154,22 +169,6 @@
     <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
     <option featureType="dependencySupport" implementationName="java:jakarta.xml.ws:jakarta.xml.ws-api" />
     <option featureType="dependencySupport" implementationName="java:org.projectlombok:lombok" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/PlanValidatorImpl.java</url>
-          <line>29</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/planEstudio/ExcelPlanProcessorImpl.java</url>
-          <line>29</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -18,17 +18,18 @@ import java.util.List;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/planes-estudio")
+@RequestMapping("/api")
 public class PlanEstudioController {
 
     private final PlanEstudioService planEstudioService;
 
     /**
      * Carga un plan de estudio desde un archivo Excel
+     *
      * @param file Archivo Excel con los datos del plan de estudio
      * @return Respuesta con el resultado de la operación
      */
-    @PostMapping("/carga")
+    @PostMapping("/admin/planes-estudio/carga")
     public ResponseEntity<?> cargarPlanDesdeExcel(
             @RequestParam("file") MultipartFile file) throws IOException {
 
@@ -39,10 +40,11 @@ public class PlanEstudioController {
 
     /**
      * Elimina un plan de estudio
+     *
      * @param codigoPlan Código único del plan de estudio (no puede estar vacío)
      * @return Respuesta con el resultado de la operación
      */
-    @DeleteMapping
+    @DeleteMapping("/admin/planes-estudio")
     public ResponseEntity<?> eliminarPlanDeEstudio(
             @RequestParam("codigo") @NotBlank String codigoPlan) {
 
@@ -56,7 +58,7 @@ public class PlanEstudioController {
      *
      * @return una lista de {@link PlanEstudioResponseDTO} que representa los planes de estudio existentes.
      */
-    @GetMapping
+    @GetMapping("/admin/planes-estudio")
     public ResponseEntity<List<PlanEstudioResponseDTO>> obtenerTodosLosPlanes() {
         List<PlanEstudioResponseDTO> planes = planEstudioService.obtenerPlanes();
         return ResponseEntity.ok(planes);
@@ -67,8 +69,8 @@ public class PlanEstudioController {
      *
      * @return una lista de Materias (Codigo y su nombre) de un plan dado.
      */
-    @GetMapping("/materias")
-    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorPlan(@RequestParam("codigoPlan") @NotBlank String codigoPlan){
+    @GetMapping("/shared/planes-estudio/materias")
+    public ResponseEntity<List<MateriaDTO>> obtenerMateriasPorPlan(@RequestParam("codigoPlan") @NotBlank String codigoPlan) {
         List<MateriaDTO> materias = planEstudioService.obtenerMateriasPorPlan(codigoPlan);
         return ResponseEntity.ok(materias);
     }

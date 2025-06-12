@@ -3,39 +3,34 @@ package com.recommendationSys.Sistema_Recomendador_Finales.services.planEstudio;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Correlativa;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.Materia;
 import com.recommendationSys.Sistema_Recomendador_Finales.model.PlanDeEstudio;
-import com.recommendationSys.Sistema_Recomendador_Finales.repository.CorrelativaRepository;
-import com.recommendationSys.Sistema_Recomendador_Finales.repository.MateriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class CorrelativaProcessor {
 
-    private final MateriaRepository materiaRepo;
-    private final CorrelativaRepository correlativaRepo;
+    public List<Correlativa> generarCorrelativasConCache(
+            String correlativasStr,
+            Materia materia,
+            Map<String, Materia> cacheMaterias,
+            PlanDeEstudio plan) {
 
-    public void procesarCorrelativas(String correlativasStr, Materia materia, PlanDeEstudio plan) {
         if (correlativasStr == null || "No tiene".equalsIgnoreCase(correlativasStr)) {
-            return;
+            return Collections.emptyList();
         }
 
-        Arrays.stream(correlativasStr.split("-"))
+        return Arrays.stream(correlativasStr.split("-"))
                 .map(String::trim)
                 .filter(codigo -> !codigo.isEmpty())
-                .forEach(codigo -> procesarCorrelativa(codigo, materia, plan));
-    }
-
-    private void procesarCorrelativa(String codigoCorrelativa, Materia materia, PlanDeEstudio plan) {
-        materiaRepo.findByCodigoAndPlanDeEstudio(codigoCorrelativa,plan)
-                .ifPresent(correlativa -> {
-                    Correlativa nuevaCorrelativa = Correlativa.builder()
-                            .materia(materia)
-                            .correlativaCodigo(correlativa)
-                            .build();
-                    correlativaRepo.save(nuevaCorrelativa);
-                });
+                .map(cacheMaterias::get)
+                .filter(Objects::nonNull)
+                .map(correlativa -> Correlativa.builder()
+                        .materia(materia)
+                        .correlativaCodigo(correlativa)
+                        .build())
+                .toList();
     }
 }

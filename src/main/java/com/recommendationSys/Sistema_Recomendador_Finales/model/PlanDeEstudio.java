@@ -27,4 +27,10 @@ public class PlanDeEstudio {
     @ToString.Exclude
     @Builder.Default
     private List<Materia> materias = new ArrayList<>();
+
+    @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ToString.Exclude
+    @Builder.Default
+    private List<HistoriaAcademica> historias = new ArrayList<>();
 }
