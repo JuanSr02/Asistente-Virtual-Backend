@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1add405-9a18-4322-a4a0-09dfd323088b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/TestConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/TestConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/SistemaRecomendadorDeFinalesApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/SistemaRecomendadorDeFinalesApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +148,7 @@
       <workItem from="1749656979609" duration="139000" />
       <workItem from="1749691237325" duration="271000" />
       <workItem from="1749752787702" duration="21258000" />
-      <workItem from="1749812768865" duration="4222000" />
+      <workItem from="1749812768865" duration="4861000" />
     </task>
     <servers />
   </component>
