@@ -43,8 +43,8 @@ public class ExcelPlanProcessorImpl implements ExcelPlanProcessor {
         planValidator.validarFilaPlan(planRow);
 
         PlanDeEstudio plan = planMapper.mapearPlanDesdeFila(planRow);
-        plan = planRepo.saveAndFlush(plan); // saveAndFlush asegura que esté en sesión
-
+        plan = planRepo.save(plan);
+        
         // --- 2. Crear y guardar todas las materias ---
         int lastRowWithData = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
         List<Materia> materias = new ArrayList<>();
@@ -59,7 +59,6 @@ public class ExcelPlanProcessorImpl implements ExcelPlanProcessor {
         }
 
         List<Materia> materiasGuardadas = materiaRepo.saveAll(materias);
-        materiaRepo.flush();
         Map<String, Materia> cacheMaterias = new HashMap<>();
         for (Materia m : materiasGuardadas) {
             cacheMaterias.put(m.getCodigo(), m);
@@ -81,7 +80,6 @@ public class ExcelPlanProcessorImpl implements ExcelPlanProcessor {
         }
 
         correlativaRepo.saveAll(correlativas);
-        correlativaRepo.flush();
 
         return plan;
     }

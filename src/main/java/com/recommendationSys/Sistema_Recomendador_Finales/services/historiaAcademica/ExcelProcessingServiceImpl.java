@@ -101,6 +101,7 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
 
     private DatosFilaExcel extraerDatosFila(Row row) {
         String nombreMateria = row.getCell(0).getStringCellValue().trim();
+        String codigo = nombreMateria.substring(nombreMateria.indexOf("(") + 1, nombreMateria.indexOf(")")).trim();
         nombreMateria = nombreMateria.substring(0, nombreMateria.indexOf("(")).trim();
         LocalDate fecha = LocalDate.parse(
                 row.getCell(1).getStringCellValue().trim(),
@@ -110,7 +111,7 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
         Double nota = ExcelProcessingUtils.extraerNota(row.getCell(3));
         String resultado = row.getCell(4).getStringCellValue().trim();
 
-        return new DatosFilaExcel(nombreMateria, fecha, tipo, nota, resultado);
+        return new DatosFilaExcel(nombreMateria, codigo, fecha, tipo, nota, resultado);
     }
 
     private boolean debeOmitirFila(DatosFilaExcel datos) {
