@@ -6,6 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="e1add405-9a18-4322-a4a0-09dfd323088b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/ING. 26_12.xls" beforeDir="false" afterPath="$PROJECT_DIR$/datos_prueba/ING. 26_12.xls" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_juan.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_juan.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/datos_prueba/historia_academica_lu.xls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/HistoriaAcademicaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/controllers/HistoriaAcademicaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/ExamenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/ExamenRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/PlanDeEstudioRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/PlanDeEstudioRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/RenglonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/repository/RenglonRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/ExcelProcessingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/ExcelProcessingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/ExcelProcessingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/ExcelProcessingServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/HistoriaAcademicaService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/HistoriaAcademicaService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/HistoriaAcademicaServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/recommendationSys/Sistema_Recomendador_Finales/services/historiaAcademica/HistoriaAcademicaServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -147,7 +159,7 @@
       <workItem from="1749646878467" duration="6338000" />
       <workItem from="1749656979609" duration="139000" />
       <workItem from="1749691237325" duration="271000" />
-      <workItem from="1749752787702" duration="9499000" />
+      <workItem from="1749752787702" duration="18132000" />
     </task>
     <servers />
   </component>

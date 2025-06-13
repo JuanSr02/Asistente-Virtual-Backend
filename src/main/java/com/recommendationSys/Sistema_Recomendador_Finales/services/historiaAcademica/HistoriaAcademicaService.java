@@ -6,7 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface HistoriaAcademicaService {
-    HistoriaAcademicaResponseDTO cargarHistoriaAcademica(MultipartFile file, Long estudianteId) throws IOException;
+    HistoriaAcademicaResponseDTO cargarHistoriaAcademica(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException;
+
     void eliminarHistoriaAcademica(Long estudianteId);
-    HistoriaAcademicaResponseDTO actualizarHistoriaAcademica(MultipartFile file, Long estudianteId) throws IOException;
+
+    HistoriaAcademicaResponseDTO actualizarHistoriaAcademica(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException;
 }

@@ -16,6 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +36,11 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
     private final RenglonFactory renglonFactory;
 
     @Override
-    public HistoriaAcademica procesarArchivoExcel(MultipartFile file, Long estudianteId) throws IOException {
+    public HistoriaAcademica procesarArchivoExcel(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
-        PlanDeEstudio plan = obtenerPlanDeEstudio(sheet);
+        PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
         HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
 
@@ -44,10 +49,9 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
         return historia;
     }
 
-    private PlanDeEstudio obtenerPlanDeEstudio(Sheet sheet) {
-        String nombrePlan = sheet.getRow(3).getCell(0).getStringCellValue().trim();
-        return (PlanDeEstudio) planRepo.findByPropuesta(nombrePlan)
-                .orElseThrow(() -> new ResourceNotFoundException("Plan de estudio no encontrado: " + nombrePlan));
+    private PlanDeEstudio obtenerPlanDeEstudio(String codigoPlan) {
+        return planRepo.findById(codigoPlan)
+                .orElseThrow(() -> new ResourceNotFoundException("Plan de estudio con codigo: " + codigoPlan + " no encontrado"));
     }
 
     private HistoriaAcademica obtenerOCrearHistoria(Estudiante estudiante, PlanDeEstudio plan) {
@@ -62,26 +66,37 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
 
     private void procesarFilasExcel(Sheet sheet, HistoriaAcademica historia, PlanDeEstudio plan) {
         int lastRow = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
-
+        Map<String, Materia> materiasMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream()
+                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
+        List<Renglon> renglonList = new ArrayList<>();
+        List<Examen> examenList = new ArrayList<>();
         for (int i = 6; i <= lastRow; i++) {
-            procesarFila(sheet.getRow(i), historia, plan);
+            procesarFila(sheet.getRow(i), historia, plan, materiasMap, renglonList, examenList);
         }
         // Borro las promociones
-        renglonRepo.deleteByTipoAndResultado("Promocion","Promocionado");
+        List<Renglon> aEliminar = renglonList.stream()
+                .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()) &&
+                        "Promocionado".equalsIgnoreCase(r.getResultado()))
+                .collect(Collectors.toList());
+
+        renglonList.removeAll(aEliminar); // mantiene la lista en memoria actualizada
+        renglonRepo.saveAll(renglonList);
+        examenRepo.saveAll(examenList);
     }
 
-    private void procesarFila(Row row, HistoriaAcademica historia, PlanDeEstudio plan) {
+    private void procesarFila(Row row, HistoriaAcademica historia, PlanDeEstudio plan, Map<String, Materia> materiasMap, List<Renglon> renglonList, List<Examen> examenList) {
         if (row == null || ExcelProcessingUtils.isEmptyRow(row)) return;
 
         DatosFilaExcel datos = extraerDatosFila(row);
         if (debeOmitirFila(datos)) return;
 
-        try {
-            Materia materia = obtenerMateria(datos.nombreMateria(), plan);
-            procesarRenglonSegunTipo(datos, historia, materia);
-        } catch (ResourceNotFoundException e) {
-            log.warn("Fila salteada - Materia no encontrada: '{}'. Detalle: {}", datos.nombreMateria(), e.getMessage());
+        Materia materia = materiasMap.get(datos.nombreMateria());
+        if (materia == null) {
+            log.warn("Materia no encontrada: {}", datos.nombreMateria());
+            return;
         }
+        procesarRenglonSegunTipo(datos, historia, materia, renglonList, examenList);
+
     }
 
     private DatosFilaExcel extraerDatosFila(Row row) {
@@ -106,88 +121,104 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
                 ;
     }
 
-    private Materia obtenerMateria(String nombreMateria, PlanDeEstudio plan) {
-        return materiaRepo.findByNombreAndPlanDeEstudio(nombreMateria, plan)
-                .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada: " + nombreMateria));
-    }
 
-    private void procesarRenglonSegunTipo(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia) {
+    private void procesarRenglonSegunTipo(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList, List<Examen> examenList) {
         switch (datos.tipo().toLowerCase()) {
             case "regularidad":
-                procesarRegularidad(datos, historia, materia);
+                procesarRegularidad(datos, historia, materia, renglonList);
                 break;
             case "examen":
-                procesarExamen(datos, historia, materia);
+                procesarExamen(datos, historia, materia, renglonList, examenList);
                 break;
             case "promocion":
-                procesarPromocion(datos, historia, materia);
+                procesarPromocion(datos, historia, materia, renglonList);
                 break;
         }
     }
 
-    private void procesarRegularidad(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia) {
-        if (tieneExamenAprobadoOMateriaPromocionada(materia, historia)) return;
+    private void procesarRegularidad(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList) {
+        if (tieneExamenAprobadoOMateriaPromocionada(materia, historia, renglonList)) return;
 
         Renglon renglon = renglonFactory.crearRenglon(
                 datos.fecha(), datos.tipo(), datos.nota(), datos.resultado(), historia, materia
         );
-        renglonRepo.save(renglon);
+        renglonList.add(renglon);
     }
 
-    private boolean tieneExamenAprobadoOMateriaPromocionada(Materia materia, HistoriaAcademica historia) {
-        return renglonRepo.existsByMateriaAndHistoriaAcademicaAndTipoAndNotaGreaterThanEqual(
-                materia, historia, "Examen", 4.0) ||
-                renglonRepo.existsByMateriaAndHistoriaAcademicaAndTipoAndResultado(
-                        materia, historia, "Promocion", "Promocionado");
+    private boolean tieneExamenAprobadoOMateriaPromocionada(Materia materia, HistoriaAcademica historia, List<Renglon> renglonList) {
+        return renglonList.stream().anyMatch(r ->
+                r.getMateria().equals(materia)
+                        && r.getHistoriaAcademica().equals(historia)
+                        && (
+                        ("Examen".equalsIgnoreCase(r.getTipo()) && r.getNota() != null && r.getNota() >= 4.0) ||
+                                ("Promocion".equalsIgnoreCase(r.getTipo()) && "Promocionado".equalsIgnoreCase(r.getResultado()))
+                )
+        );
     }
 
-    private void procesarExamen(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia) {
+
+    private void procesarExamen(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList, List<Examen> examenList) {
         Renglon renglon = renglonFactory.crearRenglon(
                 datos.fecha(), datos.tipo(), datos.nota(), datos.resultado(), historia, materia
         );
-        renglonRepo.save(renglon);
+        renglonList.add(renglon);
 
         if (datos.nota() != null) {
-            examenRepo.save(new Examen(datos.fecha(), datos.nota(), renglon));
-            if(datos.nota() >= 4.0) {
-                eliminarRegularidadSiExiste(materia, historia);
+            examenList.add(new Examen(datos.fecha(), datos.nota(), renglon));
+            if (datos.nota() >= 4.0) {
+                eliminarRegularidadSiExiste(materia, historia, renglonList);
             }
         }
     }
 
-    private void procesarPromocion(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia) {
+    private void procesarPromocion(DatosFilaExcel datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList) {
         if ("Promocionado".equalsIgnoreCase(datos.resultado())) {
             Renglon renglon = renglonFactory.crearRenglon(
                     datos.fecha(), datos.tipo(), datos.nota(), datos.resultado(), historia, materia
             );
-            renglonRepo.save(renglon);
-            eliminarRegularidadSiExiste(materia, historia);
+            renglonList.add(renglon);
+            eliminarRegularidadSiExiste(materia, historia, renglonList);
         }
     }
 
-    private void eliminarRegularidadSiExiste(Materia materia, HistoriaAcademica historia) {
-        renglonRepo.findByMateriaAndHistoriaAcademicaAndTipoAndResultado(
-                materia, historia, "Regularidad", "Aprobado"
-        ).ifPresent(renglonRepo::delete);
+    private void eliminarRegularidadSiExiste(Materia materia, HistoriaAcademica historia, List<Renglon> renglonList) {
+        renglonList.stream()
+                .filter(r ->
+                        r.getMateria().equals(materia) &&
+                                r.getHistoriaAcademica().equals(historia) &&
+                                "Regularidad".equalsIgnoreCase(r.getTipo()) &&
+                                "Aprobado".equalsIgnoreCase(r.getResultado())
+                )
+                .findFirst()
+                .ifPresent(renglon -> {
+                    renglonList.remove(renglon); // importante para mantener la lista sincronizada
+                });
     }
+
+
     @Override
-    public HistoriaAcademica procesarArchivoExcelActualizacion(MultipartFile file, Long estudianteId) throws IOException {
+    public HistoriaAcademica procesarArchivoExcelActualizacion(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
-        PlanDeEstudio plan = obtenerPlanDeEstudio(sheet);
+        PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
         HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
 
         procesarFilasExcelConChequeo(sheet, historia, plan);
-        renglonRepo.deleteByTipoAndResultado("Promocion","Promocionado");
 
         return historia;
     }
 
     private void procesarFilasExcelConChequeo(Sheet sheet, HistoriaAcademica historia, PlanDeEstudio plan) {
         int lastRow = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
+        List<Renglon> renglonList = renglonRepo.findByHistoriaAcademica(historia);
+        List<Examen> examenList = examenRepo.findAllByHistoriaAcademica(historia);
+        List<Renglon> renglonesOriginales = renglonList;
+        List<Examen> examenesOriginales = examenList;
+        Map<String, Materia> materiasMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream()
+                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
 
         for (int i = 6; i <= lastRow; i++) {
             Row row = sheet.getRow(i);
@@ -196,20 +227,33 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
             DatosFilaExcel datos = extraerDatosFila(row);
             if (debeOmitirFila(datos)) continue;
 
-            Materia materia;
-            try {
-                materia = obtenerMateria(datos.nombreMateria(), plan);
-            } catch (ResourceNotFoundException e) {
-                log.warn("Materia no encontrada en actualización: {}", datos.nombreMateria());
+            Materia materia = materiasMap.get(datos.nombreMateria());
+            if (materia == null) {
+                log.warn("Materia no encontrada: {}", datos.nombreMateria());
                 continue;
             }
 
-            boolean yaExiste = renglonRepo.existsByMateriaAndHistoriaAcademicaAndTipoAndFechaAndResultado(
-                    materia, historia, datos.tipo(), datos.fecha(), datos.resultado());
+            Renglon re = Renglon.builder().materia(materia).historiaAcademica(historia).tipo(datos.tipo()).fecha(datos.fecha()).resultado(datos.resultado()).build();
+            boolean yaExiste = renglonList.contains(re);
 
             if (yaExiste) continue;
 
-            procesarRenglonSegunTipo(datos, historia, materia);
+            procesarRenglonSegunTipo(datos, historia, materia, renglonList, examenList);
+            // Borro las promociones
+            List<Renglon> aEliminar = renglonList.stream()
+                    .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()) &&
+                            "Promocionado".equalsIgnoreCase(r.getResultado()))
+                    .collect(Collectors.toList());
+
+            renglonList.removeAll(aEliminar); // mantiene la lista en memoria actualizada
+            renglonList.removeAll(renglonesOriginales);
+            examenList.removeAll(examenesOriginales);
+            if (!renglonList.isEmpty()) {
+                renglonRepo.saveAll(renglonList);
+            }
+            if (!examenList.isEmpty()) {
+                examenRepo.saveAll(examenList);
+            }
         }
     }
 
