@@ -31,5 +31,3 @@ src/main/resources/application.properties
 ### VS Code ###
 .vscode/
 /.idea
-.idea/workspace.xml
-.idea/workspace.xml
