@@ -12,11 +12,10 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.recommendationSys</groupId>
-    <artifactId>Sistema_Recomendador_Finales</artifactId>
+    <groupId>com.asistenteVirtual</groupId>
+    <artifactId>Asistente-Virtual</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Sistema Recomendador de Finales</name>
-    <description>Proyecto de Spring Boot para un sistema recomendador de finales universitarios.</description>
+    <name>Asistente Virtual para estudiantes.</name>
 
     <properties>
         <java.version>21</java.version>
