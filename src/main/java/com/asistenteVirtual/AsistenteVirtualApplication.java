@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
- * Clase principal del sistema recomendador de finales.
+ * Clase principal del Asistente virtual.
  * Inicia la aplicación Spring Boot.
  */
 @SpringBootApplication
