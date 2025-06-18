@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     private final EstadisticasGeneralesRepository estadisticasGeneralesRepo;
 
 
-    @Transactional
     public void actualizarEstadisticas() {
         List<String> codigoMaterias = examenRepo.findDistinctMateriasPorCodigo();
         List<Materia> materias = new ArrayList<>();
@@ -105,7 +103,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         return stats;
     }
 
-    @Transactional
+
     public void guardarEstadisticasGenerales(EstadisticasGeneralesDTO dto) {
         try {
             EstadisticasGenerales stats = EstadisticasGenerales.builder()
