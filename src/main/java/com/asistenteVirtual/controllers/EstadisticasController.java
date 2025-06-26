@@ -10,7 +10,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @Validated
@@ -24,6 +27,7 @@ public class EstadisticasController {
 
     /**
      * Obtiene estadísticas detalladas para una materia específica
+     *
      * @param codigoMateria Código único de la materia (no puede estar vacío)
      * @return ResponseEntity con las estadísticas de la materia
      * @throws ResourceNotFoundException si no se encuentra la materia
@@ -38,6 +42,7 @@ public class EstadisticasController {
 
     /**
      * Obtiene estadísticas generales del sistema
+     *
      * @return ResponseEntity con las estadísticas generales
      */
     @GetMapping("/generales")
