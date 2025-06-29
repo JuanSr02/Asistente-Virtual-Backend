@@ -58,7 +58,7 @@ public class PlanEstudioController {
      *
      * @return una lista de {@link PlanEstudioResponseDTO} que representa los planes de estudio existentes.
      */
-    @GetMapping("/admin/planes-estudio")
+    @GetMapping("/shared/planes-estudio")
     public ResponseEntity<List<PlanEstudioResponseDTO>> obtenerTodosLosPlanes() {
         List<PlanEstudioResponseDTO> planes = planEstudioService.obtenerPlanes();
         return ResponseEntity.ok(planes);
