@@ -1,6 +1,7 @@
 package com.asistenteVirtual.controllers;
 
 import com.asistenteVirtual.DTOs.FinalDTO;
+import com.asistenteVirtual.DTOs.MateriaDTO;
 import com.asistenteVirtual.DTOs.OrdenFinales;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.services.rankingFinales.RankingFinalesService;
@@ -24,8 +25,9 @@ public class RankingFinalesController {
 
     /**
      * Obtiene el ranking de finales para rendir por un estudiante
+     *
      * @param estudianteId id del estudiante (no puede ser nulo)
-     * @param orden Criterio de ordenamiento (default: CORRELATIVAS)
+     * @param orden        Criterio de ordenamiento (default: CORRELATIVAS)
      * @return Lista de finales ordenados según el criterio
      * @throws ResourceNotFoundException si no se encuentra el estudiante
      */
@@ -35,6 +37,12 @@ public class RankingFinalesController {
             @RequestParam(defaultValue = "CORRELATIVAS") OrdenFinales orden) {
         log.info("Obteniendo finales para estudiante ID: {} ordenados por: {}", estudianteId, orden);
         List<FinalDTO> finales = rankingFinalesService.obtenerFinalesParaRendir(estudianteId, orden);
+        return ResponseEntity.ok(finales);
+    }
+
+    @GetMapping("/inscripciones")
+    public ResponseEntity<?> obtenerInscripcionesPosibles(@PathVariable @NotNull Long estudianteId) {
+        List<MateriaDTO> finales = rankingFinalesService.obtenerFinalesParaInscribirse(estudianteId);
         return ResponseEntity.ok(finales);
     }
 }

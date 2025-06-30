@@ -31,12 +31,12 @@ public class FinalesCalculatorImpl implements FinalesCalculator {
         return finales;
     }
 
-    private List<Renglon> obtenerRegularesAprobadas(HistoriaAcademica historia) {
+    public List<Renglon> obtenerRegularesAprobadas(HistoriaAcademica historia) {
         return renglonRepo.findByHistoriaAcademicaAndTipoAndResultado(
                 historia, "Regularidad", "Aprobado");
     }
 
-    private List<FinalDTO> mapearARenglonDTO(List<Renglon> regularesAprobadas) {
+    public List<FinalDTO> mapearARenglonDTO(List<Renglon> regularesAprobadas) {
         return regularesAprobadas.stream()
                 .map(finalesMapper::toFinalDTO)
                 .collect(Collectors.toList());

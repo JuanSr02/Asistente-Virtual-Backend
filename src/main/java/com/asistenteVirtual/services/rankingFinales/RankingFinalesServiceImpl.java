@@ -1,6 +1,7 @@
 package com.asistenteVirtual.services.rankingFinales;
 
 import com.asistenteVirtual.DTOs.FinalDTO;
+import com.asistenteVirtual.DTOs.MateriaDTO;
 import com.asistenteVirtual.DTOs.OrdenFinales;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.Estudiante;
@@ -10,6 +11,7 @@ import com.asistenteVirtual.repository.HistoriaAcademicaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,5 +31,20 @@ public class RankingFinalesServiceImpl implements RankingFinalesService {
                 .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada"));
 
         return finalesCalculator.calcularFinalesParaRendir(historia, orden);
+    }
+
+    @Override
+    public List<MateriaDTO> obtenerFinalesParaInscribirse(Long estudianteId) {
+        Estudiante estudiante = estudianteRepo.findById(estudianteId)
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
+
+        HistoriaAcademica historia = historiaAcademicaRepo.findByEstudiante(estudiante)
+                .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada"));
+        List<FinalDTO> finales = finalesCalculator.mapearARenglonDTO(finalesCalculator.obtenerRegularesAprobadas(historia));
+        List<MateriaDTO> finalesAInscribirse = new ArrayList<>();
+        for (FinalDTO finalDTO : finales) {
+            finalesAInscribirse.add(MateriaDTO.builder().codigo(finalDTO.getCodigoMateria()).nombre(finalDTO.getNombreMateria()).build());
+        }
+        return finalesAInscribirse;
     }
 }
