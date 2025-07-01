@@ -28,6 +28,7 @@ public class ExperienciaController {
 
     /**
      * Crea una nueva experiencia de examen
+     *
      * @param experienciaDTO Datos de la experiencia a crear
      * @return ResponseEntity con la experiencia creada
      */
@@ -40,6 +41,7 @@ public class ExperienciaController {
 
     /**
      * Obtiene una experiencia por su ID
+     *
      * @param id de la experiencia (no puede ser nulo)
      * @return ResponseEntity con la experiencia encontrada
      * @throws ResourceNotFoundException si no se encuentra la experiencia
@@ -54,6 +56,7 @@ public class ExperienciaController {
 
     /**
      * Obtiene todas las experiencias registradas
+     *
      * @return ResponseEntity con la lista de experiencias
      */
     @GetMapping
@@ -64,7 +67,8 @@ public class ExperienciaController {
 
     /**
      * Actualiza una experiencia existente
-     * @param id de la experiencia a actualizar (no puede ser nulo)
+     *
+     * @param id  de la experiencia a actualizar (no puede ser nulo)
      * @param dto Datos actualizados de la experiencia
      * @return ResponseEntity con la experiencia actualizada
      * @throws ResourceNotFoundException si no se encuentra la experiencia
@@ -79,6 +83,7 @@ public class ExperienciaController {
 
     /**
      * Elimina una experiencia
+     *
      * @param id de la experiencia a eliminar (no puede ser nulo)
      * @return ResponseEntity sin contenido
      * @throws ResourceNotFoundException si no se encuentra la experiencia
@@ -93,6 +98,7 @@ public class ExperienciaController {
 
     /**
      * Obtiene experiencias por materia
+     *
      * @param codigoMateria Código de la materia (no puede estar vacío)
      * @return ResponseEntity con la lista de experiencias
      * @throws ResourceNotFoundException si no se encuentra la materia
@@ -106,6 +112,7 @@ public class ExperienciaController {
 
     /**
      * Obtiene experiencias por estudiante
+     *
      * @param idEstudiante id del estudiante (no puede estar vacío)
      * @return ResponseEntity con la lista de experiencias
      * @throws ResourceNotFoundException si no se encuentra el estudiante
@@ -115,5 +122,10 @@ public class ExperienciaController {
             @PathVariable @NotNull(message = "El id del estudiante no puede ser nulo") Long idEstudiante) {
         log.info("Obteniendo experiencias para estudiante: {}", idEstudiante);
         return ResponseEntity.ok(experienciaQueryService.obtenerExperienciasPorEstudiante(idEstudiante));
+    }
+
+    @GetMapping("/examenes-por-estudiante/{idEstudiante}")
+    public ResponseEntity<?> obtenerExamenesPorEstudiante(@PathVariable @NotNull(message = "El id del estudiante no puede ser nulo") Long idEstudiante) {
+        return ResponseEntity.ok(experienciaQueryService.obtenerExamenesPorEstudiante(idEstudiante));
     }
 }

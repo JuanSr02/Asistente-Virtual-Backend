@@ -13,6 +13,13 @@ import java.util.List;
 @Repository
 public interface ExamenRepository extends JpaRepository<Examen, Long> {
 
+    @Query("SELECT e FROM Examen e " +
+            "JOIN e.renglon r " +
+            "JOIN r.historiaAcademica h " +
+            "JOIN h.estudiante est " +
+            "WHERE est.id = :idEstudiante")
+    List<Examen> findByEstudianteId(@Param("idEstudiante") Long idEstudiante);
+
     @Query("SELECT ex FROM Examen ex " +
             "JOIN ex.renglon r " +
             "WHERE r.materia = :materia")

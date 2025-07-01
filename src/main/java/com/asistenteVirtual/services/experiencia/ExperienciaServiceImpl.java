@@ -1,6 +1,7 @@
 package com.asistenteVirtual.services.experiencia;
 
 import com.asistenteVirtual.DTOs.ActualizarExperienciaDTO;
+import com.asistenteVirtual.DTOs.ExamenDTO;
 import com.asistenteVirtual.DTOs.ExperienciaDTO;
 import com.asistenteVirtual.DTOs.ExperienciaResponseDTO;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -60,9 +62,9 @@ public class ExperienciaServiceImpl implements ExperienciaCRUDService, Experienc
         return listToExperienciaResponseDTO(experiencias);
     }
 
-    public List<ExperienciaResponseDTO> listToExperienciaResponseDTO(List<Experiencia> experiencias){
+    public List<ExperienciaResponseDTO> listToExperienciaResponseDTO(List<Experiencia> experiencias) {
         List<ExperienciaResponseDTO> mapeadas = new ArrayList<ExperienciaResponseDTO>();
-        for(Experiencia e : experiencias){
+        for (Experiencia e : experiencias) {
             mapeadas.add(experienciaMapper.mapToExperienciaResponseDTO(e));
         }
         return mapeadas;
@@ -78,7 +80,7 @@ public class ExperienciaServiceImpl implements ExperienciaCRUDService, Experienc
 
     @Override
     public List<ExperienciaResponseDTO> obtenerExperienciasPorEstudiante(Long idEstudiante) {
-        if(!estudianteRepository.existsById(idEstudiante)){
+        if (!estudianteRepository.existsById(idEstudiante)) {
             throw new ResourceNotFoundException("Estudiante no encontrado");
         }
         return listToExperienciaResponseDTO(experienciaRepository.findAllByEstudianteId(idEstudiante));
@@ -106,5 +108,31 @@ public class ExperienciaServiceImpl implements ExperienciaCRUDService, Experienc
         if (experiencia.getExamen() != null && experiencia.getExamen().getExperiencia() != null) {
             experiencia.getExamen().setExperiencia(null);
         }
+    }
+
+    @Override
+    public List<ExamenDTO> obtenerExamenesPorEstudiante(Long idEstudiante) {
+        List<Examen> examenes = examenRepository.findByEstudianteId(idEstudiante);
+
+        return examenes.stream()
+                .map(examen -> {
+                    String materiaCodigo = null;
+                    String materiaNombre = null;
+
+                    if (examen.getRenglon() != null && examen.getRenglon().getMateria() != null) {
+                        materiaCodigo = examen.getRenglon().getMateria().getCodigo();
+                        materiaNombre = examen.getRenglon().getMateria().getNombre();
+                    }
+
+                    return ExamenDTO.builder()
+                            .id(examen.getId())
+                            .fecha(examen.getFecha())
+                            .nota(examen.getNota())
+                            .renglonId(examen.getRenglon() != null ? examen.getRenglon().getId() : null)
+                            .materiaCodigo(materiaCodigo)
+                            .materiaNombre(materiaNombre)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
