@@ -17,8 +17,9 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
             "JOIN e.renglon r " +
             "JOIN r.historiaAcademica h " +
             "JOIN h.estudiante est " +
-            "WHERE est.id = :idEstudiante")
+            "WHERE est.id = :idEstudiante AND e.experiencia IS NULL")
     List<Examen> findByEstudianteId(@Param("idEstudiante") Long idEstudiante);
+
 
     @Query("SELECT ex FROM Examen ex " +
             "JOIN ex.renglon r " +
