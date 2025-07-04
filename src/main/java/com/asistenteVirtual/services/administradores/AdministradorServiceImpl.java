@@ -7,6 +7,7 @@ import com.asistenteVirtual.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.Administrador;
 import com.asistenteVirtual.repository.AdministradorRepository;
 import com.asistenteVirtual.repository.PersonaRepository;
+import com.asistenteVirtual.services.supabase.SupabaseAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class AdministradorServiceImpl implements AdministradorService {
 
     private final AdministradorRepository administradorRepository;
     private final PersonaRepository personaRepository;
+    private final SupabaseAuthService supabaseAuthService;
 
     @Override
     public AdministradorResponseDTO crearAdministrador(AdministradorDto dto) {
@@ -41,7 +43,7 @@ public class AdministradorServiceImpl implements AdministradorService {
     @Override
     public List<AdministradorResponseDTO> obtenerTodos() {
         List<AdministradorResponseDTO> list = new ArrayList<>();
-        for (Administrador a : administradorRepository.findAll()){
+        for (Administrador a : administradorRepository.findAll()) {
             list.add(AdministradorResponseDTO.fromEntity(a));
         }
         return list;
@@ -76,6 +78,13 @@ public class AdministradorServiceImpl implements AdministradorService {
     public void eliminarAdministrador(Long id) {
         Administrador admin = administradorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Administrador no encontrado con ID: " + id));
-        administradorRepository.delete(admin);
+
+        // ✅ Eliminar usuario de Supabase Auth si tiene supabaseUserId
+        if (admin.getSupabaseUserId() != null) {
+            supabaseAuthService.eliminarUsuarioSupabase(admin.getSupabaseUserId());
+        }
+
+        administradorRepository.delete(admin); // borra admin y persona por cascade
     }
+
 }

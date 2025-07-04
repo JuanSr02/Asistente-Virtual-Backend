@@ -7,6 +7,7 @@ import com.asistenteVirtual.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.Estudiante;
 import com.asistenteVirtual.repository.EstudianteRepository;
 import com.asistenteVirtual.repository.PersonaRepository;
+import com.asistenteVirtual.services.supabase.SupabaseAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class EstudianteServiceImpl implements EstudianteService {
 
     private final EstudianteRepository estudianteRepository;
     private final PersonaRepository personaRepository;
+    private final SupabaseAuthService supabaseAuthService;
 
     @Override
     public EstudianteResponseDTO crearEstudiante(EstudianteDto dto) {
@@ -41,7 +43,7 @@ public class EstudianteServiceImpl implements EstudianteService {
     @Override
     public List<EstudianteResponseDTO> obtenerTodos() {
         List<EstudianteResponseDTO> list = new ArrayList<>();
-        for (Estudiante e : estudianteRepository.findAll()){
+        for (Estudiante e : estudianteRepository.findAll()) {
             list.add(EstudianteResponseDTO.fromEntity(e));
         }
         return list;
@@ -76,6 +78,12 @@ public class EstudianteServiceImpl implements EstudianteService {
     public void eliminarEstudiante(Long id) {
         Estudiante estudiante = estudianteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + id));
+
+        // ✅ Eliminar usuario de Supabase Auth si tiene supabaseUserId
+        if (estudiante.getSupabaseUserId() != null) {
+            supabaseAuthService.eliminarUsuarioSupabase(estudiante.getSupabaseUserId());
+        }
+
         estudianteRepository.delete(estudiante);
     }
 }
