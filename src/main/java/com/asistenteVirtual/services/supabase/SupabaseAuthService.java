@@ -36,7 +36,7 @@ public class SupabaseAuthService {
         }
     }
 
-    public void actualizarEmailSupabase(String userId, String nuevoEmail) {
+    public void actualizarUsuarioSupabase(String userId, String nuevoEmail, String nuevaPassword) {
         String url = supabaseUrl + "/auth/v1/admin/users/" + userId;
 
         HttpHeaders headers = new HttpHeaders();
@@ -44,10 +44,20 @@ public class SupabaseAuthService {
         headers.set("Authorization", "Bearer " + serviceRoleKey);
         headers.set("apikey", serviceRoleKey);
 
-        // JSON body con nuevo email
-        String body = String.format("{\"email\": \"%s\"}", nuevoEmail);
+        StringBuilder bodyJson = new StringBuilder("{");
 
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+        if (nuevoEmail != null) {
+            bodyJson.append(String.format("\"email\": \"%s\"", nuevoEmail));
+        }
+
+        if (nuevaPassword != null && !nuevaPassword.isBlank()) {
+            if (bodyJson.length() > 1) bodyJson.append(", ");
+            bodyJson.append(String.format("\"password\": \"%s\"", nuevaPassword));
+        }
+
+        bodyJson.append("}");
+
+        HttpEntity<String> entity = new HttpEntity<>(bodyJson.toString(), headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
@@ -57,9 +67,10 @@ public class SupabaseAuthService {
         );
 
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new RuntimeException("Error al actualizar el email en Supabase Auth: " + response.getBody());
+            throw new RuntimeException("Error al actualizar usuario en Supabase Auth: " + response.getBody());
         }
     }
+
 
 }
 

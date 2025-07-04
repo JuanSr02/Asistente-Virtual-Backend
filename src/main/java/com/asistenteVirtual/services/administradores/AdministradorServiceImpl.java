@@ -54,8 +54,16 @@ public class AdministradorServiceImpl implements AdministradorService {
         Administrador existente = administradorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Administrador no encontrado con ID: " + id));
 
+        boolean actualizarEnSupabase = false;
+        String nuevoMail = null;
+        String nuevaPassword = null;
+
         if (dto.getNombreApellido() != null) {
             existente.setNombreApellido(dto.getNombreApellido());
+        }
+
+        if (dto.getTelefono() != null) {
+            existente.setTelefono(dto.getTelefono());
         }
 
         if (dto.getMail() != null) {
@@ -64,21 +72,24 @@ public class AdministradorServiceImpl implements AdministradorService {
                 throw new IllegalArgumentException("Ya existe una persona con ese correo electrónico.");
             }
 
-            // 👇 Verificamos que el mail haya cambiado
-            String mailAnterior = existente.getMail();
-            if (!dto.getMail().equals(mailAnterior)) {
-                existente.setMail(dto.getMail());
-
-                // 👇 Si tiene usuario de Supabase, actualizamos también allá
-                String supabaseUserId = existente.getSupabaseUserId();
-                if (supabaseUserId != null && !supabaseUserId.isBlank()) {
-                    supabaseAuthService.actualizarEmailSupabase(supabaseUserId, dto.getMail());
-                }
+            if (!dto.getMail().equals(existente.getMail())) {
+                nuevoMail = dto.getMail();
+                existente.setMail(nuevoMail);
+                actualizarEnSupabase = true;
             }
         }
 
-        if (dto.getTelefono() != null) {
-            existente.setTelefono(dto.getTelefono());
+        if (dto.getContrasenia() != null && !dto.getContrasenia().isBlank()) {
+            nuevaPassword = dto.getContrasenia();
+            actualizarEnSupabase = true;
+        }
+
+        // Si hay cambios relevantes, se actualiza también en auth.users
+        if (actualizarEnSupabase) {
+            String supabaseUserId = existente.getSupabaseUserId();
+            if (supabaseUserId != null && !supabaseUserId.isBlank()) {
+                supabaseAuthService.actualizarUsuarioSupabase(supabaseUserId, nuevoMail, nuevaPassword);
+            }
         }
 
         Administrador actualizado = administradorRepository.save(existente);

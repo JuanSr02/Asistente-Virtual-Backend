@@ -2,7 +2,10 @@ package com.asistenteVirtual.DTOs;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * DTO para actualizar parcialmente los datos de un Administrador.
@@ -22,4 +25,6 @@ public class ActualizarAdministradorDTO {
 
     @Size(max = 15, message = "El telefono no puede superar los 15 caracteres")
     private String telefono;
+
+    private String contrasenia;
 }
