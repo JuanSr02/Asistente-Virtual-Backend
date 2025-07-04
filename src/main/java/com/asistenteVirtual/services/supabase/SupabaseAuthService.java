@@ -1,10 +1,7 @@
 package com.asistenteVirtual.services.supabase;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,5 +35,31 @@ public class SupabaseAuthService {
             throw new RuntimeException("Error al eliminar el usuario de Supabase Auth: " + response.getBody());
         }
     }
+
+    public void actualizarEmailSupabase(String userId, String nuevoEmail) {
+        String url = supabaseUrl + "/auth/v1/admin/users/" + userId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + serviceRoleKey);
+        headers.set("apikey", serviceRoleKey);
+
+        // JSON body con nuevo email
+        String body = String.format("{\"email\": \"%s\"}", nuevoEmail);
+
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                entity,
+                String.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Error al actualizar el email en Supabase Auth: " + response.getBody());
+        }
+    }
+
 }
 

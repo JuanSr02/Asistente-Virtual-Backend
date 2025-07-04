@@ -57,14 +57,26 @@ public class AdministradorServiceImpl implements AdministradorService {
         if (dto.getNombreApellido() != null) {
             existente.setNombreApellido(dto.getNombreApellido());
         }
+
         if (dto.getMail() != null) {
             boolean mailExistente = personaRepository.existsByMail(dto.getMail());
-            // Evitar conflicto con el mismo estudiante (es decir, si no cambió su propio mail)
             if (mailExistente && !dto.getMail().equals(existente.getMail())) {
                 throw new IllegalArgumentException("Ya existe una persona con ese correo electrónico.");
             }
-            existente.setMail(dto.getMail());
+
+            // 👇 Verificamos que el mail haya cambiado
+            String mailAnterior = existente.getMail();
+            if (!dto.getMail().equals(mailAnterior)) {
+                existente.setMail(dto.getMail());
+
+                // 👇 Si tiene usuario de Supabase, actualizamos también allá
+                String supabaseUserId = existente.getSupabaseUserId();
+                if (supabaseUserId != null && !supabaseUserId.isBlank()) {
+                    supabaseAuthService.actualizarEmailSupabase(supabaseUserId, dto.getMail());
+                }
+            }
         }
+
         if (dto.getTelefono() != null) {
             existente.setTelefono(dto.getTelefono());
         }
