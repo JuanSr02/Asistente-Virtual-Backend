@@ -31,4 +31,6 @@ public class ActualizarExperienciaDTO {
     @Size(max = 100)
     private String motivacion;
 
+    private String linkResumen;
+
 }

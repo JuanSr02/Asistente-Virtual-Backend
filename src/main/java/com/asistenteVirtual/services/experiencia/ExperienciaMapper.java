@@ -25,6 +25,7 @@ public class ExperienciaMapper {
                 .modalidad(dto.getModalidad())
                 .recursos(dto.getRecursos())
                 .motivacion(dto.getMotivacion())
+                .linkResumen(dto.getLinkResumen())
                 .build();
     }
 
@@ -36,7 +37,9 @@ public class ExperienciaMapper {
         Optional.ofNullable(dto.getModalidad()).ifPresent(experiencia::setModalidad);
         Optional.ofNullable(dto.getRecursos()).ifPresent(experiencia::setRecursos);
         Optional.ofNullable(dto.getMotivacion()).ifPresent(experiencia::setMotivacion);
+        Optional.ofNullable(dto.getLinkResumen()).ifPresent(experiencia::setLinkResumen);
     }
+
     public ExperienciaResponseDTO mapToExperienciaResponseDTO(Experiencia experiencia) {
         if (experiencia == null || experiencia.getExamen() == null || experiencia.getExamen().getRenglon() == null)
             return null;
@@ -55,6 +58,7 @@ public class ExperienciaMapper {
                 .nota(experiencia.getExamen().getNota())
                 .codigoMateria(materia.getCodigo())
                 .nombreMateria(materia.getNombre())
+                .linkResumen(experiencia.getLinkResumen())
                 .build();
     }
 }

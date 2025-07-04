@@ -1,7 +1,10 @@
 package com.asistenteVirtual.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -39,4 +42,7 @@ public class Experiencia {
 
     @Column(length = 100)
     private String motivacion;
+
+    @Column
+    private String linkResumen;
 }

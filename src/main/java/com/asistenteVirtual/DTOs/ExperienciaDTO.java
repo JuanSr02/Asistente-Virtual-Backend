@@ -38,4 +38,6 @@ public class ExperienciaDTO {
 
     @Size(max = 100, message = "La motivación no puede exceder los 100 caracteres.")
     private String motivacion;
+
+    private String linkResumen;
 }

@@ -18,6 +18,7 @@ public class ExperienciaResponseDTO {
     private String modalidad;
     private String recursos;
     private String motivacion;
+    private String linkResumen;
 
     // Examen
     private LocalDate fechaExamen;

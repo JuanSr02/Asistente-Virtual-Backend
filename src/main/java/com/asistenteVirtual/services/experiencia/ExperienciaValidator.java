@@ -43,7 +43,8 @@ public class ExperienciaValidator {
                 dto.getIntentosPrevios(),
                 dto.getModalidad(),
                 dto.getRecursos(),
-                dto.getMotivacion()
+                dto.getMotivacion(),
+                dto.getLinkResumen()
         ).allMatch(Objects::isNull)) {
             throw new IllegalArgumentException("Debe proporcionar al menos un campo para actualizar");
         }
