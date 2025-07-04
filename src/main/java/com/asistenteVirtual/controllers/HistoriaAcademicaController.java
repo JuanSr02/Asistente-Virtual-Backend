@@ -37,7 +37,6 @@ public class HistoriaAcademicaController {
     public ResponseEntity<?> cargarHistoriaDesdeExcel(
             @RequestParam("file") @NotNull MultipartFile file,
             @PathVariable @NotNull Long estudianteId, @RequestParam("codigoPlan") @NotBlank String codigoPlan) throws IOException {
-        log.info("Iniciando carga de historia académica para estudiante ID: {}", estudianteId);
         HistoriaAcademicaResponseDTO response = historiaAcademicaService.cargarHistoriaAcademica(file, estudianteId, codigoPlan);
         return ResponseEntity.ok(response);
     }
@@ -55,7 +54,6 @@ public class HistoriaAcademicaController {
     public ResponseEntity<HistoriaAcademicaResponseDTO> actualizarHistoriaDesdeExcel(
             @RequestParam("file") @NotNull MultipartFile file,
             @PathVariable @NotNull Long estudianteId, @RequestParam("codigoPlan") @NotBlank String codigoPlan) throws IOException {
-        log.info("Iniciando actualización de historia académica para estudiante ID: {}", estudianteId);
         HistoriaAcademicaResponseDTO response = historiaAcademicaService.actualizarHistoriaAcademica(file, estudianteId, codigoPlan);
         return ResponseEntity.ok(response);
     }
@@ -70,7 +68,6 @@ public class HistoriaAcademicaController {
     @DeleteMapping
     public ResponseEntity<?> eliminarHistoriaAcademica(
             @PathVariable @NotNull Long estudianteId) {
-        log.info("Eliminando historia académica para estudiante ID: {}", estudianteId);
         historiaAcademicaService.eliminarHistoriaAcademica(estudianteId);
         return ResponseEntity.noContent().build();
     }

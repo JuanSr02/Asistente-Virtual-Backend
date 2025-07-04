@@ -34,7 +34,6 @@ public class ExperienciaController {
      */
     @PostMapping
     public ResponseEntity<?> crearExperiencia(@Valid @RequestBody ExperienciaDTO experienciaDTO) {
-        log.info("Creando nueva experiencia para examen: {}", experienciaDTO.getExamenId());
         ExperienciaResponseDTO nuevaExperiencia = experienciaService.crearExperiencia(experienciaDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevaExperiencia);
     }
@@ -49,7 +48,6 @@ public class ExperienciaController {
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerExperiencia(
             @PathVariable @NotNull(message = "El ID no puede ser nulo") Long id) {
-        log.info("Obteniendo experiencia con ID: {}", id);
         return ResponseEntity.ok(experienciaService.obtenerExperienciaPorId(id));
     }
 
@@ -61,7 +59,6 @@ public class ExperienciaController {
      */
     @GetMapping
     public ResponseEntity<?> obtenerTodasLasExperiencias() {
-        log.info("Obteniendo todas las experiencias");
         return ResponseEntity.ok(experienciaService.obtenerTodasLasExperiencias());
     }
 
@@ -77,7 +74,6 @@ public class ExperienciaController {
     public ResponseEntity<?> actualizarExperiencia(
             @PathVariable @NotNull(message = "El ID no puede ser nulo") Long id,
             @Valid @RequestBody ActualizarExperienciaDTO dto) {
-        log.info("Actualizando experiencia ID: {}", id);
         return ResponseEntity.ok(experienciaService.actualizarExperiencia(id, dto));
     }
 
@@ -91,7 +87,6 @@ public class ExperienciaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarExperiencia(
             @PathVariable @NotNull(message = "El ID no puede ser nulo") Long id) {
-        log.info("Eliminando experiencia ID: {}", id);
         experienciaService.eliminarExperiencia(id);
         return ResponseEntity.noContent().build();
     }
@@ -106,7 +101,6 @@ public class ExperienciaController {
     @GetMapping("/por-materia/{codigoMateria}")
     public ResponseEntity<?> obtenerExperienciasPorMateria(
             @PathVariable @NotBlank(message = "El código de materia no puede estar vacío") String codigoMateria) {
-        log.info("Obteniendo experiencias para materia: {}", codigoMateria);
         return ResponseEntity.ok(experienciaQueryService.obtenerExperienciasPorMateria(codigoMateria));
     }
 
@@ -120,7 +114,6 @@ public class ExperienciaController {
     @GetMapping("/por-estudiante/{idEstudiante}")
     public ResponseEntity<?> obtenerExperienciasPorEstudiante(
             @PathVariable @NotNull(message = "El id del estudiante no puede ser nulo") Long idEstudiante) {
-        log.info("Obteniendo experiencias para estudiante: {}", idEstudiante);
         return ResponseEntity.ok(experienciaQueryService.obtenerExperienciasPorEstudiante(idEstudiante));
     }
 

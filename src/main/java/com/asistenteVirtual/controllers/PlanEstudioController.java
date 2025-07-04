@@ -33,7 +33,6 @@ public class PlanEstudioController {
     public ResponseEntity<?> cargarPlanDesdeExcel(
             @RequestParam("file") MultipartFile file) throws IOException {
 
-        log.info("Iniciando carga de plan de estudio desde archivo: {}", file.getOriginalFilename());
         PlanEstudioResponseDTO planCargado = planEstudioService.procesarArchivoExcel(file);
         return ResponseEntity.ok(planCargado);
     }
@@ -48,7 +47,6 @@ public class PlanEstudioController {
     public ResponseEntity<?> eliminarPlanDeEstudio(
             @RequestParam("codigo") @NotBlank String codigoPlan) {
 
-        log.info("Eliminando plan de estudio con código: {}", codigoPlan);
         planEstudioService.eliminarPlanDeEstudio(codigoPlan);
         return ResponseEntity.noContent().build();
     }

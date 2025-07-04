@@ -35,7 +35,6 @@ public class RankingFinalesController {
     public ResponseEntity<?> obtenerFinalesParaRendir(
             @PathVariable @NotNull Long estudianteId,
             @RequestParam(defaultValue = "CORRELATIVAS") OrdenFinales orden) {
-        log.info("Obteniendo finales para estudiante ID: {} ordenados por: {}", estudianteId, orden);
         List<FinalDTO> finales = rankingFinalesService.obtenerFinalesParaRendir(estudianteId, orden);
         return ResponseEntity.ok(finales);
     }
