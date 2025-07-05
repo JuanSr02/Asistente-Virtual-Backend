@@ -59,6 +59,7 @@ public class ExperienciaMapper {
                 .codigoMateria(materia.getCodigo())
                 .nombreMateria(materia.getNombre())
                 .linkResumen(experiencia.getLinkResumen())
+                .nombreEstudiante(experiencia.getExamen().getRenglon().getHistoriaAcademica().getEstudiante().getNombreApellido())
                 .build();
     }
 }
