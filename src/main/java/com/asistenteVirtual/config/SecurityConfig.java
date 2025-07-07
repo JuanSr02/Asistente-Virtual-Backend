@@ -44,7 +44,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "https://asistente-virtual-frontend.vercel.app"));  // Cambiar al dominio React en producción
+        config.setAllowedOrigins(List.of("http://localhost:3000", "https://asistente-virtual-unsl.vercel.app"));  // Cambiar al dominio React en producción
         config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
