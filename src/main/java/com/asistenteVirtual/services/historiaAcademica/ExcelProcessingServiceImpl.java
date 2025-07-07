@@ -1,5 +1,6 @@
 package com.asistenteVirtual.services.historiaAcademica;
 
+import com.asistenteVirtual.exceptions.PlanIncompatibleException;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.*;
 import com.asistenteVirtual.repository.*;
@@ -35,19 +36,68 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
     private final ExamenRepository examenRepo;
     private final RenglonFactory renglonFactory;
 
+    private static final double UMBRAL_COINCIDENCIA = 70.0;
+
     @Override
     public HistoriaAcademica procesarArchivoExcel(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
         PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
+        Map<String, Materia> materiasDelPlanMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream()
+                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
+
+        // --- PASO CLAVE: VALIDACIÓN HEURÍSTICA ---
+        validarCoincidenciaDelPlan(sheet, materiasDelPlanMap);
+
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
         HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
 
-        procesarFilasExcel(sheet, historia, plan);
+        procesarFilasExcel(sheet, historia, materiasDelPlanMap); // Pasamos el mapa que ya tenemos
 
         return historia;
     }
+
+    private void validarCoincidenciaDelPlan(Sheet sheet, Map<String, Materia> materiasDelPlanMap) {
+        int lastRow = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
+        int materiasEncontradas = 0;
+        int materiasNoEncontradas = 0;
+
+        for (int i = 6; i <= lastRow; i++) {
+            Row row = sheet.getRow(i);
+            if (row == null || ExcelProcessingUtils.isEmptyRow(row)) continue;
+
+            // Solo necesitamos el nombre de la materia para la validación
+            String nombreMateriaExcel = row.getCell(0).getStringCellValue().trim();
+            nombreMateriaExcel = nombreMateriaExcel.substring(0, nombreMateriaExcel.indexOf("(")).trim();
+
+            if (materiasDelPlanMap.containsKey(nombreMateriaExcel)) {
+                materiasEncontradas++;
+            } else {
+                // No contamos regularidades reprobadas o ausentes como "no encontradas"
+                // porque podrían ser de materias que sí existen pero no nos interesan.
+                // Es mejor contar todas las filas válidas.
+                materiasNoEncontradas++;
+            }
+        }
+
+        if (materiasEncontradas + materiasNoEncontradas == 0) {
+            throw new PlanIncompatibleException("El archivo parece estar vacío o en un formato incorrecto.");
+        }
+
+        double porcentajeCoincidencia = ((double) materiasEncontradas / (materiasEncontradas + materiasNoEncontradas)) * 100.0;
+        log.info("Análisis de coincidencia: {}% de materias encontradas para el plan seleccionado.", String.format("%.2f", porcentajeCoincidencia));
+
+        if (porcentajeCoincidencia < UMBRAL_COINCIDENCIA) {
+            throw new PlanIncompatibleException(
+                    String.format(
+                            "El archivo no parece corresponder al plan seleccionado. Solo el %.2f%% de las materias coincidieron (se requiere al menos %.0f%%).",
+                            porcentajeCoincidencia, UMBRAL_COINCIDENCIA
+                    )
+            );
+        }
+    }
+
 
     private PlanDeEstudio obtenerPlanDeEstudio(String codigoPlan) {
         return planRepo.findById(codigoPlan)
@@ -64,14 +114,12 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
                 });
     }
 
-    private void procesarFilasExcel(Sheet sheet, HistoriaAcademica historia, PlanDeEstudio plan) {
+    private void procesarFilasExcel(Sheet sheet, HistoriaAcademica historia, Map<String, Materia> materiasMap) {
         int lastRow = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
-        Map<String, Materia> materiasMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream()
-                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
         List<Renglon> renglonList = new ArrayList<>();
         List<Examen> examenList = new ArrayList<>();
         for (int i = 6; i <= lastRow; i++) {
-            procesarFila(sheet.getRow(i), historia, plan, materiasMap, renglonList, examenList);
+            procesarFila(sheet.getRow(i), historia, materiasMap, renglonList, examenList);
         }
         // Borro las promociones
         List<Renglon> aEliminar = renglonList.stream()
@@ -84,7 +132,7 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
         examenRepo.saveAll(examenList);
     }
 
-    private void procesarFila(Row row, HistoriaAcademica historia, PlanDeEstudio plan, Map<String, Materia> materiasMap, List<Renglon> renglonList, List<Examen> examenList) {
+    private void procesarFila(Row row, HistoriaAcademica historia, Map<String, Materia> materiasMap, List<Renglon> renglonList, List<Examen> examenList) {
         if (row == null || ExcelProcessingUtils.isEmptyRow(row)) return;
 
         DatosFilaExcel datos = extraerDatosFila(row);

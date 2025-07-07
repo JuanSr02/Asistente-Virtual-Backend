@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PlanEstudioValidationException.class)
     public ResponseEntity<ApiExceptionResponse> handlePlanValidationError(PlanEstudioValidationException ex) {
-        return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(),500),HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(IntegrityException.class)
@@ -32,4 +32,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiExceptionResponse> handleGeneral(Exception ex) {
         return new ResponseEntity<>(new ApiExceptionResponse("Unexpected error: " + ex.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(PlanIncompatibleException.class)
+    public ResponseEntity<ApiExceptionResponse> handlePlanIncompatible(PlanIncompatibleException ex) {
+        return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
