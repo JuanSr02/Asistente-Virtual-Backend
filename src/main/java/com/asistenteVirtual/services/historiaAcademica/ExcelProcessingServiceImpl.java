@@ -36,7 +36,7 @@ public class ExcelProcessingServiceImpl implements ExcelProcessingService {
     private final ExamenRepository examenRepo;
     private final RenglonFactory renglonFactory;
 
-    private static final double UMBRAL_COINCIDENCIA = 70.0;
+    private static final double UMBRAL_COINCIDENCIA = 80.0;
 
     @Override
     public HistoriaAcademica procesarArchivoExcel(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
