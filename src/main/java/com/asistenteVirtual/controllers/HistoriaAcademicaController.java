@@ -24,14 +24,14 @@ public class HistoriaAcademicaController {
     private final HistoriaAcademicaService historiaAcademicaService;
 
     /**
-     * Carga la historia académica desde un archivo Excel
+     * Carga la historia académica desde un archivo Excel o PDF
      *
-     * @param file         Archivo Excel con los datos
+     * @param file         Archivo Excel o PDF con los datos
      * @param estudianteId id del estudiante (no puede ser nulo)
      * @param codigoPlan   codigo del plan al que pertenece la historia
      * @return Respuesta con el resultado de la operación
      * @throws ResourceNotFoundException si no encuentra el estudiante
-     * @throws IOException               si hay error cargando el excel
+     * @throws IOException               si hay error cargando el excel o PDF
      */
     @PostMapping("/carga")
     public ResponseEntity<?> cargarHistoriaDesdeExcel(
@@ -42,9 +42,9 @@ public class HistoriaAcademicaController {
     }
 
     /**
-     * Actualiza la historia académica cargando únicamente renglones nuevos desde Excel
+     * Actualiza la historia académica cargando únicamente renglones nuevos desde Excel o PDF
      *
-     * @param file         Archivo Excel con los datos
+     * @param file         Archivo Excel/PDF con los datos
      * @param estudianteId ID del estudiante
      * @param codigoPlan   codigo del plan al que pertenece la historia
      * @return DTO con la historia académica actualizada
