@@ -2,7 +2,7 @@ package com.asistenteVirtual.services.historiaAcademica;
 
 import java.time.LocalDate;
 
-public record DatosFilaExcel(
+public record DatosFila(
         String nombreMateria,
         String codigo,
         LocalDate fecha,

@@ -2,6 +2,7 @@ package com.asistenteVirtual.services.historiaAcademica;
 
 import com.asistenteVirtual.DTOs.HistoriaAcademicaResponseDTO;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.exceptions.UnsupportedFileTypeException;
 import com.asistenteVirtual.model.Estudiante;
 import com.asistenteVirtual.model.HistoriaAcademica;
 import com.asistenteVirtual.repository.EstudianteRepository;
@@ -25,14 +26,27 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
     private final HistoriaAcademicaRepository historiaRepo;
     private final RenglonRepository renglonRepo;
     private final EstudianteRepository estudianteRepo;
-    private final ExcelProcessingService excelProcessingService;
+    private final ArchivoProcessingService archivoProcessingService;
     private final HistoriaAcademicaValidator validator;
 
     @Override
     public HistoriaAcademicaResponseDTO cargarHistoriaAcademica(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         validator.validarEstudiante(estudianteId);
         validator.validarHistoria(estudianteId);
-        HistoriaAcademica historia = excelProcessingService.procesarArchivoExcel(file, estudianteId, codigoPlan);
+        HistoriaAcademica historia;
+        String fileExtension = getFileExtension(file);
+
+        switch (fileExtension) {
+            case "xlsx":
+            case "xls":
+                historia = archivoProcessingService.procesarArchivoExcel(file, estudianteId, codigoPlan);
+                break;
+            case "pdf":
+                historia = archivoProcessingService.procesarArchivoPDF(file, estudianteId, codigoPlan);
+                break;
+            default:
+                throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
+        }
         Long renglonesCargados = renglonRepo.countByHistoriaAcademica(historia);
         return HistoriaAcademicaResponseDTO.builder()
                 .nombreCompleto(historia.getEstudiante().getNombreApellido())
@@ -45,14 +59,37 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
     @Override
     public HistoriaAcademicaResponseDTO actualizarHistoriaAcademica(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         validator.validarEstudiante(estudianteId);
-        Long renglonesOriginales = renglonRepo.countByHistoriaAcademica(historiaRepo.findByEstudiante(estudianteRepo.findById(estudianteId).orElseThrow()).orElseThrow());
-        HistoriaAcademica historia = excelProcessingService.procesarArchivoExcelActualizacion(file, estudianteId, codigoPlan);
-        Long renglonesCargados = renglonRepo.countByHistoriaAcademica(historia);
+        // Obtener la historia académica existente para contar los renglones originales
+        HistoriaAcademica historiaExistente = historiaRepo.findByEstudiante(estudianteRepo.findById(estudianteId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId)))
+                .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada para el estudiante con ID: " + estudianteId));
+
+        Long renglonesOriginales = renglonRepo.countByHistoriaAcademica(historiaExistente);
+
+        HistoriaAcademica historiaActualizada;
+        String fileExtension = getFileExtension(file);
+
+        switch (fileExtension) {
+            case "xlsx":
+            case "xls":
+                historiaActualizada = archivoProcessingService.procesarArchivoExcelActualizacion(file, estudianteId, codigoPlan);
+                break;
+            case "pdf":
+                historiaActualizada = archivoProcessingService.procesarArchivoPDFActualizacion(file, estudianteId, codigoPlan);
+                break;
+            default:
+                throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
+        }
+
+        Long renglonesTotalesDespuesActualizacion = renglonRepo.countByHistoriaAcademica(historiaActualizada);
+        // Los renglones cargados son la diferencia entre el total y los originales
+        Long renglonesNuevosCargados = renglonesTotalesDespuesActualizacion - renglonesOriginales;
+
         return HistoriaAcademicaResponseDTO.builder()
-                .nombreCompleto(historia.getEstudiante().getNombreApellido())
-                .codigoPlan(historia.getPlanDeEstudio().getCodigo())
+                .nombreCompleto(historiaActualizada.getEstudiante().getNombreApellido())
+                .codigoPlan(historiaActualizada.getPlanDeEstudio().getCodigo())
                 .fechaUltimaActualizacion(LocalDate.now())
-                .renglonesCargados(renglonesCargados - renglonesOriginales)
+                .renglonesCargados(renglonesNuevosCargados)
                 .build();
     }
 
@@ -80,5 +117,19 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
         estudianteRepo.save(estudiante);
         historiaRepo.delete(historia);
         historiaRepo.flush();
+    }
+
+    /**
+     * Metodo auxiliar para obtener la extensión del archivo.
+     *
+     * @param file El MultipartFile.
+     * @return La extensión del archivo en minúsculas, o una cadena vacía si no tiene extensión.
+     */
+    private String getFileExtension(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        if (fileName != null && fileName.contains(".")) {
+            return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        }
+        return "";
     }
 }

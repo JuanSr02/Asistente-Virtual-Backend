@@ -38,4 +38,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(), 500), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(UnsupportedFileTypeException.class)
+    public ResponseEntity<ApiExceptionResponse> handlePlanIncompatible(UnsupportedFileTypeException ex) {
+        return new ResponseEntity<>(new ApiExceptionResponse(ex.getMessage(), 400), HttpStatus.BAD_REQUEST);
+    }
+
 }
