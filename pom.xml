@@ -107,9 +107,56 @@
             <version>2.0.24</version> <!-- O la versión más reciente compatible -->
         </dependency>
 
-
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <build.profile.id>dev</build.profile.id>
+                <profileActive>dev</profileActive>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>
+                            src/main/resources
+                        </directory>
+                        <filtering>true</filtering>
+                        <excludes>
+                            <exclude>application-prod.properties</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <build.profile.id>prod</build.profile.id>
+                <profileActive>prod</profileActive>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>
+                            src/main/resources
+                        </directory>
+                        <filtering>true</filtering>
+                        <excludes>
+                            <exclude>application-dev.properties</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <plugins>
             <plugin>

@@ -30,3 +30,5 @@ build/
 ### VS Code ###
 .vscode/
 .idea/
+src/main/resources/application-dev.properties
+.env.local
