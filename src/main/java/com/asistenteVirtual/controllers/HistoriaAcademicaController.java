@@ -37,6 +37,7 @@ public class HistoriaAcademicaController {
     public ResponseEntity<?> cargarHistoriaDesdeExcel(
             @RequestParam("file") @NotNull MultipartFile file,
             @PathVariable @NotNull Long estudianteId, @RequestParam("codigoPlan") @NotBlank String codigoPlan) throws IOException {
+        log.warn("Cargando historia");
         HistoriaAcademicaResponseDTO response = historiaAcademicaService.cargarHistoriaAcademica(file, estudianteId, codigoPlan);
         return ResponseEntity.ok(response);
     }
