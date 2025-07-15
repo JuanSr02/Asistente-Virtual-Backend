@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,9 +17,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -48,8 +45,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         Sheet sheet = workbook.getSheetAt(0);
 
         PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
-        Map<String, Materia> materiasDelPlanMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream()
-                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
+        Map<String, Materia> materiasDelPlanMap = obtenerMaterialesParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
 
@@ -61,6 +57,26 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         procesarDatos(datosExtraidos, historia, materiasDelPlanMap);
         return historia;
+    }
+
+    /**
+     * Obtiene las materias para validación. Si es plan "32/12", incluye también materias del plan "1/23"
+     */
+    private Map<String, Materia> obtenerMaterialesParaValidacion(String codigoPlan) {
+        Map<String, Materia> materiasMap = new HashMap<>();
+
+        // Agregar materias del plan principal
+        List<Materia> materiasDelPlan = materiaRepo.findByPlanDeEstudio_Codigo(codigoPlan);
+        materiasDelPlan.forEach(materia -> materiasMap.put(materia.getNombre(), materia));
+
+        // Si es plan "32/12", agregar también materias del plan "1/23"
+        if ("32/12".equals(codigoPlan)) {
+            List<Materia> materiasDelPlan123 = materiaRepo.findByPlanDeEstudio_Codigo("1/23");
+            materiasDelPlan123.forEach(materia -> materiasMap.put(materia.getNombre(), materia));
+            log.info("Plan 32/12 detectado. Se agregaron {} materias del plan 1/23 para validación", materiasDelPlan123.size());
+        }
+
+        return materiasMap;
     }
 
     private void validarCoincidenciaDelPlan(List<DatosFila> datosExtraidos, Map<String, Materia> materiasDelPlanMap) {
@@ -116,7 +132,6 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         examenRepo.saveAll(examenList);
     }
 
-
     private PlanDeEstudio obtenerPlanDeEstudio(String codigoPlan) {
         return planRepo.findById(codigoPlan)
                 .orElseThrow(() -> new ResourceNotFoundException("Plan de estudio con codigo: " + codigoPlan + " no encontrado"));
@@ -132,7 +147,6 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
                 });
     }
 
-
     private void procesarFila(DatosFila datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList, List<Examen> examenList) {
         if (debeOmitirFila(datos)) return;
         procesarRenglonSegunTipo(datos, historia, materia, renglonList, examenList);
@@ -142,8 +156,8 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         return "En curso".equalsIgnoreCase(datos.tipo()) ||
                 ("Regularidad".equalsIgnoreCase(datos.tipo()) &&
                         ("Reprobado".equalsIgnoreCase(datos.resultado()) ||
-                                "Ausente".equalsIgnoreCase(datos.resultado()))) || ("Examen".equalsIgnoreCase(datos.tipo()) && ("Ausente".equalsIgnoreCase(datos.resultado())))
-                ;
+                                "Ausente".equalsIgnoreCase(datos.resultado()))) ||
+                ("Examen".equalsIgnoreCase(datos.tipo()) && ("Ausente".equalsIgnoreCase(datos.resultado())));
     }
 
     private void procesarRenglonSegunTipo(DatosFila datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList, List<Examen> examenList) {
@@ -157,6 +171,19 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
             case "promocion":
                 procesarPromocion(datos, historia, materia, renglonList);
                 break;
+            case "equivalencia":
+                procesarEquivalencia(datos, historia, materia, renglonList, examenList);
+                break;
+        }
+    }
+
+    private void procesarEquivalencia(DatosFila datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList, List<Examen> examenList) {
+        if (datos.nota() != null) {
+            // Tiene nota: actúa como examen
+            procesarExamen(datos, historia, materia, renglonList, examenList);
+        } else {
+            // No tiene nota: actúa como regularidad
+            procesarRegularidad(datos, historia, materia, renglonList);
         }
     }
 
@@ -193,33 +220,32 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         }
     }
 
-
     private boolean tieneExamenAprobadoOMateriaPromocionada(Materia materia, HistoriaAcademica historia, List<Renglon> renglonList) {
         return renglonList.stream().anyMatch(r ->
                 r.getMateria().equals(materia)
                         && r.getHistoriaAcademica().equals(historia)
                         && (
                         ("Examen".equalsIgnoreCase(r.getTipo()) && r.getNota() != null && r.getNota() >= 4.0) ||
-                                ("Promocion".equalsIgnoreCase(r.getTipo()) && "Promocionado".equalsIgnoreCase(r.getResultado()))
+                                ("Promocion".equalsIgnoreCase(r.getTipo()) && "Promocionado".equalsIgnoreCase(r.getResultado())) ||
+                                ("Equivalencia".equalsIgnoreCase(r.getTipo()) && r.getNota() != null && r.getNota() >= 4.0)
                 )
         );
     }
-
 
     private void eliminarRegularidadSiExiste(Materia materia, HistoriaAcademica historia, List<Renglon> renglonList) {
         renglonList.stream()
                 .filter(r ->
                         r.getMateria().equals(materia) &&
                                 r.getHistoriaAcademica().equals(historia) &&
-                                "Regularidad".equalsIgnoreCase(r.getTipo()) &&
+                                ("Regularidad".equalsIgnoreCase(r.getTipo()) ||
+                                        ("Equivalencia".equalsIgnoreCase(r.getTipo()) && r.getNota() == null)) &&
                                 "Aprobado".equalsIgnoreCase(r.getResultado())
                 )
                 .findFirst()
                 .ifPresent(renglon -> {
-                    renglonList.remove(renglon); // importante para mantener la lista sincronizada
+                    renglonList.remove(renglon);
                 });
     }
-
 
     @Override
     public HistoriaAcademica procesarArchivoExcelActualizacion(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
@@ -231,8 +257,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
 
-        Map<String, Materia> materiasMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream()
-                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
+        Map<String, Materia> materiasMap = obtenerMaterialesParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
         validarCoincidenciaDelPlan(datosExtraidos, materiasMap);
@@ -300,27 +325,20 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         }
     }
 
-
     private List<DatosFila> extraerDatosDeExcel(Sheet sheet) {
         List<DatosFila> datos = new ArrayList<>();
         int lastRow = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Formato de fecha en Excel
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        for (int i = 6; i <= lastRow; i++) { // Asumiendo que los datos empiezan en la fila 6
+        for (int i = 6; i <= lastRow; i++) {
             Row row = sheet.getRow(i);
             if (row == null || ExcelProcessingUtils.isEmptyRow(row)) continue;
 
             try {
-                String nombreMateriaCompleto = row.getCell(0).getStringCellValue().trim();
-                String codigo = nombreMateriaCompleto.substring(nombreMateriaCompleto.indexOf("(") + 1, nombreMateriaCompleto.indexOf(")")).trim();
-                String nombreMateria = nombreMateriaCompleto.substring(0, nombreMateriaCompleto.indexOf("(")).trim();
-
-                LocalDate fecha = LocalDate.parse(row.getCell(1).getStringCellValue().trim(), dateFormatter);
-                String tipo = row.getCell(2).getStringCellValue().trim();
-                Double nota = ExcelProcessingUtils.extraerNota(row.getCell(3));
-                String resultado = row.getCell(4).getStringCellValue().trim();
-
-                datos.add(new DatosFila(nombreMateria, codigo, fecha, tipo, nota, resultado));
+                DatosFila datosFila = determinarFormatoYExtraer(row, dateFormatter);
+                if (datosFila != null) {
+                    datos.add(datosFila);
+                }
             } catch (Exception e) {
                 log.warn("Error al parsear fila de Excel (fila {}): {}. Se omite la fila.", i, e.getMessage());
             }
@@ -328,15 +346,58 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         return datos;
     }
 
+    private DatosFila determinarFormatoYExtraer(Row row, DateTimeFormatter dateFormatter) {
+        // Verificar si la primera celda es una fecha
+        Cell primeraCell = row.getCell(0);
+        if (primeraCell == null) return null;
 
-    // Metodos para PDF (adaptados para usar DatosFila)
+        String primerValor = primeraCell.getStringCellValue().trim();
+
+        // Verificar si es fecha (formato dd/MM/yyyy)
+        if (primerValor.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            // Formato: fecha, materia, tipo, nota, resultado
+            return extraerFormatoFechaMateria(row, dateFormatter);
+        } else {
+            // Formato: materia, fecha, tipo, nota, resultado
+            return extraerFormatoMateriaFecha(row, dateFormatter);
+        }
+    }
+
+    private DatosFila extraerFormatoFechaMateria(Row row, DateTimeFormatter dateFormatter) {
+        LocalDate fecha = LocalDate.parse(row.getCell(0).getStringCellValue().trim(), dateFormatter);
+
+        String nombreMateriaCompleto = row.getCell(1).getStringCellValue().trim();
+        String codigo = nombreMateriaCompleto.substring(nombreMateriaCompleto.indexOf("(") + 1, nombreMateriaCompleto.indexOf(")")).trim();
+        String nombreMateria = nombreMateriaCompleto.substring(0, nombreMateriaCompleto.indexOf("(")).trim();
+
+        String tipo = row.getCell(2).getStringCellValue().trim();
+        Double nota = ExcelProcessingUtils.extraerNota(row.getCell(3));
+        String resultado = row.getCell(4).getStringCellValue().trim();
+
+        return new DatosFila(nombreMateria, codigo, fecha, tipo, nota, resultado);
+    }
+
+    private DatosFila extraerFormatoMateriaFecha(Row row, DateTimeFormatter dateFormatter) {
+        String nombreMateriaCompleto = row.getCell(0).getStringCellValue().trim();
+        String codigo = nombreMateriaCompleto.substring(nombreMateriaCompleto.indexOf("(") + 1, nombreMateriaCompleto.indexOf(")")).trim();
+        String nombreMateria = nombreMateriaCompleto.substring(0, nombreMateriaCompleto.indexOf("(")).trim();
+
+        LocalDate fecha = LocalDate.parse(row.getCell(1).getStringCellValue().trim(), dateFormatter);
+        String tipo = row.getCell(2).getStringCellValue().trim();
+        Double nota = ExcelProcessingUtils.extraerNota(row.getCell(3));
+        String resultado = row.getCell(4).getStringCellValue().trim();
+
+        return new DatosFila(nombreMateria, codigo, fecha, tipo, nota, resultado);
+    }
+
+    // Métodos para PDF (adaptados)
 
     @Override
     public HistoriaAcademica procesarArchivoPDF(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         String pdfContent = leerContenidoPDF(file);
 
         PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
-        Map<String, Materia> materiasDelPlanMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream().collect(Collectors.toMap(Materia::getNombre, Function.identity()));
+        Map<String, Materia> materiasDelPlanMap = obtenerMaterialesParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDePDF(pdfContent);
 
@@ -359,8 +420,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
 
-        Map<String, Materia> materiasMap = materiaRepo.findByPlanDeEstudio_Codigo(plan.getCodigo()).stream()
-                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
+        Map<String, Materia> materiasMap = obtenerMaterialesParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDePDF(pdfContent);
         validarCoincidenciaDelPlan(datosExtraidos, materiasMap);
@@ -383,9 +443,9 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         pdfContent = limpiarPdfRaw(pdfContent);
 
-        // 🔹 Regex de extracción
+        // Regex actualizada para incluir "Equivalencia"
         Pattern pattern = Pattern.compile(
-                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((03MA\\w{5})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen)\\s+([\\d\\.,]+)?\\s*(Aprobado|Promocionado|Reprobado|Ausente)"
+                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((03MA\\w{5})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+([\\d\\.,]+)?\\s*(Aprobado|Promocionado|Reprobado|Ausente)"
         );
 
         Matcher matcher = pattern.matcher(pdfContent);
@@ -419,10 +479,8 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
             return "";
         }
 
-
         // Borra todas las líneas que tengan "HISTORIA ACADÉMICA", "Alumno:" o "Propuesta:" en cualquier parte
         pdfContent = pdfContent.replaceAll("(?m)^.*(HISTORIA ACADÉMICA|Alumno:|Propuesta:).*(\\r?\\n)?", "");
-
 
         // Eliminar paginación + fecha + hora tipo "1 de 4 08/07/2025 22:32:09"
         pdfContent = pdfContent.replaceAll("\\d+ de \\d+ \\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}", "");
@@ -436,5 +494,4 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         // Limpiar espacios al inicio y final
         return pdfContent.trim();
     }
-
 }
