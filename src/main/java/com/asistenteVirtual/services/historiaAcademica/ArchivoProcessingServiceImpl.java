@@ -481,16 +481,16 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         pdfContent = limpiarPdfRaw(pdfContent);
 
-        // Regex actualizada para incluir "Equivalencia"
+        // Regex actualizada para incluir materias con mayúsculas, minúsculas, guiones y acentos
         Pattern pattern = Pattern.compile(
-                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
+                "([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
         );
 
         Matcher matcher = pattern.matcher(pdfContent);
 
         while (matcher.find()) {
             try {
-                String nombreMateria = matcher.group(1).trim();
+                String nombreMateria = matcher.group(1).trim().toUpperCase();
                 String codigo = matcher.group(2).trim();
                 LocalDate fecha = LocalDate.parse(matcher.group(3).trim(), dateFormatter);
                 String tipo = matcher.group(4).trim();
@@ -505,12 +505,13 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
                 datos.add(new DatosFila(nombreMateria, codigo, fecha, tipo, nota, resultado));
 
             } catch (Exception e) {
-                System.err.println("⚠️ Error al parsear línea: '" + matcher.group(0) + "'. Causa: " + e.getMessage());
+                log.warn("⚠️ Error al parsear línea: '" + matcher.group(0) + "'. Causa: " + e.getMessage());
             }
         }
 
         return datos;
     }
+
 
     public static String limpiarPdfRaw(String pdfContent) {
         if (pdfContent == null || pdfContent.isEmpty()) {
@@ -522,6 +523,13 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         // Eliminar paginación + fecha + hora tipo "1 de 4 08/07/2025 22:32:09"
         pdfContent = pdfContent.replaceAll("\\d+ de \\d+ \\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}", "");
+
+        // 1. Limpiar "Actividad Fecha Tipo Nota Resultado"
+        pdfContent = pdfContent.replaceAll("Actividad\\s+Fecha\\s+Tipo\\s+Nota\\s+Resultado", "");
+
+        // 2. Limpiar patrones como "Derecho Procesal Penal (MT2104019) 25/03/2025 En curso"
+        // IMPORTANTE: Hacer esto ANTES de reemplazar saltos de línea
+        pdfContent = pdfContent.replaceAll("(?m)^([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+En\\s+curso\\s*$", "");
 
         // Reemplazar saltos de línea, retornos de carro y form feeds por espacio simple
         pdfContent = pdfContent.replaceAll("[\\r\\n\\f]+", " ");

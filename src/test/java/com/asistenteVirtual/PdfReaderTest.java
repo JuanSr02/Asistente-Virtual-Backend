@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class PdfReaderTest {
 
-    private static final String PDF_FILE_PATH = "C:/Users/juan_/Downloads/historia_academica_tebo.pdf";
+    private static final String PDF_FILE_PATH = "C:/Users/juan_/Downloads/historia_academica.pdf";
 
     public static void main(String[] args) {
         System.out.println("Iniciando lectura y parseo del PDF: " + PDF_FILE_PATH);
@@ -62,11 +62,11 @@ public class PdfReaderTest {
         pdfContent = limpiarPdfRaw(pdfContent);
 
         System.out.println(pdfContent);
-        // Regex actualizada para incluir "Equivalencia"
-        Pattern pattern = Pattern.compile(
-                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
-        );
 
+        // Regex actualizada para incluir materias con mayúsculas, minúsculas, guiones y acentos
+        Pattern pattern = Pattern.compile(
+                "([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
+        );
 
         Matcher matcher = pattern.matcher(pdfContent);
 
@@ -105,6 +105,13 @@ public class PdfReaderTest {
         // Eliminar paginación + fecha + hora tipo "1 de 4 08/07/2025 22:32:09"
         pdfContent = pdfContent.replaceAll("\\d+ de \\d+ \\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}", "");
 
+        // 1. Limpiar "Actividad Fecha Tipo Nota Resultado"
+        pdfContent = pdfContent.replaceAll("Actividad\\s+Fecha\\s+Tipo\\s+Nota\\s+Resultado", "");
+
+        // 2. Limpiar patrones como "Derecho Procesal Penal (MT2104019) 25/03/2025 En curso"
+        // IMPORTANTE: Hacer esto ANTES de reemplazar saltos de línea
+        pdfContent = pdfContent.replaceAll("(?m)^([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+En\\s+curso\\s*$", "");
+
         // Reemplazar saltos de línea, retornos de carro y form feeds por espacio simple
         pdfContent = pdfContent.replaceAll("[\\r\\n\\f]+", " ");
 
@@ -114,7 +121,6 @@ public class PdfReaderTest {
         // Limpiar espacios al inicio y final
         return pdfContent.trim();
     }
-
 
     public record DatosFila(
             String nombreMateria,
