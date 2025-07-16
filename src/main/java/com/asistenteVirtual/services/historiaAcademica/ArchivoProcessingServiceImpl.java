@@ -16,10 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,7 +47,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
 
         // --- PASO CLAVE: VALIDACIÓN HEURÍSTICA ---
-        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap);
+        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap, codigoPlan);
 
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
         HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
@@ -59,9 +56,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         return historia;
     }
 
-    /**
-     * Obtiene las materias para validación. Si es plan "32/12", incluye también materias del plan "1/23"
-     */
+
     private Map<String, Materia> obtenerMaterialesParaValidacion(String codigoPlan) {
         Map<String, Materia> materiasMap = new HashMap<>();
 
@@ -69,17 +64,10 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         List<Materia> materiasDelPlan = materiaRepo.findByPlanDeEstudio_Codigo(codigoPlan);
         materiasDelPlan.forEach(materia -> materiasMap.put(materia.getNombre(), materia));
 
-        // Si es plan "32/12", agregar también materias del plan "1/23"
-        if ("32/12".equals(codigoPlan)) {
-            List<Materia> materiasDelPlan123 = materiaRepo.findByPlanDeEstudio_Codigo("1/23");
-            materiasDelPlan123.forEach(materia -> materiasMap.put(materia.getNombre(), materia));
-            log.info("Plan 32/12 detectado. Se agregaron {} materias del plan 1/23 para validación", materiasDelPlan123.size());
-        }
-
         return materiasMap;
     }
 
-    private void validarCoincidenciaDelPlan(List<DatosFila> datosExtraidos, Map<String, Materia> materiasDelPlanMap) {
+    private void validarCoincidenciaDelPlan(List<DatosFila> datosExtraidos, Map<String, Materia> materiasDelPlanMap, String codigoPlan) {
         int materiasEncontradas = 0;
         int materiasNoEncontradas = 0;
 
@@ -98,7 +86,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         double porcentajeCoincidencia = ((double) materiasEncontradas / (materiasEncontradas + materiasNoEncontradas)) * 100.0;
         log.info("Análisis de coincidencia: {}% de materias encontradas para el plan seleccionado.", String.format("%.2f", porcentajeCoincidencia));
 
-        if (porcentajeCoincidencia < UMBRAL_COINCIDENCIA) {
+        if (porcentajeCoincidencia < UMBRAL_COINCIDENCIA && !codigoPlan.equalsIgnoreCase("1/23")) {
             throw new PlanIncompatibleException(
                     String.format(
                             "El archivo no parece corresponder al plan seleccionado. Solo el %.2f%% de las materias coincidieron (se requiere al menos %.0f%%).",
@@ -121,6 +109,9 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
             procesarFila(datos, historia, materiasMap.get(datos.nombreMateria()), renglonList, examenList);
         }
 
+        // Eliminar duplicados antes de guardar
+        eliminarDuplicados(renglonList, examenList);
+
         // Borro las promociones
         List<Renglon> aEliminar = renglonList.stream()
                 .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()) &&
@@ -130,6 +121,48 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         renglonList.removeAll(aEliminar);
         renglonRepo.saveAll(renglonList);
         examenRepo.saveAll(examenList);
+    }
+
+    private void eliminarDuplicados(List<Renglon> renglonList, List<Examen> examenList) {
+        // Eliminar regularidades duplicadas (misma materia y tipo "Regularidad" con resultado "Aprobado")
+        Set<Materia> materiasConRegularidad = new HashSet<>();
+        List<Renglon> regularidadesDuplicadas = new ArrayList<>();
+
+        for (Renglon renglon : renglonList) {
+            if ("Regularidad".equalsIgnoreCase(renglon.getTipo()) &&
+                    "Aprobado".equalsIgnoreCase(renglon.getResultado())) {
+                if (materiasConRegularidad.contains(renglon.getMateria())) {
+                    regularidadesDuplicadas.add(renglon);
+                } else {
+                    materiasConRegularidad.add(renglon.getMateria());
+                }
+            }
+        }
+        renglonList.removeAll(regularidadesDuplicadas);
+
+        // Eliminar exámenes duplicados (misma materia y nota aprobada)
+        Map<Materia, Set<Double>> materiasYNotas = new HashMap<>();
+        List<Examen> examenesDuplicados = new ArrayList<>();
+
+        for (Examen examen : examenList) {
+            if (examen.getNota() >= 4.0) {
+                Materia materia = examen.getRenglon().getMateria();
+                Double nota = examen.getNota();
+
+                if (!materiasYNotas.containsKey(materia)) {
+                    materiasYNotas.put(materia, new HashSet<>());
+                }
+
+                if (materiasYNotas.get(materia).contains(nota)) {
+                    examenesDuplicados.add(examen);
+                    // También eliminar el renglón asociado
+                    renglonList.removeIf(r -> r.equals(examen.getRenglon()));
+                } else {
+                    materiasYNotas.get(materia).add(nota);
+                }
+            }
+        }
+        examenList.removeAll(examenesDuplicados);
     }
 
     private PlanDeEstudio obtenerPlanDeEstudio(String codigoPlan) {
@@ -180,10 +213,12 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
     private void procesarEquivalencia(DatosFila datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList, List<Examen> examenList) {
         if (datos.nota() != null) {
             // Tiene nota: actúa como examen
-            procesarExamen(datos, historia, materia, renglonList, examenList);
+            DatosFila datosNew = new DatosFila(datos.nombreMateria(), datos.codigo(), datos.fecha(), "Examen", datos.nota(), datos.resultado());
+            procesarExamen(datosNew, historia, materia, renglonList, examenList);
         } else {
             // No tiene nota: actúa como regularidad
-            procesarRegularidad(datos, historia, materia, renglonList);
+            DatosFila datosNew = new DatosFila(datos.nombreMateria(), datos.codigo(), datos.fecha(), "Regularidad", null, datos.resultado());
+            procesarRegularidad(datosNew, historia, materia, renglonList);
         }
     }
 
@@ -260,7 +295,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         Map<String, Materia> materiasMap = obtenerMaterialesParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
-        validarCoincidenciaDelPlan(datosExtraidos, materiasMap);
+        validarCoincidenciaDelPlan(datosExtraidos, materiasMap, codigoPlan);
         procesarDatosConChequeo(datosExtraidos, historia, materiasMap);
 
         return historia;
@@ -302,6 +337,9 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
             procesarFila(datos, historia, materia, renglonList, examenList);
         }
+
+        // Eliminar duplicados antes de guardar
+        eliminarDuplicados(renglonList, examenList);
 
         List<Renglon> aEliminar = renglonList.stream()
                 .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()) &&
@@ -401,7 +439,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         List<DatosFila> datosExtraidos = extraerDatosDePDF(pdfContent);
 
-        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap);
+        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap, codigoPlan);
 
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
         HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
@@ -423,7 +461,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         Map<String, Materia> materiasMap = obtenerMaterialesParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDePDF(pdfContent);
-        validarCoincidenciaDelPlan(datosExtraidos, materiasMap);
+        validarCoincidenciaDelPlan(datosExtraidos, materiasMap, codigoPlan);
 
         procesarDatosConChequeo(datosExtraidos, historia, materiasMap);
 
@@ -445,7 +483,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         // Regex actualizada para incluir "Equivalencia"
         Pattern pattern = Pattern.compile(
-                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((03MA\\w{5})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+([\\d\\.,]+)?\\s*(Aprobado|Promocionado|Reprobado|Ausente)"
+                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
         );
 
         Matcher matcher = pattern.matcher(pdfContent);

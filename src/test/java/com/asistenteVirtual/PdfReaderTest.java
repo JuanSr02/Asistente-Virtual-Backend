@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class PdfReaderTest {
 
-    private static final String PDF_FILE_PATH = "C:/Users/juan_/Downloads/historia_academica.pdf";
+    private static final String PDF_FILE_PATH = "C:/Users/juan_/Downloads/historia_academica_tebo.pdf";
 
     public static void main(String[] args) {
         System.out.println("Iniciando lectura y parseo del PDF: " + PDF_FILE_PATH);
@@ -61,13 +61,12 @@ public class PdfReaderTest {
 
         pdfContent = limpiarPdfRaw(pdfContent);
 
-        System.out.println("--- CONTENIDO PDF RAW ---");
-        System.out.println(pdfContent.substring(0, Math.min(7000, pdfContent.length()))); // Para evitar error si es menos de 5000 chars
-
-        // 🔹 Regex de extracción
+        System.out.println(pdfContent);
+        // Regex actualizada para incluir "Equivalencia"
         Pattern pattern = Pattern.compile(
-                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((03MA\\w{5})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen)\\s+([\\d\\.,]+)?\\s*(Aprobado|Promocionado|Reprobado|Ausente)"
+                "([A-ZÁÉÍÓÚÜÑ0-9\\s\\.\\-]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
         );
+
 
         Matcher matcher = pattern.matcher(pdfContent);
 
@@ -100,10 +99,8 @@ public class PdfReaderTest {
             return "";
         }
 
-
         // Borra todas las líneas que tengan "HISTORIA ACADÉMICA", "Alumno:" o "Propuesta:" en cualquier parte
         pdfContent = pdfContent.replaceAll("(?m)^.*(HISTORIA ACADÉMICA|Alumno:|Propuesta:).*(\\r?\\n)?", "");
-
 
         // Eliminar paginación + fecha + hora tipo "1 de 4 08/07/2025 22:32:09"
         pdfContent = pdfContent.replaceAll("\\d+ de \\d+ \\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}", "");
