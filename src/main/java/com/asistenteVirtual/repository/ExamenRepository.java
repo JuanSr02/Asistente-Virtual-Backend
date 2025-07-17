@@ -42,30 +42,44 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     List<String> findDistinctMateriasPorCodigo();
 
     @Query(value = """
-            SELECT m.codigo, m.nombre, 
+            WITH materias_unicas AS (
+                SELECT codigo, nombre,
+                       ROW_NUMBER() OVER (PARTITION BY codigo ORDER BY nombre) AS rn
+                FROM materia
+            )
+            SELECT mu.codigo, mu.nombre,
                    COUNT(*) as total,
                    SUM(CASE WHEN e.nota >= 4 THEN 1 ELSE 0 END) as aprobados
-            FROM materia m
-            JOIN renglon r ON m.codigo = r.materia_codigo
+            FROM materias_unicas mu
+            JOIN renglon r ON mu.codigo = r.materia_codigo
             JOIN examen e ON r.id = e.renglon_id
-            GROUP BY m.codigo, m.nombre
+            WHERE mu.rn = 1
+            GROUP BY mu.codigo, mu.nombre
             ORDER BY (SUM(CASE WHEN e.nota >= 4 THEN 1 ELSE 0 END)*1.0/COUNT(*)) DESC
             LIMIT 5
             """, nativeQuery = true)
     List<Object[]> findTop5MateriasAprobadas();
 
+
     @Query(value = """
-            SELECT m.codigo, m.nombre, 
+            WITH materias_unicas AS (
+                SELECT codigo, nombre,
+                       ROW_NUMBER() OVER (PARTITION BY codigo ORDER BY nombre) AS rn
+                FROM materia
+            )
+            SELECT mu.codigo, mu.nombre,
                    COUNT(*) as total,
                    SUM(CASE WHEN e.nota < 4 THEN 1 ELSE 0 END) as reprobados
-            FROM materia m
-            JOIN renglon r ON m.codigo = r.materia_codigo
+            FROM materias_unicas mu
+            JOIN renglon r ON mu.codigo = r.materia_codigo
             JOIN examen e ON r.id = e.renglon_id
-            GROUP BY m.codigo, m.nombre
+            WHERE mu.rn = 1
+            GROUP BY mu.codigo, mu.nombre
             ORDER BY (SUM(CASE WHEN e.nota < 4 THEN 1 ELSE 0 END)*1.0/COUNT(*)) DESC
             LIMIT 5
             """, nativeQuery = true)
     List<Object[]> findTop5MateriasReprobadas();
+
 
     long countByNotaGreaterThanEqual(double nota);
 
