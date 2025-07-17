@@ -1,8 +1,5 @@
 package com.asistenteVirtual.services.estadisticas;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.asistenteVirtual.DTOs.EstadisticasMateriaDTO;
 import com.asistenteVirtual.DTOs.MateriaRankingDTO;
 import com.asistenteVirtual.model.EstadisticasMateria;
@@ -11,6 +8,9 @@ import com.asistenteVirtual.model.Experiencia;
 import com.asistenteVirtual.model.HistoriaAcademica;
 import com.asistenteVirtual.repository.EstadisticasMateriaRepository;
 import com.asistenteVirtual.repository.EstudianteRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -30,7 +30,7 @@ public class EstadisticasHelper {
     private final EstadisticasMateriaRepository estadisticasRepo;
     private final EstudianteRepository estudianteRepository;
 
-    public Long calcularEstudiantes(){
+    public Long calcularEstudiantes() {
         return estudianteRepository.count();
     }
 
@@ -74,11 +74,11 @@ public class EstadisticasHelper {
                 .orElse(0.0);
     }
 
-    public MateriaRankingDTO calcularMateriaMasRendida(String codigoMateria,String nombre,long cantidad,long aprobados){
+    public MateriaRankingDTO calcularMateriaMasRendida(String codigoMateria, String nombre, long cantidad, long aprobados) {
         MateriaRankingDTO rendida = new MateriaRankingDTO();
         rendida.setCodigoMateria(codigoMateria);
         rendida.setNombre(nombre);
-        Double porcentaje = calcularPorcentaje(aprobados,cantidad);
+        Double porcentaje = calcularPorcentaje(aprobados, cantidad);
         rendida.setPorcentaje(porcentaje);
         return rendida;
     }
@@ -95,8 +95,10 @@ public class EstadisticasHelper {
         return estadisticasRepo.findAll().stream()
                 .collect(Collectors.toMap(
                         EstadisticasMateria::getNombreMateria,
-                        EstadisticasMateria::getPromedioNotas
+                        EstadisticasMateria::getPromedioNotas,
+                        (primero, duplicado) -> primero // en caso de duplicado, quedarse con el primero
                 ));
+
     }
 
     public List<MateriaRankingDTO> mapToMateriaRankingDTO(List<Object[]> results) {
@@ -125,7 +127,8 @@ public class EstadisticasHelper {
             dto.setDistribucionDificultad(
                     objectMapper.readValue(
                             stats.getDistribucionDificultad(),
-                            new TypeReference<Map<Integer, Integer>>() {}
+                            new TypeReference<Map<Integer, Integer>>() {
+                            }
                     ));
         }
 
@@ -133,7 +136,8 @@ public class EstadisticasHelper {
             dto.setDistribucionModalidad(
                     objectMapper.readValue(
                             stats.getDistribucionModalidad(),
-                            new TypeReference<Map<String, Integer>>() {}
+                            new TypeReference<Map<String, Integer>>() {
+                            }
                     ));
         }
 
@@ -141,10 +145,12 @@ public class EstadisticasHelper {
             dto.setDistribucionRecursos(
                     objectMapper.readValue(
                             stats.getDistribucionRecursos(),
-                            new TypeReference<Map<String, Integer>>() {}
+                            new TypeReference<Map<String, Integer>>() {
+                            }
                     ));
         }
     }
+
     public double calcularPromedioDiasEstudio(List<Experiencia> experiencias) {
         if (experiencias == null || experiencias.isEmpty()) {
             return 0.0;
