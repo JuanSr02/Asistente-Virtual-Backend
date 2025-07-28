@@ -3,17 +3,13 @@ package com.asistenteVirtual.controllers;
 import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.EstadisticasMateriaDTO;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
-import com.asistenteVirtual.services.estadisticas.EstadisticasCalculator;
-import com.asistenteVirtual.services.estadisticas.EstadisticasGeneralCalculator;
+import com.asistenteVirtual.services.estadisticas.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Validated
@@ -24,6 +20,9 @@ public class EstadisticasController {
 
     private final EstadisticasCalculator estadisticasService;
     private final EstadisticasGeneralCalculator estadisticasGeneralService;
+    private final EstadisticasAvanzadasService estadisticasAvanzadasService;
+    private final EstadisticasMateriaPeriodoService estadisticasMateriaPeriodoService;
+
 
     /**
      * Obtiene estadísticas detalladas para una materia específica
@@ -48,4 +47,22 @@ public class EstadisticasController {
     public ResponseEntity<EstadisticasGeneralesDTO> obtenerEstadisticasGenerales() {
         return ResponseEntity.ok(estadisticasGeneralService.obtenerEstadisticasGenerales());
     }
+
+    @GetMapping("/generales/carrera")
+    public ResponseEntity<EstadisticasGeneralesDTO> obtenerEstadisticasPorCarrera(
+            @RequestParam String plan,
+            @RequestParam(required = false, defaultValue = "ULTIMO_ANIO") PeriodoEstadisticas periodo) {
+
+        return ResponseEntity.ok(estadisticasAvanzadasService.obtenerEstadisticasPorCarrera(plan, periodo));
+    }
+
+    @GetMapping("/materia/{codigoMateria}/periodo")
+    public ResponseEntity<EstadisticasMateriaDTO> obtenerEstadisticasMateriaPorPeriodo(
+            @PathVariable @NotBlank String codigoMateria,
+            @RequestParam PeriodoEstadisticas periodo) {
+
+        return ResponseEntity.ok(estadisticasMateriaPeriodoService.obtenerEstadisticasMateriaPorPeriodo(codigoMateria, periodo));
+    }
+
+
 }

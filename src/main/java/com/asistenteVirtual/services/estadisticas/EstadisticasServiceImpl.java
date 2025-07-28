@@ -56,7 +56,6 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
     }
 
     public EstadisticasMateria obtenerEstadisticasMateria(String codigoMateria) {
-        // Modo agrupado por código
         List<Materia> materiasConMismoCodigo = materiaRepo.findByCodigo(codigoMateria);
 
         if (materiasConMismoCodigo == null || materiasConMismoCodigo.isEmpty()) {
@@ -172,7 +171,7 @@ public class EstadisticasServiceImpl implements EstadisticasCalculator, Estadist
         long cantMateriaMasRendida = examenRepo.countExamenesByCodigoMateria(materiaMasRendida);
         long cantAprobadosMateriaMasRendida = examenRepo.countExamenesAprobadosByCodigoMateria(materiaMasRendida);
 
-        List<HistoriaAcademica> historias = historiaRepo.findAll(); // Asegurate de tener este repo
+        List<HistoriaAcademica> historias = historiaRepo.findAll();
         Map<String, Integer> distEstudiantes = estadisticasHelper.calcularDistribucionEstudiantesPorCarrera(historias);
         Map<String, Integer> distExamenes = estadisticasHelper.calcularDistribucionExamenesPorMateria(todosLosExamenes);
 
