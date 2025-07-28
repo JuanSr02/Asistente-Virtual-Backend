@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -110,5 +111,15 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
             """)
     long countExamenesByCodigoMateria(@Param("codigoMateria") String codigoMateria);
 
+    @Query("SELECT e FROM Examen e JOIN e.renglon r WHERE r.materia.codigo IN :codigosMaterias AND r.materia.planDeEstudio.codigo = :codigoPlan")
+    List<Examen> findByRenglon_Materia_CodigoIn(@Param("codigosMaterias") List<String> codigosMaterias, @Param("codigoPlan") String codigoPlan);
+
+    @Query("SELECT e FROM Examen e JOIN e.renglon r WHERE r.materia.codigo IN :codigosMaterias AND e.fecha >= :fechaLimite AND r.materia.planDeEstudio.codigo = :codigoPlan")
+    List<Examen> findByRenglon_Materia_CodigoInAndFechaAfter(
+            @Param("codigosMaterias") List<String> codigosMaterias,
+            @Param("fechaLimite") LocalDate fechaLimite, @Param("codigoPlan") String codigoPlan);
+
+    @Query("SELECT e FROM Examen e JOIN e.renglon r WHERE r.materia = :materia AND e.fecha >= :fechaLimite")
+    List<Examen> findByMateriaAndFechaAfter(@Param("materia") Materia materia, @Param("fechaLimite") LocalDate fechaLimite);
 
 }
