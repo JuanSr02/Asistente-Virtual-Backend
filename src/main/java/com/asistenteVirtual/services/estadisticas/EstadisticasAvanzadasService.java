@@ -2,16 +2,17 @@ package com.asistenteVirtual.services.estadisticas;
 
 import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.MateriaRankingDTO;
-import com.asistenteVirtual.model.Examen;
-import com.asistenteVirtual.model.HistoriaAcademica;
-import com.asistenteVirtual.model.Materia;
-import com.asistenteVirtual.model.PlanDeEstudio;
+import com.asistenteVirtual.model.*;
 import com.asistenteVirtual.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +20,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EstadisticasAvanzadasService {
     private final ExamenRepository examenRepository;
     private final MateriaRepository materiaRepository;
     private final PlanDeEstudioRepository planDeEstudioRepository;
     private final EstadisticasHelper estadisticasHelper;
-    private final RenglonRepository renglonRepository;
     private final HistoriaAcademicaRepository historiaAcademicaRepository;
-    private final EstudianteRepository estudianteRepository;
+    private final ObjectMapper objectMapper;
+    private final EstadisticasPorCarreraRepository estadisticasPorCarreraRepo;
+
 
     public EstadisticasGeneralesDTO obtenerEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo) {
         PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan)
@@ -39,7 +42,11 @@ public class EstadisticasAvanzadasService {
         List<Examen> examenesFiltrados = filtrarExamenesPorMateriasYFecha(codigosMaterias, fechaLimite, codigoPlan);
         List<HistoriaAcademica> historiasCarrera = filtrarHistoriasPorPlan(codigoPlan);
 
-        return construirEstadisticasDTO(plan, examenesFiltrados, historiasCarrera, codigosMaterias);
+        EstadisticasGeneralesDTO dto = construirEstadisticasDTO(plan, examenesFiltrados, historiasCarrera, codigosMaterias);
+
+        guardarEstadisticasPorCarrera(codigoPlan, periodo, dto);
+
+        return dto;
     }
 
     private EstadisticasGeneralesDTO construirEstadisticasDTO(PlanDeEstudio plan, List<Examen> examenes, List<HistoriaAcademica> historias, List<String> codigosMaterias) {
@@ -69,6 +76,32 @@ public class EstadisticasAvanzadasService {
                 .distribucionExamenesPorMateria(calcularDistribucionExamenesPorMateria(examenes))
                 .build();
     }
+
+    private void guardarEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo, EstadisticasGeneralesDTO dto) {
+        try {
+            EstadisticasPorCarrera stats = EstadisticasPorCarrera.builder()
+                    .codigoPlan(codigoPlan)
+                    .periodo(periodo.toString())
+                    .estudiantesActivos(Math.toIntExact(dto.getEstudiantesActivos()))
+                    .totalMaterias(dto.getTotalMaterias())
+                    .totalExamenesRendidos(dto.getTotalExamenesRendidos())
+                    .porcentajeAprobadosGeneral(dto.getPorcentajeAprobadosGeneral())
+                    .promedioGeneral(dto.getPromedioGeneral())
+                    .distribucionExamenesPorMateria(objectMapper.writeValueAsString(dto.getDistribucionExamenesPorMateria()))
+                    .top5Aprobadas(objectMapper.writeValueAsString(dto.getTop5Aprobadas()))
+                    .top5Reprobadas(objectMapper.writeValueAsString(dto.getTop5Reprobadas()))
+                    .promedioNotasPorMateria(objectMapper.writeValueAsString(dto.getPromedioNotasPorMateria()))
+                    .materiaMasRendida(objectMapper.writeValueAsString(dto.getMateriaMasRendida()))
+                    .cantidadMateriaMasRendida(dto.getCantidadMateriaMasRendida())
+                    .fechaUltimaActualizacion(LocalDateTime.now())
+                    .build();
+
+            estadisticasPorCarreraRepo.save(stats);
+        } catch (JsonProcessingException e) {
+            log.error("Error al serializar estadísticas por carrera", e);
+        }
+    }
+
 
     private long contarEstudiantesActivos(List<HistoriaAcademica> historias) {
         return historias.size();
