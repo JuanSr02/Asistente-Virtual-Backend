@@ -48,6 +48,11 @@ public class EstadisticasController {
         return ResponseEntity.ok(estadisticasGeneralService.obtenerEstadisticasGenerales());
     }
 
+    /**
+     * Obtiene estadísticas generales por carrera
+     *
+     * @return ResponseEntity con las estadísticas generales
+     */
     @GetMapping("/generales/carrera")
     public ResponseEntity<EstadisticasGeneralesDTO> obtenerEstadisticasPorCarrera(
             @RequestParam String plan,
@@ -56,6 +61,14 @@ public class EstadisticasController {
         return ResponseEntity.ok(estadisticasAvanzadasService.obtenerEstadisticasPorCarrera(plan, periodo));
     }
 
+    /**
+     * Obtiene estadísticas detalladas para una materia específica en un periodo dado
+     *
+     * @param codigoMateria Código único de la materia (no puede estar vacío)
+     * @param periodo       Periodo en el cual se quieren calcular las estadisticas
+     * @return ResponseEntity con las estadísticas de la materia
+     * @throws ResourceNotFoundException si no se encuentra la materia
+     */
     @GetMapping("/materia/{codigoMateria}/periodo")
     public ResponseEntity<EstadisticasMateriaDTO> obtenerEstadisticasMateriaPorPeriodo(
             @PathVariable @NotBlank String codigoMateria,
@@ -63,6 +76,5 @@ public class EstadisticasController {
 
         return ResponseEntity.ok(estadisticasMateriaPeriodoService.obtenerEstadisticasMateriaPorPeriodo(codigoMateria, periodo));
     }
-
 
 }

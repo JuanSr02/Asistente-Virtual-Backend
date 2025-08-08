@@ -5,6 +5,6 @@ import com.asistenteVirtual.model.EstadisticasMateria;
 
 public interface EstadisticasCalculator {
     EstadisticasMateria obtenerEstadisticasMateriaUnica(String materia, String plan);
-    EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String materia);
 
+    EstadisticasMateriaDTO obtenerEstadisticasSuperMateria(String materia);
 }
