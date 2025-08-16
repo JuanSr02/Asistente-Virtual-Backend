@@ -13,18 +13,21 @@ import java.util.Optional;
 @Repository
 public interface MateriaRepository extends JpaRepository<Materia, String> {
 
-    Optional<Materia> findByNombreAndPlanDeEstudio(String nombre, PlanDeEstudio plan);
     Optional<Materia> findByCodigoAndPlanDeEstudio(String codigo, PlanDeEstudio planDeEstudio);
+
     Optional<Materia> findFirstByCodigo(String codigo);
+
     List<Materia> findByCodigo(String codigo);
+
     @Query("""
-    SELECT m.nombre
-    FROM Materia m
-    WHERE m.codigo = :codigo
-    ORDER BY m.nombre ASC
-    LIMIT 1
-""")
+                SELECT m.nombre
+                FROM Materia m
+                WHERE m.codigo = :codigo
+                ORDER BY m.nombre ASC
+                LIMIT 1
+            """)
     String findFirstNombreByCodigo(@Param("codigo") String codigo);
+
     @Query("SELECT COUNT(m) FROM Materia m WHERE m.planDeEstudio.codigo = :codigoPlan")
     Long ContarByPlanCodigo(@Param("codigoPlan") String codigoPlan);
 
