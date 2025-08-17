@@ -21,7 +21,7 @@ public class EstadisticasController {
     private final EstadisticasCalculator estadisticasService;
     private final EstadisticasGeneralCalculator estadisticasGeneralService;
     private final EstadisticasAvanzadasService estadisticasAvanzadasService;
-    private final EstadisticasMateriaPeriodoService estadisticasMateriaPeriodoService;
+    private final EstadisticasMateriaPeriodoServiceImpl estadisticasMateriaPeriodoService;
 
 
     /**
