@@ -4,8 +4,6 @@ import com.asistenteVirtual.DTOs.FinalDTO;
 import com.asistenteVirtual.DTOs.OrdenFinales;
 import com.asistenteVirtual.model.HistoriaAcademica;
 import com.asistenteVirtual.model.Renglon;
-import com.asistenteVirtual.repository.CorrelativaRepository;
-import com.asistenteVirtual.repository.EstadisticasMateriaRepository;
 import com.asistenteVirtual.repository.RenglonRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +16,6 @@ import java.util.stream.Collectors;
 public class FinalesCalculatorImpl implements FinalesCalculator {
 
     private final RenglonRepository renglonRepo;
-    private final CorrelativaRepository correlativaRepo;
-    private final EstadisticasMateriaRepository estadisticasRepo;
     private final FinalesMapper finalesMapper;
     private final FinalesSorter finalesSorter;
 
