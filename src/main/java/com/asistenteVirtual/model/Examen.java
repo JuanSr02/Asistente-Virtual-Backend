@@ -2,7 +2,10 @@ package com.asistenteVirtual.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -28,7 +31,7 @@ public class Examen {
     @JsonIgnore
     private Renglon renglon;
 
-    @OneToOne(mappedBy = "examen", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "examen")
     @JsonIgnore
     private Experiencia experiencia;
 

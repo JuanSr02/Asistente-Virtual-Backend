@@ -35,12 +35,12 @@ public class Renglon {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "materia_codigo", referencedColumnName = "codigo",nullable = false),
-            @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo",nullable = false)
+            @JoinColumn(name = "materia_codigo", referencedColumnName = "codigo", nullable = false),
+            @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo", nullable = false)
     })
     private Materia materia;
 
-    @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "renglon")
     private Examen examen;
 
     @PrePersist
