@@ -2,7 +2,10 @@ package com.asistenteVirtual.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,4 +35,6 @@ public class HistoriaAcademica {
     @JsonIgnore
     @ToString.Exclude
     private List<Renglon> renglones = new ArrayList<>();
+
+    private String estado; // ACTIVO - BAJA.
 }

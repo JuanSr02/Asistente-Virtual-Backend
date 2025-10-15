@@ -32,28 +32,32 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
     @Override
     public HistoriaAcademicaResponseDTO cargarHistoriaAcademica(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         validator.validarEstudiante(estudianteId);
-        validator.validarHistoria(estudianteId);
-        HistoriaAcademica historia;
-        String fileExtension = getFileExtension(file);
+        boolean tieneHistoria = validator.validarHistoria(estudianteId);
+        if (tieneHistoria) {
+            return actualizarHistoriaAcademica(file, estudianteId, codigoPlan);
+        } else {
+            HistoriaAcademica historia;
+            String fileExtension = getFileExtension(file);
 
-        switch (fileExtension) {
-            case "xlsx":
-            case "xls":
-                historia = archivoProcessingService.procesarArchivoExcel(file, estudianteId, codigoPlan);
-                break;
-            case "pdf":
-                historia = archivoProcessingService.procesarArchivoPDF(file, estudianteId, codigoPlan);
-                break;
-            default:
-                throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
+            switch (fileExtension) {
+                case "xlsx":
+                case "xls":
+                    historia = archivoProcessingService.procesarArchivoExcel(file, estudianteId, codigoPlan);
+                    break;
+                case "pdf":
+                    historia = archivoProcessingService.procesarArchivoPDF(file, estudianteId, codigoPlan);
+                    break;
+                default:
+                    throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
+            }
+            Long renglonesCargados = renglonRepo.countByHistoriaAcademica(historia);
+            return HistoriaAcademicaResponseDTO.builder()
+                    .nombreCompleto(historia.getEstudiante().getNombreApellido())
+                    .codigoPlan(historia.getPlanDeEstudio().getCodigo())
+                    .fechaUltimaActualizacion(LocalDate.now())
+                    .renglonesCargados(renglonesCargados)
+                    .build();
         }
-        Long renglonesCargados = renglonRepo.countByHistoriaAcademica(historia);
-        return HistoriaAcademicaResponseDTO.builder()
-                .nombreCompleto(historia.getEstudiante().getNombreApellido())
-                .codigoPlan(historia.getPlanDeEstudio().getCodigo())
-                .fechaUltimaActualizacion(LocalDate.now())
-                .renglonesCargados(renglonesCargados)
-                .build();
     }
 
     @Override
@@ -101,22 +105,10 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
 
         HistoriaAcademica historia = estudiante.getHistoriaAcademica();
         if (historia != null) {
-            eliminarHistoriaCompleta(estudiante, historia);
+            historia.setEstado("BAJA");
+            historiaRepo.save(historia);
+            historiaRepo.flush();
         }
-    }
-
-    private void eliminarHistoriaCompleta(Estudiante estudiante, HistoriaAcademica historia) {
-        // Romper relación bidireccional
-        estudiante.setHistoriaAcademica(null);
-        historia.setEstudiante(null);
-
-        // Eliminar renglones (orphanRemoval se encarga de los exámenes)
-        historia.getRenglones().clear();
-
-        // Guardar cambios
-        estudianteRepo.save(estudiante);
-        historiaRepo.delete(historia);
-        historiaRepo.flush();
     }
 
     /**
