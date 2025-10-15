@@ -39,8 +39,8 @@ public class Renglon {
             @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo", nullable = false)
     })
     private Materia materia;
-
-    @OneToOne(mappedBy = "renglon")
+    
+    @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL, orphanRemoval = true)
     private Examen examen;
 
     @PrePersist

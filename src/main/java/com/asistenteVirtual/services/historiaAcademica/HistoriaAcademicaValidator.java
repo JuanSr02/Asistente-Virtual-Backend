@@ -1,6 +1,5 @@
 package com.asistenteVirtual.services.historiaAcademica;
 
-import com.asistenteVirtual.exceptions.IntegrityException;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.Estudiante;
 import com.asistenteVirtual.repository.EstudianteRepository;
@@ -21,11 +20,8 @@ public class HistoriaAcademicaValidator {
         }
     }
 
-    public void validarHistoria(Long estudianteId){
+    public boolean validarHistoria(Long estudianteId) {
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
-        if(historiaAcademicaRepository.existsByEstudiante(estudiante)){
-            throw new IntegrityException("El estudiante con ID " + estudianteId +
-                    " ya tiene una historia cargada");
-        }
+        return historiaAcademicaRepository.existsByEstudiante(estudiante);
     }
 }

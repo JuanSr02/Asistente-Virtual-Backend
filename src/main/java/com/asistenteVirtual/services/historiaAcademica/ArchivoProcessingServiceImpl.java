@@ -46,7 +46,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
 
-        // --- PASO CLAVE: VALIDACIÓN HEURÍSTICA ---
+        // --- PASO CLAVE: VALIDACIÓN HEURÍSTICA PARA CHEQUEAR QUE EL PLAN ELEGIDO CONCUERDA CON LA HISTORIA ---
         validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap, codigoPlan);
 
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
@@ -86,7 +86,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         double porcentajeCoincidencia = ((double) materiasEncontradas / (materiasEncontradas + materiasNoEncontradas)) * 100.0;
         log.info("Análisis de coincidencia: {}% de materias encontradas para el plan seleccionado.", String.format("%.2f", porcentajeCoincidencia));
 
-        if (porcentajeCoincidencia < UMBRAL_COINCIDENCIA && !codigoPlan.equalsIgnoreCase("1/23")) {
+        if (porcentajeCoincidencia < UMBRAL_COINCIDENCIA) {
             throw new PlanIncompatibleException(
                     String.format(
                             "El archivo no parece corresponder al plan seleccionado. Solo el %.2f%% de las materias coincidieron (se requiere al menos %.0f%%).",
@@ -176,6 +176,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
                     HistoriaAcademica h = new HistoriaAcademica();
                     h.setEstudiante(estudiante);
                     h.setPlanDeEstudio(plan);
+                    h.setEstado("ACTIVA");
                     return historiaRepo.save(h);
                 });
     }
@@ -287,8 +288,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
-        PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
-        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
+        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado para actualización de historia"));
         HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
 
@@ -297,7 +297,8 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
         validarCoincidenciaDelPlan(datosExtraidos, materiasMap, codigoPlan);
         procesarDatosConChequeo(datosExtraidos, historia, materiasMap);
-
+        historia.setEstado("ACTIVA");
+        historia = historiaRepo.save(historia);
         return historia;
     }
 
@@ -453,7 +454,6 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
     public HistoriaAcademica procesarArchivoPDFActualizacion(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         String pdfContent = leerContenidoPDF(file);
 
-        PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
         HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
@@ -464,6 +464,9 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         validarCoincidenciaDelPlan(datosExtraidos, materiasMap, codigoPlan);
 
         procesarDatosConChequeo(datosExtraidos, historia, materiasMap);
+
+        historia.setEstado("ACTIVA");
+        historia = historiaRepo.save(historia);
 
         return historia;
     }
