@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class EstadisticasAvanzadasService {
     private final EstadisticasPorCarreraRepository estadisticasPorCarreraRepo;
 
 
+    @Transactional
     public EstadisticasGeneralesDTO obtenerEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo) {
         PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan)
                 .orElseThrow(() -> new EntityNotFoundException("Plan de estudio no encontrado"));
@@ -77,7 +79,8 @@ public class EstadisticasAvanzadasService {
                 .build();
     }
 
-    private void guardarEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo, EstadisticasGeneralesDTO dto) {
+    @Transactional
+    public void guardarEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo, EstadisticasGeneralesDTO dto) {
         try {
             EstadisticasPorCarrera stats = EstadisticasPorCarrera.builder()
                     .codigoPlan(codigoPlan)

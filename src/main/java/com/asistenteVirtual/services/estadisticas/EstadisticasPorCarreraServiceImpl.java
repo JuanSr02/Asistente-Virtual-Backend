@@ -26,7 +26,7 @@ public class EstadisticasPorCarreraServiceImpl implements EstadisticasPorCarrera
     @Override
     public EstadisticasGeneralesDTO obtenerEstadisticasPorCarreraRapido(String codigoPlan, PeriodoEstadisticas periodo) {
         EstadisticasPorCarrera stats = estadisticasPorCarreraRepo
-                .findFirstByCodigoPlanAndPeriodoOrderByFechaUltimaActualizacionDesc(
+                .findByCodigoPlanAndPeriodo(
                         codigoPlan, periodo.toString())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No hay estadísticas almacenadas para esta carrera y periodo"));
