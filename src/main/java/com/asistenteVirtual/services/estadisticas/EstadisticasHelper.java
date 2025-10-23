@@ -112,7 +112,11 @@ public class EstadisticasHelper {
     private MateriaRankingDTO mapearFilaARankingDTO(Object[] row) {
         MateriaRankingDTO dto = new MateriaRankingDTO();
         dto.setCodigoMateria((String) row[0]);
-        dto.setNombre((String) row[1]);
+        if (dto.getCodigoMateria().equals("MA158")) {
+            dto.setNombre(row[1] + " (TEC. WEB.)");
+        } else {
+            dto.setNombre((String) row[1]);
+        }
 
         long total = ((Number) row[2]).longValue();
         long aprobados = ((Number) row[3]).longValue();
