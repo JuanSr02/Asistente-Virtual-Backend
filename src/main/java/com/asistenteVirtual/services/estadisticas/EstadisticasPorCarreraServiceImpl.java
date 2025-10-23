@@ -4,7 +4,7 @@ import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.MateriaRankingDTO;
 import com.asistenteVirtual.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.EstadisticasPorCarrera;
-import com.asistenteVirtual.repository.*;
+import com.asistenteVirtual.repository.EstadisticasPorCarreraRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,11 +19,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class EstadisticasPorCarreraServiceImpl implements EstadisticasPorCarreraService {
-    private final PlanDeEstudioRepository planDeEstudioRepository;
-    private final MateriaRepository materiaRepository;
-    private final ExamenRepository examenRepository;
-    private final HistoriaAcademicaRepository historiaRepo;
-    private final EstadisticasHelper estadisticasHelper;
     private final ObjectMapper objectMapper;
     private final EstadisticasPorCarreraRepository estadisticasPorCarreraRepo;
 

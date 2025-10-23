@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface EstadisticasPorCarreraRepository extends JpaRepository<EstadisticasPorCarrera, Long> {
     Optional<EstadisticasPorCarrera> findFirstByCodigoPlanAndPeriodoOrderByFechaUltimaActualizacionDesc(
             String codigoPlan, String periodo);
+
+    void deleteByCodigoPlanAndPeriodo(String codigoPlan, String periodo);
 }

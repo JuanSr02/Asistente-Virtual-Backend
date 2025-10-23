@@ -96,6 +96,7 @@ public class EstadisticasAvanzadasService {
                     .fechaUltimaActualizacion(LocalDateTime.now())
                     .build();
 
+            estadisticasPorCarreraRepo.deleteByCodigoPlanAndPeriodo(codigoPlan, periodo.toString());
             estadisticasPorCarreraRepo.save(stats);
         } catch (JsonProcessingException e) {
             log.error("Error al serializar estadísticas por carrera", e);
