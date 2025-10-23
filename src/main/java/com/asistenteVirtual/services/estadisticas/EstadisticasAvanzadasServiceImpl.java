@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class EstadisticasAvanzadasServiceImpl implements EstadisticasAvanzadasSe
     private final EstadisticasPorCarreraRepository estadisticasPorCarreraRepo;
 
 
+    @Transactional
     @Override
     public EstadisticasGeneralesDTO obtenerEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo) {
         PlanDeEstudio plan = planDeEstudioRepository.findById(codigoPlan)
@@ -43,14 +45,14 @@ public class EstadisticasAvanzadasServiceImpl implements EstadisticasAvanzadasSe
         List<Examen> examenesFiltrados = filtrarExamenesPorMateriasYFecha(codigosMaterias, fechaLimite, codigoPlan);
         List<HistoriaAcademica> historiasCarrera = filtrarHistoriasPorPlan(codigoPlan);
 
-        EstadisticasGeneralesDTO dto = construirEstadisticasDTO(examenesFiltrados, historiasCarrera, codigosMaterias);
+        EstadisticasGeneralesDTO dto = construirEstadisticasDTO(plan, examenesFiltrados, historiasCarrera, codigosMaterias);
 
         guardarEstadisticasPorCarrera(codigoPlan, periodo, dto);
 
         return dto;
     }
 
-    private EstadisticasGeneralesDTO construirEstadisticasDTO(List<Examen> examenes, List<HistoriaAcademica> historias, List<String> codigosMaterias) {
+    private EstadisticasGeneralesDTO construirEstadisticasDTO(PlanDeEstudio plan, List<Examen> examenes, List<HistoriaAcademica> historias, List<String> codigosMaterias) {
 
         long totalExamenes = examenes.size();
         long totalAprobados = examenes.stream()
@@ -78,7 +80,8 @@ public class EstadisticasAvanzadasServiceImpl implements EstadisticasAvanzadasSe
                 .build();
     }
 
-    private void guardarEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo, EstadisticasGeneralesDTO dto) {
+    @Transactional
+    public void guardarEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo, EstadisticasGeneralesDTO dto) {
         try {
             EstadisticasPorCarrera stats = EstadisticasPorCarrera.builder()
                     .codigoPlan(codigoPlan)
@@ -97,6 +100,7 @@ public class EstadisticasAvanzadasServiceImpl implements EstadisticasAvanzadasSe
                     .fechaUltimaActualizacion(LocalDateTime.now())
                     .build();
 
+            estadisticasPorCarreraRepo.deleteByCodigoPlanAndPeriodo(codigoPlan, periodo.toString());
             estadisticasPorCarreraRepo.save(stats);
         } catch (JsonProcessingException e) {
             log.error("Error al serializar estadísticas por carrera", e);
