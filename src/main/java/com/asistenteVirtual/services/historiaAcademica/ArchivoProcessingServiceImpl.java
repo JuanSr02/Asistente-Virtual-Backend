@@ -42,14 +42,14 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         Sheet sheet = workbook.getSheetAt(0);
 
         PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
-        Map<String, Materia> materiasDelPlanMap = obtenerMaterialesParaValidacion(codigoPlan);
+        Map<String, Materia> materiasDelPlanMap = obtenerMateriasParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
 
-        // --- PASO CLAVE: VALIDACIÓN HEURÍSTICA PARA CHEQUEAR QUE EL PLAN ELEGIDO CONCUERDA CON LA HISTORIA ---
-        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap, codigoPlan);
+        // --- VALIDACIÓN HEURÍSTICA PARA CHEQUEAR QUE EL PLAN ELEGIDO CONCUERDA CON LA HISTORIA ---
+        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap);
 
-        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
+        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado para carga de historia"));
         HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
 
         procesarDatos(datosExtraidos, historia, materiasDelPlanMap);
@@ -57,7 +57,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
     }
 
 
-    private Map<String, Materia> obtenerMaterialesParaValidacion(String codigoPlan) {
+    private Map<String, Materia> obtenerMateriasParaValidacion(String codigoPlan) {
         Map<String, Materia> materiasMap = new HashMap<>();
 
         // Agregar materias del plan principal
@@ -67,7 +67,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         return materiasMap;
     }
 
-    private void validarCoincidenciaDelPlan(List<DatosFila> datosExtraidos, Map<String, Materia> materiasDelPlanMap, String codigoPlan) {
+    private void validarCoincidenciaDelPlan(List<DatosFila> datosExtraidos, Map<String, Materia> materiasDelPlanMap) {
         int materiasEncontradas = 0;
         int materiasNoEncontradas = 0;
 
@@ -84,7 +84,6 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         }
 
         double porcentajeCoincidencia = ((double) materiasEncontradas / (materiasEncontradas + materiasNoEncontradas)) * 100.0;
-        log.info("Análisis de coincidencia: {}% de materias encontradas para el plan seleccionado.", String.format("%.2f", porcentajeCoincidencia));
 
         if (porcentajeCoincidencia < UMBRAL_COINCIDENCIA) {
             throw new PlanIncompatibleException(
@@ -103,7 +102,6 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         for (DatosFila datos : datosExtraidos) {
             Materia materia = materiasMap.get(datos.nombreMateria());
             if (materia == null) {
-                log.warn("Materia no encontrada en el plan: {}", datos.nombreMateria());
                 continue;
             }
             procesarFila(datos, historia, materiasMap.get(datos.nombreMateria()), renglonList, examenList);
@@ -145,21 +143,19 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         List<Examen> examenesDuplicados = new ArrayList<>();
 
         for (Examen examen : examenList) {
-            if (examen.getNota() >= 4.0) {
-                Materia materia = examen.getRenglon().getMateria();
-                Double nota = examen.getNota();
+            Materia materia = examen.getRenglon().getMateria();
+            Double nota = examen.getNota();
 
-                if (!materiasYNotas.containsKey(materia)) {
-                    materiasYNotas.put(materia, new HashSet<>());
-                }
+            if (!materiasYNotas.containsKey(materia)) {
+                materiasYNotas.put(materia, new HashSet<>());
+            }
 
-                if (materiasYNotas.get(materia).contains(nota)) {
-                    examenesDuplicados.add(examen);
-                    // También eliminar el renglón asociado
-                    renglonList.removeIf(r -> r.equals(examen.getRenglon()));
-                } else {
-                    materiasYNotas.get(materia).add(nota);
-                }
+            if (materiasYNotas.get(materia).contains(nota)) {
+                examenesDuplicados.add(examen);
+                // También eliminar el renglón asociado
+                renglonList.removeIf(r -> r.equals(examen.getRenglon()));
+            } else {
+                materiasYNotas.get(materia).add(nota);
             }
         }
         examenList.removeAll(examenesDuplicados);
@@ -288,17 +284,23 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
 
-        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado para actualización de historia"));
-        HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
-                .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
-
-        Map<String, Materia> materiasMap = obtenerMaterialesParaValidacion(codigoPlan);
+        PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
+        Map<String, Materia> materiasDelPlanMap = obtenerMateriasParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDeExcel(sheet);
-        validarCoincidenciaDelPlan(datosExtraidos, materiasMap, codigoPlan);
-        procesarDatosConChequeo(datosExtraidos, historia, materiasMap);
+
+        // --- VALIDACIÓN HEURÍSTICA PARA CHEQUEAR QUE EL PLAN ELEGIDO CONCUERDA CON LA HISTORIA ---
+        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap);
+
+        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado para actualización de historia"));
+        HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
+
+        procesarDatosConChequeo(datosExtraidos, historia, materiasDelPlanMap);
+
+        // CAMBIAR ESTADO A LA HISTORIA
         historia.setEstado("ACTIVA");
         historia = historiaRepo.save(historia);
+
         return historia;
     }
 
@@ -313,7 +315,6 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
             Materia materia = materiasMap.get(datos.nombreMateria());
             if (materia == null) {
-                log.warn("Materia no encontrada en el plan: {}", datos.nombreMateria());
                 continue;
             }
 
@@ -436,11 +437,11 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         String pdfContent = leerContenidoPDF(file);
 
         PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
-        Map<String, Materia> materiasDelPlanMap = obtenerMaterialesParaValidacion(codigoPlan);
+        Map<String, Materia> materiasDelPlanMap = obtenerMateriasParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDePDF(pdfContent);
 
-        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap, codigoPlan);
+        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap);
 
         Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
         HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
@@ -454,17 +455,20 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
     public HistoriaAcademica procesarArchivoPDFActualizacion(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         String pdfContent = leerContenidoPDF(file);
 
-        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow();
-        HistoriaAcademica historia = historiaRepo.findByEstudiante(estudiante)
-                .orElseThrow(() -> new ResourceNotFoundException("Historia no encontrada para actualización"));
-
-        Map<String, Materia> materiasMap = obtenerMaterialesParaValidacion(codigoPlan);
+        PlanDeEstudio plan = obtenerPlanDeEstudio(codigoPlan);
+        Map<String, Materia> materiasDelPlanMap = obtenerMateriasParaValidacion(codigoPlan);
 
         List<DatosFila> datosExtraidos = extraerDatosDePDF(pdfContent);
-        validarCoincidenciaDelPlan(datosExtraidos, materiasMap, codigoPlan);
 
-        procesarDatosConChequeo(datosExtraidos, historia, materiasMap);
+        // --- VALIDACIÓN HEURÍSTICA PARA CHEQUEAR QUE EL PLAN ELEGIDO CONCUERDA CON LA HISTORIA ---
+        validarCoincidenciaDelPlan(datosExtraidos, materiasDelPlanMap);
 
+        Estudiante estudiante = estudianteRepo.findById(estudianteId).orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado para actualización de historia"));
+        HistoriaAcademica historia = obtenerOCrearHistoria(estudiante, plan);
+
+        procesarDatosConChequeo(datosExtraidos, historia, materiasDelPlanMap);
+
+        // CAMBIAR ESTADO A LA HISTORIA
         historia.setEstado("ACTIVA");
         historia = historiaRepo.save(historia);
 
