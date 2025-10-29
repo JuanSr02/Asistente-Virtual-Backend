@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class PdfReaderTest {
 
-    private static final String PDF_FILE_PATH = "C:/Users/juan_/Downloads/historia_academica.pdf";
+    private static final String PDF_FILE_PATH = "C:/Users/juan_/Downloads/historia_academica_nueva_rodrigo.pdf";
 
     public static void main(String[] args) {
         System.out.println("Iniciando lectura y parseo del PDF: " + PDF_FILE_PATH);
@@ -65,7 +65,7 @@ public class PdfReaderTest {
 
         // Regex actualizada para incluir materias con mayúsculas, minúsculas, guiones y acentos
         Pattern pattern = Pattern.compile(
-                "([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
+                "([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\(([A-Za-z0-9-]{5,9})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
         );
 
         Matcher matcher = pattern.matcher(pdfContent);
