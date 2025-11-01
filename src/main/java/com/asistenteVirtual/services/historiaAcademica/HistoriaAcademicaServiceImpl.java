@@ -50,12 +50,10 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
                 default:
                     throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
             }
-            Long renglonesCargados = renglonRepo.countByHistoriaAcademica(historia);
             return HistoriaAcademicaResponseDTO.builder()
                     .nombreCompleto(historia.getEstudiante().getNombreApellido())
                     .codigoPlan(historia.getPlanDeEstudio().getCodigo())
                     .fechaUltimaActualizacion(LocalDate.now())
-                    .renglonesCargados(renglonesCargados)
                     .build();
         }
     }
@@ -63,26 +61,17 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
     @Override
     public HistoriaAcademicaResponseDTO actualizarHistoriaAcademica(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
         validator.validarEstudiante(estudianteId);
-        // Obtener la historia académica existente para contar los renglones originales
-        HistoriaAcademica historiaExistente = historiaRepo.findByEstudiante(estudianteRepo.findById(estudianteId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId)))
-                .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada para el estudiante con ID: " + estudianteId));
-
 
         HistoriaAcademica historiaActualizada;
         String fileExtension = getFileExtension(file);
 
-        switch (fileExtension) {
-            case "xlsx":
-            case "xls":
-                historiaActualizada = archivoProcessingService.procesarArchivoExcelActualizacion(file, estudianteId, codigoPlan);
-                break;
-            case "pdf":
-                historiaActualizada = archivoProcessingService.procesarArchivoPDFActualizacion(file, estudianteId, codigoPlan);
-                break;
-            default:
-                throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
-        }
+        historiaActualizada = switch (fileExtension) {
+            case "xlsx", "xls" ->
+                    archivoProcessingService.procesarArchivoExcelActualizacion(file, estudianteId, codigoPlan);
+            case "pdf" -> archivoProcessingService.procesarArchivoPDFActualizacion(file, estudianteId, codigoPlan);
+            default ->
+                    throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
+        };
 
 
         return HistoriaAcademicaResponseDTO.builder()
