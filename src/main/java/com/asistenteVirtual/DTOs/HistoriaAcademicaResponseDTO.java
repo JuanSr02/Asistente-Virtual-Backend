@@ -11,5 +11,4 @@ public class HistoriaAcademicaResponseDTO {
     private String nombreCompleto;
     private String codigoPlan;
     private LocalDate fechaUltimaActualizacion;
-    private Long renglonesCargados;
 }

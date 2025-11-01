@@ -332,7 +332,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
                             r.getFecha().equals(tempRenglon.getFecha()) &&
                             r.getResultado().equalsIgnoreCase(tempRenglon.getResultado())
             );
-
+            
             if (yaExiste) {
                 continue;
             }
@@ -356,6 +356,13 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         List<Examen> nuevosExamenes = examenList.stream()
                 .filter(e -> !examenesOriginales.contains(e))
                 .collect(Collectors.toList());
+
+        List<Renglon> renglonesViejos = new ArrayList<>(renglonesOriginales);
+        renglonesViejos.removeAll(renglonList);
+
+        if (!renglonesViejos.isEmpty()) {
+            renglonRepo.deleteAll(renglonesViejos);
+        }
 
         if (!nuevosRenglones.isEmpty()) {
             renglonRepo.saveAll(nuevosRenglones);
