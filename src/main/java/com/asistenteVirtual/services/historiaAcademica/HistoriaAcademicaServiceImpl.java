@@ -68,7 +68,6 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
                         .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId)))
                 .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada para el estudiante con ID: " + estudianteId));
 
-        Long renglonesOriginales = renglonRepo.countByHistoriaAcademica(historiaExistente);
 
         HistoriaAcademica historiaActualizada;
         String fileExtension = getFileExtension(file);
@@ -85,15 +84,11 @@ public class HistoriaAcademicaServiceImpl implements HistoriaAcademicaService {
                 throw new UnsupportedFileTypeException("Tipo de archivo no soportado: ." + fileExtension + ". Solo se permiten archivos .xlsx, .xls y .pdf.");
         }
 
-        Long renglonesTotalesDespuesActualizacion = renglonRepo.countByHistoriaAcademica(historiaActualizada);
-        // Los renglones cargados son la diferencia entre el total y los originales
-        Long renglonesNuevosCargados = renglonesTotalesDespuesActualizacion - renglonesOriginales;
 
         return HistoriaAcademicaResponseDTO.builder()
                 .nombreCompleto(historiaActualizada.getEstudiante().getNombreApellido())
                 .codigoPlan(historiaActualizada.getPlanDeEstudio().getCodigo())
                 .fechaUltimaActualizacion(LocalDate.now())
-                .renglonesCargados(renglonesNuevosCargados)
                 .build();
     }
 
