@@ -15,10 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.Normalizer;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,14 +44,34 @@ public class EstadisticasHelper {
     }
 
     public Map<String, Integer> calcularDistribucionExamenesPorMateria(List<Examen> examenes) {
-        if (examenes == null || examenes.isEmpty()) return Collections.emptyMap();
+        if (examenes == null || examenes.isEmpty()) {
+            return Collections.emptyMap();
+        }
 
-        return examenes.stream()
-                .filter(e -> e.getRenglon() != null && e.getRenglon().getMateria() != null)
-                .map(e -> e.getRenglon().getMateria().getNombre())
+        // 1. Función para normalizar el nombre de la materia:
+        //    - Convierte a mayúsculas.
+        //    - Elimina acentos/diacríticos (ej: Á -> A, É -> E).
+        Function<String, String> normalizarNombre = nombre ->
+                Normalizer.normalize(nombre.toUpperCase(), Normalizer.Form.NFD)
+                        .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        // 2. Agrupación y conteo, aplicando la normalización en la clave
+        Map<String, Integer> conteoNoOrdenado = examenes.stream()
+                .filter(e -> e.getRenglon() != null && e.getRenglon().getMateria() != null && e.getRenglon().getMateria().getNombre() != null)
                 .collect(Collectors.groupingBy(
-                        Function.identity(),
-                        Collectors.reducing(0, e -> 1, Integer::sum)
+                        e -> normalizarNombre.apply(e.getRenglon().getMateria().getNombre()), // Clave: Nombre normalizado
+                        Collectors.reducing(0, e -> 1, Integer::sum) // Valor: Conteo
+                ));
+
+        // 3. Ordenamiento del mapa por el valor (la suma de exámenes) en orden descendente.
+        //    Se usa un LinkedHashMap para preservar el orden de inserción (el orden ordenado).
+        return conteoNoOrdenado.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1, // No debería ocurrir duplicados al final
+                        LinkedHashMap::new // Importante: usar LinkedHashMap para mantener el orden
                 ));
     }
 
