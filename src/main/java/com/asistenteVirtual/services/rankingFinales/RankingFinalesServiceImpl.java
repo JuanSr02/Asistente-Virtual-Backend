@@ -40,7 +40,7 @@ public class RankingFinalesServiceImpl implements RankingFinalesService {
 
         HistoriaAcademica historia = historiaAcademicaRepo.findByEstudiante(estudiante)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada"));
-        List<FinalDTO> finales = finalesCalculator.mapearARenglonDTO(finalesCalculator.obtenerRegularesAprobadas(historia));
+        List<FinalDTO> finales = finalesCalculator.mapearARenglonDTO(finalesCalculator.obtenerRegularesAprobadasHabilitadas(historia));
         List<MateriaDTO> finalesAInscribirse = new ArrayList<>();
         for (FinalDTO finalDTO : finales) {
             finalesAInscribirse.add(MateriaDTO.builder().codigo(finalDTO.getCodigoMateria()).nombre(finalDTO.getNombreMateria()).build());
