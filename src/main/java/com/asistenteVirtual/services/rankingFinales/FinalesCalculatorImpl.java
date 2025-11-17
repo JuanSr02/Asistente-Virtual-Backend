@@ -21,15 +21,14 @@ public class FinalesCalculatorImpl implements FinalesCalculator {
 
     @Override
     public List<FinalDTO> calcularFinalesParaRendir(HistoriaAcademica historia, OrdenFinales orden) {
-        List<Renglon> regularesAprobadas = obtenerRegularesAprobadas(historia);
+        List<Renglon> regularesAprobadas = obtenerRegularesAprobadasHabilitadas(historia);
         List<FinalDTO> finales = mapearARenglonDTO(regularesAprobadas);
         finalesSorter.ordenarFinales(finales, orden);
         return finales;
     }
 
-    public List<Renglon> obtenerRegularesAprobadas(HistoriaAcademica historia) {
-        return renglonRepo.findByHistoriaAcademicaAndTipoAndResultado(
-                historia, "Regularidad", "Aprobado");
+    public List<Renglon> obtenerRegularesAprobadasHabilitadas(HistoriaAcademica historia) {
+        return renglonRepo.findRegularesHabilitadas(historia.getId());
     }
 
     public List<FinalDTO> mapearARenglonDTO(List<Renglon> regularesAprobadas) {

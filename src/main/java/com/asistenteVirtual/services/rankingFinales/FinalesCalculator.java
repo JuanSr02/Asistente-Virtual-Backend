@@ -10,7 +10,7 @@ import java.util.List;
 public interface FinalesCalculator {
     List<FinalDTO> calcularFinalesParaRendir(HistoriaAcademica historia, OrdenFinales orden);
 
-    List<Renglon> obtenerRegularesAprobadas(HistoriaAcademica historia);
+    List<Renglon> obtenerRegularesAprobadasHabilitadas(HistoriaAcademica historia);
 
     List<FinalDTO> mapearARenglonDTO(List<Renglon> regularesAprobadas);
 }
