@@ -112,9 +112,8 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         // Borro las promociones
         List<Renglon> aEliminar = renglonList.stream()
-                .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()) &&
-                        "Promocionado".equalsIgnoreCase(r.getResultado()))
-                .collect(Collectors.toList());
+                .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()))
+                .toList();
 
         renglonList.removeAll(aEliminar);
         renglonRepo.saveAll(renglonList);
@@ -198,6 +197,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
             case "examen":
                 procesarExamen(datos, historia, materia, renglonList, examenList);
                 break;
+            case "aprobres":
             case "promocion":
                 procesarPromocion(datos, historia, materia, renglonList);
                 break;
@@ -243,9 +243,10 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
     }
 
     private void procesarPromocion(DatosFila datos, HistoriaAcademica historia, Materia materia, List<Renglon> renglonList) {
-        if ("Promocionado".equalsIgnoreCase(datos.resultado())) {
+        if ("Promocionado".equalsIgnoreCase(datos.resultado())
+                || "Aprobado".equalsIgnoreCase(datos.resultado())) {
             Renglon renglon = renglonFactory.crearRenglon(
-                    datos.fecha(), datos.tipo(), datos.nota(), datos.resultado(), historia, materia
+                    datos.fecha(), "Promocion", datos.nota(), datos.resultado(), historia, materia
             );
             renglonList.add(renglon);
             eliminarRegularidadSiExiste(materia, historia, renglonList);
@@ -332,7 +333,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
                             r.getFecha().equals(tempRenglon.getFecha()) &&
                             r.getResultado().equalsIgnoreCase(tempRenglon.getResultado())
             );
-            
+
             if (yaExiste) {
                 continue;
             }
@@ -344,9 +345,8 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         eliminarDuplicados(renglonList, examenList);
 
         List<Renglon> aEliminar = renglonList.stream()
-                .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()) &&
-                        "Promocionado".equalsIgnoreCase(r.getResultado()))
-                .collect(Collectors.toList());
+                .filter(r -> "Promocion".equalsIgnoreCase(r.getTipo()))
+                .toList();
         renglonList.removeAll(aEliminar);
 
         List<Renglon> nuevosRenglones = renglonList.stream()
@@ -497,7 +497,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         // Regex actualizada para incluir materias con mayúsculas, minúsculas, guiones y acentos
         Pattern pattern = Pattern.compile(
-                "([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\(([A-Za-z0-9-]{5,9})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
+                "([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\(([A-Za-z0-9-]{5,9})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(Promocion|Regularidad|Examen|Equivalencia|AprobRes)\\s+(?:(\\d+[\\.,]?\\d*)\\s+)?(Aprobado|Promocionado|Reprobado|Ausente)"
         );
 
         Matcher matcher = pattern.matcher(pdfContent);
@@ -541,7 +541,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         // 1. Limpiar "Actividad Fecha Tipo Nota Resultado"
         pdfContent = pdfContent.replaceAll("Actividad\\s+Fecha\\s+Tipo\\s+Nota\\s+Resultado", "");
 
-        // 2. Limpiar patrones como "Derecho Procesal Penal (MT2104019) 25/03/2025 En curso"
+        // 2. Limpiar patrones
         // IMPORTANTE: Hacer esto ANTES de reemplazar saltos de línea
         pdfContent = pdfContent.replaceAll("(?m)^([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+En\\s+curso\\s*$", "");
 
