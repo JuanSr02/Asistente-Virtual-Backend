@@ -3,7 +3,7 @@ package com.asistenteVirtual.modules.estadisticas.service;
 import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.common.utils.JsonConverter;
 import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasGeneralesResponse;
-import com.asistenteVirtual.modules.estadisticas.dto.MateriaRanking;
+import com.asistenteVirtual.modules.estadisticas.dto.MateriaRankingResponse;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasPorCarrera;
 import com.asistenteVirtual.modules.estadisticas.model.PeriodoEstadisticas;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasPorCarreraRepository;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EstadisticasAvanzadasService implements EstadisticasAvanzadasService {
+public class EstadisticasAvanzadasService {
 
     private final ExamenRepository examenRepository;
     private final MateriaRepository materiaRepository;
@@ -42,7 +42,6 @@ public class EstadisticasAvanzadasService implements EstadisticasAvanzadasServic
     private final EstadisticasCalculatorHelper helper;
     private final JsonConverter jsonConverter;
 
-    @Override
     @Transactional
     public EstadisticasGeneralesResponse obtenerEstadisticasPorCarrera(String codigoPlan, PeriodoEstadisticas periodo) {
         PlanDeEstudio plan = planRepository.findById(codigoPlan)
@@ -80,9 +79,9 @@ public class EstadisticasAvanzadasService implements EstadisticasAvanzadasServic
         // Nota: No podemos usar las queries SQL nativas del repo general porque aquí filtramos por FECHA y PLAN
         // Debemos calcular en memoria sobre la lista 'examenesFiltrados'.
         
-        MateriaRanking materiaMasRendida = calcularMateriaMasRendida(examenes);
-        List<MateriaRanking> top5Aprobadas = calcularTopRankings(examenes, true);
-        List<MateriaRanking> top5Reprobadas = calcularTopRankings(examenes, false);
+        MateriaRankingResponse materiaMasRendida = calcularMateriaMasRendida(examenes);
+        List<MateriaRankingResponse> top5Aprobadas = calcularTopRankings(examenes, true);
+        List<MateriaRankingResponse> top5Reprobadas = calcularTopRankings(examenes, false);
         
         Map<String, Integer> distExamenes = helper.calcularDistribucionExamenesPorMateria(examenes);
         // La distribución de estudiantes por carrera es trivial aquí (todos son de esta carrera), 
@@ -133,7 +132,7 @@ public class EstadisticasAvanzadasService implements EstadisticasAvanzadasServic
 
     // --- Métodos de Cálculo en Memoria (necesarios porque filtramos por fecha) ---
 
-    private List<MateriaRanking> calcularTopRankings(List<Examen> examenes, boolean buscarAprobadas) {
+    private List<MateriaRankingResponse> calcularTopRankings(List<Examen> examenes, boolean buscarAprobadas) {
         // Agrupar exámenes por código de materia
         Map<String, List<Examen>> porMateria = examenes.stream()
                 .collect(Collectors.groupingBy(e -> e.getRenglon().getMateria().getCodigo()));
@@ -152,14 +151,14 @@ public class EstadisticasAvanzadasService implements EstadisticasAvanzadasServic
                             ? helper.calcularPorcentaje(aprobados, total)
                             : helper.calcularPorcentaje(total - aprobados, total); // % Reprobados
 
-                    return new MateriaRanking(codigo, nombre, score);
+                    return new MateriaRankingResponse(codigo, nombre, score);
                 })
-                .sorted(Comparator.comparingDouble(MateriaRanking::porcentaje).reversed())
+                .sorted(Comparator.comparingDouble(MateriaRankingResponse::porcentaje).reversed())
                 .limit(5)
                 .toList();
     }
 
-    private MateriaRanking calcularMateriaMasRendida(List<Examen> examenes) {
+    private MateriaRankingResponse calcularMateriaMasRendida(List<Examen> examenes) {
         if (examenes.isEmpty()) return null;
 
         Map<String, Long> conteo = examenes.stream()

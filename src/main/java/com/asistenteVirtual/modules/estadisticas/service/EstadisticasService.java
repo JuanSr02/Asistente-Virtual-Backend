@@ -1,7 +1,6 @@
 package com.asistenteVirtual.modules.estadisticas.service;
 
 import com.asistenteVirtual.common.utils.JsonConverter;
-import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasGenerales;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasGeneralesRepository;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -101,8 +99,8 @@ public class EstadisticasService {
         List<HistoriaAcademica> historias = historiaRepo.findAll();
         
         // Consultas optimizadas para rankings
-        var topAprobadas = helper.mapToMateriaRanking(examenRepo.findTop5MateriasAprobadas());
-        var topReprobadas = helper.mapToMateriaRanking(examenRepo.findTop5MateriasReprobadas());
+        var topAprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasAprobadas());
+        var topReprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasReprobadas());
         
         String materiaMasRendida = examenRepo.findCodigoMateriaMasRendida();
         String materiaMasRendidaNombre = materiaRepo.findFirstNombreByCodigo(materiaMasRendida);

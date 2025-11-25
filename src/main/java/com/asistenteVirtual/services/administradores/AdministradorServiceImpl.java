@@ -29,7 +29,7 @@ public class AdministradorServiceImpl implements AdministradorService {
                 .mail(dto.getMail())
                 .telefono(dto.getTelefono())
                 .supabaseUserId(dto.getSupabaseUserId())
-                .rol_usuario(dto.getRole())
+                .rolUsuario(dto.getRole())
                 .build();
         return AdministradorResponseDTO.fromEntity(administradorRepository.save(admin));
     }
