@@ -1,8 +1,8 @@
 package com.asistenteVirtual.modules.estudiante.model;
 
 import com.asistenteVirtual.common.model.Persona;
-import com.asistenteVirtual.model.HistoriaAcademica;
 import com.asistenteVirtual.model.RegistroInscripcion;
+import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

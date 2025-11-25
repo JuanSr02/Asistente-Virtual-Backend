@@ -1,7 +1,8 @@
-package com.asistenteVirtual.repository;
+package com.asistenteVirtual.modules.historiaAcademica.repository;
 
-import com.asistenteVirtual.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

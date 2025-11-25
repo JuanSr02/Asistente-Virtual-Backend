@@ -3,7 +3,7 @@ package com.asistenteVirtual.services.rankingFinales;
 import com.asistenteVirtual.DTOs.EstadisticasFinalDTO;
 import com.asistenteVirtual.DTOs.FinalDTO;
 import com.asistenteVirtual.model.EstadisticasMateria;
-import com.asistenteVirtual.model.Renglon;
+import com.asistenteVirtual.modules.historiaAcademica.model.Renglon;
 import com.asistenteVirtual.modules.planEstudio.repository.CorrelativaRepository;
 import com.asistenteVirtual.repository.EstadisticasMateriaRepository;
 import lombok.RequiredArgsConstructor;

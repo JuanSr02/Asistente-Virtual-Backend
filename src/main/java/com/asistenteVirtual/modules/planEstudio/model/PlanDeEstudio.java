@@ -1,6 +1,6 @@
 package com.asistenteVirtual.modules.planEstudio.model;
 
-import com.asistenteVirtual.model.HistoriaAcademica;
+import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

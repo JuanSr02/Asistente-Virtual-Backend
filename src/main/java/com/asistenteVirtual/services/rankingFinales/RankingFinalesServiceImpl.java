@@ -3,11 +3,12 @@ package com.asistenteVirtual.services.rankingFinales;
 import com.asistenteVirtual.DTOs.FinalDTO;
 import com.asistenteVirtual.DTOs.OrdenFinales;
 import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
-import com.asistenteVirtual.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
+import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
 import com.asistenteVirtual.modules.planEstudio.dto.MateriaResponse;
-import com.asistenteVirtual.repository.HistoriaAcademicaRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

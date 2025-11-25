@@ -1,0 +1,63 @@
+package com.asistenteVirtual.modules.historiaAcademica.service;
+
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.historiaAcademica.dto.HistoriaAcademicaResponse;
+import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
+import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class HistoriaAcademicaService {
+
+    private final HistoriaImportService historiaImportService;
+    private final HistoriaAcademicaRepository historiaRepository;
+    private final EstudianteRepository estudianteRepository;
+
+    /**
+     * Carga o Actualiza la historia académica.
+     * Aprovechamos la lógica idempotente de 'HistoriaImportService' que ya hace merge inteligente.
+     */
+    @Transactional
+    public HistoriaAcademicaResponse procesarHistoria(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
+        HistoriaAcademica historia = historiaImportService.cargarHistoria(file, estudianteId, codigoPlan);
+        return HistoriaAcademicaResponse.fromEntity(historia);
+    }
+
+    /**
+     * Eliminación lógica (Soft Delete)
+     */
+    @Transactional
+    public void eliminarHistoria(Long estudianteId) {
+        Estudiante estudiante = estudianteRepository.findById(estudianteId)
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
+
+        HistoriaAcademica historia = historiaRepository.findByEstudiante(estudiante)
+                .orElseThrow(() -> new ResourceNotFoundException("El estudiante no tiene historia académica activa"));
+
+        historia.setEstado("BAJA");
+        historiaRepository.save(historia);
+        
+        log.info("Historia académica dada de baja para el estudiante ID: {}", estudianteId);
+    }
+    
+    @Transactional(readOnly = true)
+    public HistoriaAcademicaResponse obtenerHistoria(Long estudianteId) {
+         Estudiante estudiante = estudianteRepository.findById(estudianteId)
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
+
+        return historiaRepository.findByEstudiante(estudiante)
+                .filter(h -> !"BAJA".equals(h.getEstado()))
+                .map(HistoriaAcademicaResponse::fromEntity)
+                .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada"));
+    }
+}

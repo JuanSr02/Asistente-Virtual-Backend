@@ -1,7 +1,8 @@
-package com.asistenteVirtual.repository;
+package com.asistenteVirtual.modules.historiaAcademica.repository;
 
-import com.asistenteVirtual.model.HistoriaAcademica;
-import com.asistenteVirtual.model.Renglon;
+import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
+import com.asistenteVirtual.modules.historiaAcademica.model.Renglon;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

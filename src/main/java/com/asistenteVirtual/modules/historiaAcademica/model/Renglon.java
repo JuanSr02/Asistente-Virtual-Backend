@@ -1,4 +1,4 @@
-package com.asistenteVirtual.model;
+package com.asistenteVirtual.modules.historiaAcademica.model;
 
 import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import jakarta.persistence.*;
@@ -6,7 +6,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -22,19 +23,19 @@ public class Renglon {
     private LocalDate fecha;
 
     @Column(nullable = false, length = 50)
-    private String tipo;
+    private String tipo; // Examen, Regularidad, Promocion, Equivalencia, En curso, Resolución
 
     private Double nota;
 
     @Column(nullable = false, length = 50)
-    private String resultado;
+    private String resultado; // Aprobado, Reprobado, Ausente
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "historia_id", nullable = false)
-    @ToString.Exclude
     private HistoriaAcademica historiaAcademica;
 
-    @ManyToOne
+    // Relación con la Materia (Usando la clave compuesta o JoinColumns)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "materia_codigo", referencedColumnName = "codigo", nullable = false),
             @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo", nullable = false)
@@ -43,12 +44,4 @@ public class Renglon {
 
     @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL, orphanRemoval = true)
     private Examen examen;
-
-    @PrePersist
-    @PreUpdate
-    private void validarFecha() {
-        if (fecha != null && fecha.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("La fecha no puede ser posterior a la actual");
-        }
-    }
 }

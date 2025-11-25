@@ -1,4 +1,4 @@
-package com.asistenteVirtual.services.historiaAcademica;
+package com.asistenteVirtual.modules.historiaAcademica.dto;
 
 import java.time.LocalDate;
 
@@ -9,5 +9,4 @@ public record DatosFila(
         String tipo,
         Double nota,
         String resultado
-) {
-}
+) {}

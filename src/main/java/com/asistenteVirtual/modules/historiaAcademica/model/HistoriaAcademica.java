@@ -1,20 +1,18 @@
-package com.asistenteVirtual.model;
+package com.asistenteVirtual.modules.historiaAcademica.model;
 
 import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "historia_academica")
 public class HistoriaAcademica {
@@ -24,19 +22,23 @@ public class HistoriaAcademica {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "persona_id_estudiante", unique = true)
-    @ToString.Exclude
+    @JoinColumn(name = "persona_id_estudiante", unique = true, nullable = false)
     private Estudiante estudiante;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_de_estudio_codigo", nullable = false)
-    @ToString.Exclude
     private PlanDeEstudio planDeEstudio;
 
+    @Builder.Default
     @OneToMany(mappedBy = "historiaAcademica", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    @ToString.Exclude
     private List<Renglon> renglones = new ArrayList<>();
 
-    private String estado; // ACTIVO - BAJA.
+    @Column(nullable = false)
+    private String estado; // ACTIVA, BAJA
+    
+    // Helper para mantener la consistencia bidireccional
+    public void agregarRenglon(Renglon renglon) {
+        renglones.add(renglon);
+        renglon.setHistoriaAcademica(this);
+    }
 }
