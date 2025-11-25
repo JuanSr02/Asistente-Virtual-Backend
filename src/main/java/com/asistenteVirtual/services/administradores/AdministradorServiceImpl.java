@@ -3,11 +3,11 @@ package com.asistenteVirtual.services.administradores;
 import com.asistenteVirtual.DTOs.ActualizarAdministradorDTO;
 import com.asistenteVirtual.DTOs.AdministradorDto;
 import com.asistenteVirtual.DTOs.AdministradorResponseDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.repository.PersonaRepository;
 import com.asistenteVirtual.model.Administrador;
+import com.asistenteVirtual.modules.security.service.SupabaseAuthService;
 import com.asistenteVirtual.repository.AdministradorRepository;
-import com.asistenteVirtual.repository.PersonaRepository;
-import com.asistenteVirtual.services.supabase.SupabaseAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

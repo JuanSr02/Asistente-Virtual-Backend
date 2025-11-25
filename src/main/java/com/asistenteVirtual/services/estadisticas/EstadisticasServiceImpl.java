@@ -2,8 +2,12 @@ package com.asistenteVirtual.services.estadisticas;
 
 import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.EstadisticasMateriaDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.*;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
+import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
+import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
+import com.asistenteVirtual.modules.planEstudio.repository.PlanDeEstudioRepository;
 import com.asistenteVirtual.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

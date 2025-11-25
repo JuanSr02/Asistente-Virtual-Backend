@@ -5,6 +5,7 @@ import com.asistenteVirtual.model.RegistroInscripcion;
 
 public interface InscripcionNotificationService {
     void notificarCompaneros(RegistroInscripcion nuevaInscripcion);
+
     void notificarCompanerosDTO(RegistroInscripcionDTO nuevaInscripcion);
 }
 

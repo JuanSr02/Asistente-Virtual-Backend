@@ -1,5 +1,7 @@
 package com.asistenteVirtual.model;
 
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

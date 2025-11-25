@@ -1,5 +1,6 @@
 package com.asistenteVirtual.model;
 
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,7 +40,7 @@ public class Renglon {
             @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo", nullable = false)
     })
     private Materia materia;
-    
+
     @OneToOne(mappedBy = "renglon", cascade = CascadeType.ALL, orphanRemoval = true)
     private Examen examen;
 

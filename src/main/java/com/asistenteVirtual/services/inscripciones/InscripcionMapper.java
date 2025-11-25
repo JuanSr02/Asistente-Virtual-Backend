@@ -2,9 +2,9 @@ package com.asistenteVirtual.services.inscripciones;
 
 import com.asistenteVirtual.DTOs.InscripcionResponseDTO;
 import com.asistenteVirtual.DTOs.RegistroInscripcionDTO;
-import com.asistenteVirtual.model.Estudiante;
-import com.asistenteVirtual.model.Materia;
 import com.asistenteVirtual.model.RegistroInscripcion;
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import org.springframework.stereotype.Component;
 
 @Component

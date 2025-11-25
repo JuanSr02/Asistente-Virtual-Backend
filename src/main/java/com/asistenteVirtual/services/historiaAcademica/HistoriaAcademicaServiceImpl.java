@@ -1,11 +1,11 @@
 package com.asistenteVirtual.services.historiaAcademica;
 
 import com.asistenteVirtual.DTOs.HistoriaAcademicaResponseDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
-import com.asistenteVirtual.exceptions.UnsupportedFileTypeException;
-import com.asistenteVirtual.model.Estudiante;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.UnsupportedFileTypeException;
 import com.asistenteVirtual.model.HistoriaAcademica;
-import com.asistenteVirtual.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
 import com.asistenteVirtual.repository.HistoriaAcademicaRepository;
 import com.asistenteVirtual.repository.RenglonRepository;
 import lombok.RequiredArgsConstructor;

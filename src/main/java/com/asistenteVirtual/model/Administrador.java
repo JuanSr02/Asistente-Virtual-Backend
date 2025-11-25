@@ -1,5 +1,6 @@
 package com.asistenteVirtual.model;
 
+import com.asistenteVirtual.common.model.Persona;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;

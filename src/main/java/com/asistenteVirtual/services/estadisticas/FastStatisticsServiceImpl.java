@@ -1,16 +1,16 @@
 package com.asistenteVirtual.services.estadisticas;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.EstadisticasMateriaDTO;
 import com.asistenteVirtual.DTOs.MateriaRankingDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.EstadisticasGenerales;
 import com.asistenteVirtual.model.EstadisticasMateria;
 import com.asistenteVirtual.repository.EstadisticasGeneralesRepository;
 import com.asistenteVirtual.repository.EstadisticasMateriaRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,19 +42,24 @@ public class FastStatisticsServiceImpl implements FastStatisticsService {
                     .promedioGeneral(stats.getPromedioGeneral())
                     .distribucionEstudiantesPorCarrera(
                             objectMapper.readValue(stats.getDistribucionEstudiantesPorCarrera(),
-                                    new TypeReference<Map<String, Integer>>() {}))
+                                    new TypeReference<Map<String, Integer>>() {
+                                    }))
                     .distribucionExamenesPorMateria(
                             objectMapper.readValue(stats.getDistribucionExamenesPorMateria(),
-                                    new TypeReference<Map<String, Integer>>() {}))
+                                    new TypeReference<Map<String, Integer>>() {
+                                    }))
                     .top5Aprobadas(
                             objectMapper.readValue(stats.getTop5Aprobadas(),
-                                    new TypeReference<List<MateriaRankingDTO>>() {}))
+                                    new TypeReference<List<MateriaRankingDTO>>() {
+                                    }))
                     .top5Reprobadas(
                             objectMapper.readValue(stats.getTop5Reprobadas(),
-                                    new TypeReference<List<MateriaRankingDTO>>() {}))
+                                    new TypeReference<List<MateriaRankingDTO>>() {
+                                    }))
                     .promedioNotasPorMateria(
                             objectMapper.readValue(stats.getPromedioNotasPorMateria(),
-                                    new TypeReference<Map<String, Double>>() {}))
+                                    new TypeReference<Map<String, Double>>() {
+                                    }))
                     .materiaMasRendida(
                             objectMapper.readValue(stats.getMateriaMasRendida(), MateriaRankingDTO.class))
                     .cantidadMateriaMasRendida(stats.getCantidadMateriaMasRendida())

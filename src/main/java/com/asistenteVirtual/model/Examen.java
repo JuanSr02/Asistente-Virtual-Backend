@@ -34,7 +34,7 @@ public class Examen {
     @OneToOne(mappedBy = "examen", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Experiencia experiencia;
-    
+
     public Examen(LocalDate fecha, Double nota, Renglon renglon) {
         this.fecha = fecha;
         this.nota = nota;

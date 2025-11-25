@@ -2,7 +2,7 @@ package com.asistenteVirtual.services.estadisticas;
 
 import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.MateriaRankingDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.EstadisticasPorCarrera;
 import com.asistenteVirtual.repository.EstadisticasPorCarreraRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -1,7 +1,7 @@
 package com.asistenteVirtual.services.email;
 
-import com.asistenteVirtual.exceptions.EmailException;
-import com.asistenteVirtual.model.Estudiante;
+import com.asistenteVirtual.common.exceptions.EmailException;
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +40,10 @@ public class EmailNotificationService {
      * Envía una notificación asíncrona sobre un nuevo estudiante inscrito.
      *
      * @param emailDestinatario email del destinatario
-     * @param materiaNombre nombre de la materia
-     * @param turno turno del examen
-     * @param anio año del examen
-     * @param companero datos del nuevo estudiante
+     * @param materiaNombre     nombre de la materia
+     * @param turno             turno del examen
+     * @param anio              año del examen
+     * @param companero         datos del nuevo estudiante
      * @return CompletableFuture que se completa cuando el email es enviado
      * @throws EmailException si ocurre un error durante el envío
      */

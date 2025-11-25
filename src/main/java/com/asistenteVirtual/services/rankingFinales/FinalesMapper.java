@@ -4,7 +4,7 @@ import com.asistenteVirtual.DTOs.EstadisticasFinalDTO;
 import com.asistenteVirtual.DTOs.FinalDTO;
 import com.asistenteVirtual.model.EstadisticasMateria;
 import com.asistenteVirtual.model.Renglon;
-import com.asistenteVirtual.repository.CorrelativaRepository;
+import com.asistenteVirtual.modules.planEstudio.repository.CorrelativaRepository;
 import com.asistenteVirtual.repository.EstadisticasMateriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class FinalesMapper {
                 .fechaRegularidad(renglon.getFecha())
                 .fechaVencimiento(calcularFechaVencimiento(renglon.getFecha()))
                 .semanasParaVencimiento(calcularSemanasParaVencimiento(renglon.getFecha()))
-                .vecesEsCorrelativa(contarCorrelativas(renglon.getMateria().getCodigo(),renglon.getMateria().getPlanDeEstudio().getCodigo()))
+                .vecesEsCorrelativa(contarCorrelativas(renglon.getMateria().getCodigo(), renglon.getMateria().getPlanDeEstudio().getCodigo()))
                 .estadisticas(mapearEstadisticas(renglon.getMateria().getCodigo()))
                 .build();
     }
@@ -39,8 +39,8 @@ public class FinalesMapper {
         return ChronoUnit.WEEKS.between(LocalDate.now(), calcularFechaVencimiento(fechaRegularidad));
     }
 
-    private long contarCorrelativas(String codigoMateria,String codigoPlan) {
-        return correlativaRepo.countByCorrelativaCodigo_CodigoAndCorrelativaCodigo_PlanDeEstudio_Codigo(codigoMateria,codigoPlan);
+    private long contarCorrelativas(String codigoMateria, String codigoPlan) {
+        return correlativaRepo.countByCorrelativaCodigo_CodigoAndCorrelativaCodigo_PlanDeEstudio_Codigo(codigoMateria, codigoPlan);
     }
 
     private EstadisticasFinalDTO mapearEstadisticas(String codigoMateria) {

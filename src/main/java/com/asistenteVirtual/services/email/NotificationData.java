@@ -1,6 +1,6 @@
 package com.asistenteVirtual.services.email;
 
-import com.asistenteVirtual.model.Estudiante;
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 
 /**
  * Datos necesarios para enviar una notificación de nuevo inscripto.

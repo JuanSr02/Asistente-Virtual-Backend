@@ -3,7 +3,7 @@ package com.asistenteVirtual.controllers;
 import com.asistenteVirtual.DTOs.ActualizarExperienciaDTO;
 import com.asistenteVirtual.DTOs.ExperienciaDTO;
 import com.asistenteVirtual.DTOs.ExperienciaResponseDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.services.experiencia.ExperienciaCRUDService;
 import com.asistenteVirtual.services.experiencia.ExperienciaQueryService;
 import jakarta.validation.Valid;

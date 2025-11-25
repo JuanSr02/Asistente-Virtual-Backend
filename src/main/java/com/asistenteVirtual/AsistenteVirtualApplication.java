@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * Inicia la aplicación Spring Boot.
  */
 @SpringBootApplication
-@EntityScan(basePackages = "com.asistenteVirtual.model")
+@EntityScan(basePackages = "com.asistenteVirtual.modules.planEstudio.model.model")
 @EnableJpaRepositories(basePackages = "com.asistenteVirtual.repository")
 public class AsistenteVirtualApplication {
 

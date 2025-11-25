@@ -2,7 +2,7 @@ package com.asistenteVirtual.repository;
 
 import com.asistenteVirtual.model.Examen;
 import com.asistenteVirtual.model.HistoriaAcademica;
-import com.asistenteVirtual.model.Materia;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

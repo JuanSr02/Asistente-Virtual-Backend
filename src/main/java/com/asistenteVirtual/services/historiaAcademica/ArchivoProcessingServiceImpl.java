@@ -1,10 +1,20 @@
 package com.asistenteVirtual.services.historiaAcademica;
 
-import com.asistenteVirtual.exceptions.PlanIncompatibleException;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
-import com.asistenteVirtual.model.*;
-import com.asistenteVirtual.repository.*;
-import com.asistenteVirtual.services.ExcelProcessingUtils;
+import com.asistenteVirtual.common.exceptions.PlanIncompatibleException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.utils.ExcelHelper;
+import com.asistenteVirtual.model.Examen;
+import com.asistenteVirtual.model.HistoriaAcademica;
+import com.asistenteVirtual.model.Renglon;
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
+import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
+import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
+import com.asistenteVirtual.modules.planEstudio.repository.PlanDeEstudioRepository;
+import com.asistenteVirtual.repository.ExamenRepository;
+import com.asistenteVirtual.repository.HistoriaAcademicaRepository;
+import com.asistenteVirtual.repository.RenglonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -374,12 +384,12 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
     private List<DatosFila> extraerDatosDeExcel(Sheet sheet) {
         List<DatosFila> datos = new ArrayList<>();
-        int lastRow = ExcelProcessingUtils.obtenerUltimaFilaConDatos(sheet);
+        int lastRow = ExcelHelper.obtenerUltimaFilaConDatos(sheet);
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         for (int i = 6; i <= lastRow; i++) {
             Row row = sheet.getRow(i);
-            if (row == null || ExcelProcessingUtils.isEmptyRow(row)) continue;
+            if (row == null || ExcelHelper.isEmptyRow(row)) continue;
 
             try {
                 DatosFila datosFila = determinarFormatoYExtraer(row, dateFormatter);
@@ -418,7 +428,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
         String nombreMateria = nombreMateriaCompleto.substring(0, nombreMateriaCompleto.indexOf("(")).trim();
 
         String tipo = row.getCell(2).getStringCellValue().trim();
-        Double nota = ExcelProcessingUtils.extraerNota(row.getCell(3));
+        Double nota = ExcelHelper.extraerNota(row.getCell(3));
         String resultado = row.getCell(4).getStringCellValue().trim();
 
         return new DatosFila(nombreMateria, codigo, fecha, tipo, nota, resultado);
@@ -431,7 +441,7 @@ public class ArchivoProcessingServiceImpl implements ArchivoProcessingService {
 
         LocalDate fecha = LocalDate.parse(row.getCell(1).getStringCellValue().trim(), dateFormatter);
         String tipo = row.getCell(2).getStringCellValue().trim();
-        Double nota = ExcelProcessingUtils.extraerNota(row.getCell(3));
+        Double nota = ExcelHelper.extraerNota(row.getCell(3));
         String resultado = row.getCell(4).getStringCellValue().trim();
 
         return new DatosFila(nombreMateria, codigo, fecha, tipo, nota, resultado);

@@ -2,14 +2,14 @@ package com.asistenteVirtual.services.inscripciones;
 
 import com.asistenteVirtual.DTOs.InscripcionResponseDTO;
 import com.asistenteVirtual.DTOs.RegistroInscripcionDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
-import com.asistenteVirtual.model.Estudiante;
-import com.asistenteVirtual.model.Materia;
-import com.asistenteVirtual.model.PlanDeEstudio;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.RegistroInscripcion;
-import com.asistenteVirtual.repository.EstudianteRepository;
-import com.asistenteVirtual.repository.MateriaRepository;
-import com.asistenteVirtual.repository.PlanDeEstudioRepository;
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
+import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
+import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
+import com.asistenteVirtual.modules.planEstudio.repository.PlanDeEstudioRepository;
 import com.asistenteVirtual.repository.RegistroInscripcionRepository;
 import com.asistenteVirtual.services.email.EmailNotificationService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
         inscripcionValidator.validarInscripcion(dto);
         PlanDeEstudio plan = planDeEstudioRepository.findById(dto.getMateriaPlan())
                 .orElseThrow(() -> new ResourceNotFoundException("Plan de estudios no encontrado"));
-        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(),plan)
+        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(), plan)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
         Estudiante estudiante = estudianteRepo.findById(dto.getEstudianteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
@@ -87,7 +87,7 @@ public class RegistroInscripcionServiceImpl implements InscripcionService, Inscr
     public void notificarCompanerosDTO(RegistroInscripcionDTO dto) {
         PlanDeEstudio plan = planDeEstudioRepository.findById(dto.getMateriaPlan())
                 .orElseThrow(() -> new ResourceNotFoundException("Plan de estudios no encontrado"));
-        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(),plan)
+        Materia materia = materiaRepo.findByCodigoAndPlanDeEstudio(dto.getMateriaCodigo(), plan)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada"));
         Estudiante estudiante = estudianteRepo.findById(dto.getEstudianteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));

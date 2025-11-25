@@ -2,7 +2,7 @@ package com.asistenteVirtual.services.experiencia;
 
 import com.asistenteVirtual.DTOs.ActualizarExperienciaDTO;
 import com.asistenteVirtual.DTOs.ExperienciaDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.model.Examen;
 import com.asistenteVirtual.repository.ExamenRepository;
 import com.asistenteVirtual.repository.ExperienciaRepository;

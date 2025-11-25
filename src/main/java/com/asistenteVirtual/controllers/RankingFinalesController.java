@@ -1,9 +1,9 @@
 package com.asistenteVirtual.controllers;
 
 import com.asistenteVirtual.DTOs.FinalDTO;
-import com.asistenteVirtual.DTOs.MateriaDTO;
 import com.asistenteVirtual.DTOs.OrdenFinales;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.modules.planEstudio.dto.MateriaResponse;
 import com.asistenteVirtual.services.rankingFinales.RankingFinalesService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class RankingFinalesController {
 
     @GetMapping("/inscripciones")
     public ResponseEntity<?> obtenerInscripcionesPosibles(@PathVariable @NotNull Long estudianteId) {
-        List<MateriaDTO> finales = rankingFinalesService.obtenerFinalesParaInscribirse(estudianteId);
+        List<MateriaResponse> finales = rankingFinalesService.obtenerFinalesParaInscribirse(estudianteId);
         return ResponseEntity.ok(finales);
     }
 }

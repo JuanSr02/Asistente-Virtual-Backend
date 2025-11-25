@@ -2,8 +2,8 @@ package com.asistenteVirtual.controllers;
 
 import com.asistenteVirtual.DTOs.InscripcionResponseDTO;
 import com.asistenteVirtual.DTOs.RegistroInscripcionDTO;
-import com.asistenteVirtual.exceptions.IntegrityException;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.IntegrityException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.services.inscripciones.InscripcionNotificationService;
 import com.asistenteVirtual.services.inscripciones.InscripcionService;
 import jakarta.validation.Valid;

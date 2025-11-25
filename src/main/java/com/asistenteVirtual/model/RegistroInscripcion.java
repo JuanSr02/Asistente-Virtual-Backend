@@ -1,5 +1,7 @@
 package com.asistenteVirtual.model;
 
+import com.asistenteVirtual.modules.estudiante.model.Estudiante;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -35,8 +37,8 @@ public class RegistroInscripcion {
     @NotNull(message = "La materia es obligatoria")
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "materia_codigo", referencedColumnName = "codigo",nullable = false),
-            @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo",nullable = false)
+            @JoinColumn(name = "materia_codigo", referencedColumnName = "codigo", nullable = false),
+            @JoinColumn(name = "materia_plan_codigo", referencedColumnName = "PlanDeEstudio_codigo", nullable = false)
     })
     private Materia materia;
 

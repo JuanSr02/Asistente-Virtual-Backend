@@ -1,7 +1,7 @@
 package com.asistenteVirtual.controllers;
 
 import com.asistenteVirtual.DTOs.HistoriaAcademicaResponseDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.services.historiaAcademica.HistoriaAcademicaService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

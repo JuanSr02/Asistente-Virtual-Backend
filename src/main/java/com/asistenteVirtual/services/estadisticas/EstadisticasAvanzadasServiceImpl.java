@@ -2,8 +2,16 @@ package com.asistenteVirtual.services.estadisticas;
 
 import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.MateriaRankingDTO;
-import com.asistenteVirtual.model.*;
-import com.asistenteVirtual.repository.*;
+import com.asistenteVirtual.model.EstadisticasPorCarrera;
+import com.asistenteVirtual.model.Examen;
+import com.asistenteVirtual.model.HistoriaAcademica;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
+import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
+import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
+import com.asistenteVirtual.modules.planEstudio.repository.PlanDeEstudioRepository;
+import com.asistenteVirtual.repository.EstadisticasPorCarreraRepository;
+import com.asistenteVirtual.repository.ExamenRepository;
+import com.asistenteVirtual.repository.HistoriaAcademicaRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;

@@ -5,7 +5,7 @@ import com.asistenteVirtual.DTOs.ExperienciaDTO;
 import com.asistenteVirtual.DTOs.ExperienciaResponseDTO;
 import com.asistenteVirtual.model.Examen;
 import com.asistenteVirtual.model.Experiencia;
-import com.asistenteVirtual.model.Materia;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

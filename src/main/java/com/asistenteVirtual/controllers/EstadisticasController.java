@@ -2,7 +2,7 @@ package com.asistenteVirtual.controllers;
 
 import com.asistenteVirtual.DTOs.EstadisticasGeneralesDTO;
 import com.asistenteVirtual.DTOs.EstadisticasMateriaDTO;
-import com.asistenteVirtual.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.services.estadisticas.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;

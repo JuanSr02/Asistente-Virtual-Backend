@@ -1,8 +1,8 @@
 package com.asistenteVirtual.services.historiaAcademica;
 
 import com.asistenteVirtual.model.HistoriaAcademica;
-import com.asistenteVirtual.model.Materia;
 import com.asistenteVirtual.model.Renglon;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
