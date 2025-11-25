@@ -1,6 +1,4 @@
-package com.asistenteVirtual.model;
-
-import com.asistenteVirtual.modules.historiaAcademica.model.Examen;
+package com.asistenteVirtual.modules.historiaAcademica.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

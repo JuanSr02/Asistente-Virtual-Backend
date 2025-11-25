@@ -1,9 +1,10 @@
 package com.asistenteVirtual.config;
 
-import com.asistenteVirtual.services.estadisticas.EstadisticasServiceImpl;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+
+import com.asistenteVirtual.modules.estadisticas.service.EstadisticasServiceImpl;
 
 @Configuration
 @EnableScheduling

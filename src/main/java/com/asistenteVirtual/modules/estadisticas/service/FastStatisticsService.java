@@ -1,0 +1,75 @@
+package com.asistenteVirtual.modules.estadisticas.service;
+
+import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.common.utils.JsonConverter;
+import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasGeneralesResponse;
+import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasMateriaResponse;
+import com.asistenteVirtual.modules.estadisticas.dto.MateriaRankingResponse;
+import com.asistenteVirtual.modules.estadisticas.model.EstadisticasGenerales;
+import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
+import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasGeneralesRepository;
+import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasMateriaRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+public class FastStatisticsService {
+
+    private final EstadisticasGeneralesRepository generalesRepo;
+    private final EstadisticasMateriaRepository materiaRepo;
+    private final JsonConverter jsonConverter;
+
+    @Transactional(readOnly = true)
+    public EstadisticasGeneralesResponse getCachedGeneralStatistics() {
+        EstadisticasGenerales stats = generalesRepo.findFirstByOrderByFechaUltimaActualizacionDesc()
+                .orElseThrow(() -> new ResourceNotFoundException("No hay estadísticas generales calculadas aún."));
+
+        return new EstadisticasGeneralesResponse(
+                stats.getEstudiantesActivos(),
+                stats.getTotalMaterias(),
+                stats.getTotalExamenesRendidos(),
+                stats.getPorcentajeAprobadosGeneral(),
+                stats.getPromedioGeneral(),
+                jsonConverter.fromJson(stats.getDistribucionEstudiantesPorCarrera(), new TypeReference<Map<String, Integer>>() {}),
+                jsonConverter.fromJson(stats.getDistribucionExamenesPorMateria(), new TypeReference<Map<String, Integer>>() {}),
+                jsonConverter.fromJson(stats.getMateriaMasRendida(), MateriaRankingResponse.class),
+                stats.getCantidadMateriaMasRendida(),
+                jsonConverter.fromJson(stats.getTop5Aprobadas(), new TypeReference<List<MateriaRankingResponse>>() {}),
+                jsonConverter.fromJson(stats.getTop5Reprobadas(), new TypeReference<List<MateriaRankingResponse>>() {}),
+                jsonConverter.fromJson(stats.getPromedioNotasPorMateria(), new TypeReference<Map<String, Double>>() {})
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public EstadisticasMateriaResponse getCachedMateriaStatistics(String codigoMateria) {
+        EstadisticasMateria stats = materiaRepo.findById(codigoMateria)
+                .orElseThrow(() -> new ResourceNotFoundException("No hay estadísticas calculadas para la materia: " + codigoMateria));
+
+        return new EstadisticasMateriaResponse(
+                stats.getCodigoMateria(),
+                stats.getNombreMateria(),
+                stats.getTotalRendidos(),
+                stats.getAprobados(),
+                stats.getReprobados(),
+                calcularPorcentaje(stats.getAprobados(), stats.getTotalRendidos()),
+                stats.getPromedioNotas(),
+                stats.getPromedioDiasEstudio(),
+                stats.getPromedioHorasDiarias(),
+                stats.getPromedioDificultad(),
+                jsonConverter.fromJson(stats.getDistribucionDificultad(), new TypeReference<Map<Integer, Integer>>() {}),
+                jsonConverter.fromJson(stats.getDistribucionModalidad(), new TypeReference<Map<String, Integer>>() {}),
+                jsonConverter.fromJson(stats.getDistribucionRecursos(), new TypeReference<Map<String, Integer>>() {}),
+                stats.getFechaUltimaActualizacion().toLocalDate()
+        );
+    }
+
+    private Double calcularPorcentaje(long parte, long total) {
+        return total > 0 ? (double) parte / total * 100 : 0.0;
+    }
+}

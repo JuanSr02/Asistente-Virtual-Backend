@@ -1,11 +1,12 @@
 package com.asistenteVirtual.services.rankingFinales;
 
-import com.asistenteVirtual.DTOs.EstadisticasFinalDTO;
+import com.asistenteVirtual.DTOs.EstadisticasFinalResponse;
 import com.asistenteVirtual.DTOs.FinalDTO;
-import com.asistenteVirtual.model.EstadisticasMateria;
+import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
+import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasMateriaRepository;
 import com.asistenteVirtual.modules.historiaAcademica.model.Renglon;
 import com.asistenteVirtual.modules.planEstudio.repository.CorrelativaRepository;
-import com.asistenteVirtual.repository.EstadisticasMateriaRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -43,14 +44,14 @@ public class FinalesMapper {
         return correlativaRepo.countByCorrelativaCodigo_CodigoAndCorrelativaCodigo_PlanDeEstudio_Codigo(codigoMateria, codigoPlan);
     }
 
-    private EstadisticasFinalDTO mapearEstadisticas(String codigoMateria) {
+    private EstadisticasFinalResponse mapearEstadisticas(String codigoMateria) {
         return estadisticasRepo.findById(codigoMateria)
                 .map(this::toEstadisticasDTO)
                 .orElse(null);
     }
 
-    private EstadisticasFinalDTO toEstadisticasDTO(EstadisticasMateria estadisticas) {
-        return EstadisticasFinalDTO.builder()
+    private EstadisticasFinalResponse toEstadisticasDTO(EstadisticasMateria estadisticas) {
+        return EstadisticasFinalResponse.builder()
                 .porcentajeAprobados(calcularPorcentajeAprobados(estadisticas))
                 .promedioNotas(estadisticas.getPromedioNotas())
                 .promedioDiasEstudio(estadisticas.getPromedioDiasEstudio())

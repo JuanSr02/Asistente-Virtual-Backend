@@ -1,8 +1,9 @@
-package com.asistenteVirtual.repository;
+package com.asistenteVirtual.modules.estadisticas.repository;
 
-import com.asistenteVirtual.model.EstadisticasGenerales;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.asistenteVirtual.modules.estadisticas.model.EstadisticasGenerales;
 
 import java.util.Optional;
 

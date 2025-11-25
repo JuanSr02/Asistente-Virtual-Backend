@@ -1,4 +1,4 @@
-package com.asistenteVirtual.services.estadisticas;
+package com.asistenteVirtual.modules.estadisticas.model;
 
 public enum PeriodoEstadisticas {
     ULTIMO_ANIO,

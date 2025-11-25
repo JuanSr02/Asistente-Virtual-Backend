@@ -1,4 +1,4 @@
-package com.asistenteVirtual.model;
+package com.asistenteVirtual.modules.estadisticas.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

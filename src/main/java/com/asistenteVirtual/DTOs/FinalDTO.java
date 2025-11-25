@@ -20,5 +20,5 @@ public class FinalDTO {
     private long semanasParaVencimiento;
     private long vecesEsCorrelativa;
 
-    private EstadisticasFinalDTO estadisticas;
+    private EstadisticasFinalResponse estadisticas;
 }
