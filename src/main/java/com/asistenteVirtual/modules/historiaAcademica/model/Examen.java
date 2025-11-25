@@ -1,5 +1,6 @@
 package com.asistenteVirtual.modules.historiaAcademica.model;
 
+import com.asistenteVirtual.modules.experiencia.model.Experiencia;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

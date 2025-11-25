@@ -1,25 +1,24 @@
-package com.asistenteVirtual.modules.historiaAcademica.model;
+package com.asistenteVirtual.modules.experiencia.model;
 
+import com.asistenteVirtual.modules.historiaAcademica.model.Examen;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "Experiencia")
+@Table(name = "experiencia")
 public class Experiencia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "examen_id", unique = true)
+    @OneToOne(fetch = FetchType.LAZY) // Lazy para rendimiento
+    @JoinColumn(name = "examen_id", unique = true, nullable = false)
     private Examen examen;
 
     @Column(nullable = false)
@@ -43,6 +42,5 @@ public class Experiencia {
     @Column(length = 100)
     private String motivacion;
 
-    @Column
     private String linkResumen;
 }

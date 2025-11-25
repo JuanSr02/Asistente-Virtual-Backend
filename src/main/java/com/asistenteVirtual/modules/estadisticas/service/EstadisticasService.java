@@ -5,15 +5,14 @@ import com.asistenteVirtual.modules.estadisticas.model.EstadisticasGenerales;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasGeneralesRepository;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasMateriaRepository;
+import com.asistenteVirtual.modules.experiencia.model.Experiencia;
+import com.asistenteVirtual.modules.experiencia.repository.ExperienciaRepository;
 import com.asistenteVirtual.modules.historiaAcademica.model.Examen;
-import com.asistenteVirtual.modules.historiaAcademica.model.Experiencia;
 import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.historiaAcademica.repository.ExamenRepository;
 import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
 import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
-import com.asistenteVirtual.repository.ExperienciaRepository; // Asumiendo que aún no mueves Experiencias
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,10 +30,10 @@ public class EstadisticasService {
     private final MateriaRepository materiaRepo;
     private final HistoriaAcademicaRepository historiaRepo;
     private final ExperienciaRepository experienciaRepo;
-    
+
     private final EstadisticasMateriaRepository statsMateriaRepo;
     private final EstadisticasGeneralesRepository statsGeneralesRepo;
-    
+
     private final EstadisticasCalculatorHelper helper;
     private final JsonConverter jsonConverter;
 
@@ -45,18 +44,18 @@ public class EstadisticasService {
     @Transactional
     public void actualizarTodas() {
         log.info("🔄 Iniciando actualización masiva de estadísticas...");
-        
+
         // 1. Actualizar por Materia
         List<String> codigosMaterias = examenRepo.findDistinctMateriasPorCodigo();
         log.info("Se procesarán {} materias.", codigosMaterias.size());
-        
+
         for (String codigo : codigosMaterias) {
             calcularYGuardarMateria(codigo);
         }
 
         // 2. Actualizar Generales
         calcularYGuardarGenerales();
-        
+
         log.info("✅ Actualización de estadísticas finalizada.");
     }
 
@@ -68,7 +67,7 @@ public class EstadisticasService {
         // Buscamos todos los exámenes y experiencias de esta materia (en cualquier plan)
         // Nota: Esto asume que tu repositorio soporta búsqueda polimórfica o que iteramos.
         // Para optimizar, usamos la primera materia para buscar relaciones si el código es único conceptualmente.
-        Materia materiaPrincipal = materias.get(0); 
+        Materia materiaPrincipal = materias.get(0);
 
         List<Examen> examenes = examenRepo.findByMateriaWithJoins(materiaPrincipal);
         List<Experiencia> experiencias = experienciaRepo.findByMateriaWithJoins(materiaPrincipal);
@@ -97,11 +96,11 @@ public class EstadisticasService {
     public void calcularYGuardarGenerales() {
         List<Examen> todosExamenes = examenRepo.findAll();
         List<HistoriaAcademica> historias = historiaRepo.findAll();
-        
+
         // Consultas optimizadas para rankings
         var topAprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasAprobadas());
         var topReprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasReprobadas());
-        
+
         String materiaMasRendida = examenRepo.findCodigoMateriaMasRendida();
         String materiaMasRendidaNombre = materiaRepo.findFirstNombreByCodigo(materiaMasRendida);
         long cantMateriaMasRendida = examenRepo.countExamenesByCodigoMateria(materiaMasRendida);

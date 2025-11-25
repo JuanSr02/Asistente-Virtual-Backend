@@ -1,8 +1,8 @@
 package com.asistenteVirtual.modules.estudiante.model;
 
 import com.asistenteVirtual.common.model.Persona;
-import com.asistenteVirtual.model.RegistroInscripcion;
 import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
+import com.asistenteVirtual.modules.inscripcion.model.Inscripcion;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,5 +27,5 @@ public class Estudiante extends Persona {
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<RegistroInscripcion> inscripciones;
+    private List<Inscripcion> inscripciones;
 }

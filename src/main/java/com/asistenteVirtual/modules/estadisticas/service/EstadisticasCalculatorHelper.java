@@ -2,8 +2,8 @@ package com.asistenteVirtual.modules.estadisticas.service;
 
 import com.asistenteVirtual.modules.estadisticas.dto.MateriaRankingResponse;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
+import com.asistenteVirtual.modules.experiencia.model.Experiencia;
 import com.asistenteVirtual.modules.historiaAcademica.model.Examen;
-import com.asistenteVirtual.modules.historiaAcademica.model.Experiencia;
 import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import org.springframework.stereotype.Component;
 
@@ -173,7 +173,7 @@ public class EstadisticasCalculatorHelper {
 
     public Map<String, Long> calcularDistribucionModalidadMap(List<Experiencia> experiencias) {
         if (experiencias == null || experiencias.isEmpty()) return Collections.emptyMap();
-        
+
         return experiencias.stream()
                 .filter(e -> e.getModalidad() != null && !e.getModalidad().isEmpty())
                 .collect(Collectors.groupingBy(Experiencia::getModalidad, Collectors.counting()));

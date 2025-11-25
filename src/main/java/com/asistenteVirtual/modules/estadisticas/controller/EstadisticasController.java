@@ -2,10 +2,11 @@ package com.asistenteVirtual.modules.estadisticas.controller;
 
 import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasGeneralesResponse;
 import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasMateriaResponse;
+import com.asistenteVirtual.modules.estadisticas.model.PeriodoEstadisticas;
+import com.asistenteVirtual.modules.estadisticas.service.EstadisticasAvanzadasService;
+import com.asistenteVirtual.modules.estadisticas.service.EstadisticasMateriaPeriodoService;
 import com.asistenteVirtual.modules.estadisticas.service.EstadisticasService;
 import com.asistenteVirtual.modules.estadisticas.service.FastStatisticsService;
-import com.asistenteVirtual.modules.estadisticas.service.EstadisticasAvanzadasService;
-import com.asistenteVirtual.modules.estadisticas.model.PeriodoEstadisticas; // Enum movido al modelo
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class EstadisticasController {
 
     private final FastStatisticsService fastStatisticsService;
-    private final EstadisticasService estadisticasService; // Para cálculos on-demand si fuera necesario
+    private final EstadisticasService estadisticasService;
     private final EstadisticasAvanzadasService avanzadasService;
+    private final EstadisticasMateriaPeriodoService periodoService; // ✅ Inyección
 
     @GetMapping("/generales")
     public ResponseEntity<EstadisticasGeneralesResponse> obtenerGenerales() {
-        // Usamos la versión rápida (cached) por defecto para rendimiento
         return ResponseEntity.ok(fastStatisticsService.getCachedGeneralStatistics());
     }
 
@@ -30,14 +31,20 @@ public class EstadisticasController {
         return ResponseEntity.ok(fastStatisticsService.getCachedMateriaStatistics(codigoMateria));
     }
 
+    @GetMapping("/materia/{codigoMateria}/periodo")
+    public ResponseEntity<EstadisticasMateriaResponse> obtenerPorMateriaYPeriodo(
+            @PathVariable String codigoMateria,
+            @RequestParam(required = false, defaultValue = "TODOS_LOS_TIEMPOS") PeriodoEstadisticas periodo) {
+        return ResponseEntity.ok(periodoService.obtenerEstadisticasPorPeriodo(codigoMateria, periodo));
+    }
+
     @GetMapping("/generales/carrera")
     public ResponseEntity<EstadisticasGeneralesResponse> obtenerPorCarrera(
             @RequestParam String plan,
             @RequestParam(required = false, defaultValue = "ULTIMO_ANIO") PeriodoEstadisticas periodo) {
         return ResponseEntity.ok(avanzadasService.obtenerEstadisticasPorCarrera(plan, periodo));
     }
-    
-    // Endpoint administrativo para forzar recálculo
+
     @PostMapping("/recalcular")
     public ResponseEntity<Void> forzarRecalculo() {
         estadisticasService.actualizarTodas();
