@@ -27,19 +27,23 @@ public class HistoriaProcesadorDatos {
 
     @Transactional
     public void procesarDatos(HistoriaAcademica historia, List<DatosFila> filasCrudas, PlanDeEstudio plan) {
-        // 1. Obtener todas las materias del plan para búsqueda rápida (O(1))
+        // 1. Obtener mapa de materias (O(1))
         Map<String, Materia> mapaMaterias = materiaRepository.findByPlanDeEstudio_Codigo(plan.getCodigo())
                 .stream()
-                .collect(Collectors.toMap(Materia::getNombre, Function.identity())); // Clave: Nombre, Valor: Materia
+                .collect(Collectors.toMap(Materia::getNombre, Function.identity()));
 
-        // 2. Validación Heurística: ¿Es este el plan correcto?
+        // 2. Validación Heurística
         validarCoincidenciaDelPlan(filasCrudas, mapaMaterias);
 
-        // 3. Filtrado y Transformación: De DatosFila a Renglon
+        // 3. Transformación y Lógica de Negocio (Promoción mata Regularidad)
         List<Renglon> nuevosRenglones = transformarYFiltrar(filasCrudas, mapaMaterias, historia);
 
-        // 4. Actualización Inteligente: Merge con lo existente
+        // 4. Actualización Inteligente (Merge)
         mergeRenglones(historia, nuevosRenglones);
+
+        // 5. LIMPIEZA FINAL (Regla de Negocio Crítica):
+        // Las promociones son instrumentales, no se persisten. Se borran todas (nuevas y viejas).
+        eliminarPromociones(historia);
     }
 
     private void validarCoincidenciaDelPlan(List<DatosFila> filas, Map<String, Materia> materiasDelPlan) {
@@ -66,30 +70,25 @@ public class HistoriaProcesadorDatos {
             if (debeOmitirFila(fila)) continue;
 
             Materia materia = mapaMaterias.get(fila.nombreMateria());
-            if (materia == null) continue; // Ignoramos materias ajenas al plan
+            if (materia == null) continue;
 
             procesarFilaSegunTipo(fila, materia, historia, listaProcesada);
         }
-        
-        // Limpieza final de duplicados en la lista procesada
+
         return eliminarDuplicadosLogicos(listaProcesada);
     }
 
     private boolean debeOmitirFila(DatosFila fila) {
-        // Regla: Ignorar "En curso", "Reprobados" en regularidades, o "Ausentes"
         if ("En curso".equalsIgnoreCase(fila.tipo())) return true;
         if ("Ausente".equalsIgnoreCase(fila.resultado())) return true;
-        
-        boolean esRegularidad = "Regularidad".equalsIgnoreCase(fila.tipo());
-        boolean esReprobado = "Reprobado".equalsIgnoreCase(fila.resultado());
-
-        return esRegularidad && esReprobado;
+        // Ignorar regularidades reprobadas
+        return "Regularidad".equalsIgnoreCase(fila.tipo()) && "Reprobado".equalsIgnoreCase(fila.resultado());
     }
 
     private void procesarFilaSegunTipo(DatosFila fila, Materia materia, HistoriaAcademica historia, List<Renglon> acumulador) {
         Renglon renglon = Renglon.builder()
                 .fecha(fila.fecha())
-                .tipo(fila.tipo()) // Normalizamos luego si es necesario
+                .tipo(fila.tipo())
                 .nota(fila.nota())
                 .resultado(fila.resultado())
                 .materia(materia)
@@ -100,7 +99,7 @@ public class HistoriaProcesadorDatos {
 
         switch (tipoNormalizado) {
             case "examen":
-            case "equivalencia": // Equivalencia con nota se trata como examen
+            case "equivalencia": // Equivalencia con nota = Examen
                 if (fila.nota() != null) {
                     Examen examen = Examen.builder()
                             .fecha(fila.fecha())
@@ -108,25 +107,31 @@ public class HistoriaProcesadorDatos {
                             .renglon(renglon)
                             .build();
                     renglon.setExamen(examen);
-                    // Regla: Si aprobó examen, borramos regularidades previas de la lista
+
+                    // Si aprobó examen, borramos regularidades (del acumulador y de la DB histórica)
                     if (fila.nota() >= 4.0) {
                         eliminarRegularidadesDeLaMateria(acumulador, materia);
+                        eliminarRegularidadesDeLaMateria(historia.getRenglones(), materia); // ¡Fix Crítico!
                     }
                 }
                 acumulador.add(renglon);
                 break;
 
             case "promocion":
-            case "aprobres": // Aprobación por resolución
-                renglon.setTipo("Promocion"); // Unificamos nombre
-                // Regla: Promoción mata regularidad
+            case "aprobres":
+                renglon.setTipo("Promocion");
+                // Regla: Promoción mata regularidad (del acumulador y de la DB histórica)
                 eliminarRegularidadesDeLaMateria(acumulador, materia);
-                acumulador.add(renglon);
+                eliminarRegularidadesDeLaMateria(historia.getRenglones(), materia); // ¡Fix Crítico!
+
+                acumulador.add(renglon); // Se agrega temporalmente para procesar, se borrará en el paso 5.
                 break;
 
             case "regularidad":
-                // Solo agregamos si NO existe ya una aprobación (examen o promo) para esta materia
-                if (!tieneAprobacionRegistrada(acumulador, materia)) {
+                // Solo agregamos si NO existe ya una aprobación (examen o promo)
+                // Verificamos tanto en lo nuevo (acumulador) como en lo viejo (historia)
+                if (!tieneAprobacionRegistrada(acumulador, materia) &&
+                        !tieneAprobacionRegistrada(historia.getRenglones(), materia)) {
                     acumulador.add(renglon);
                 }
                 break;
@@ -134,17 +139,13 @@ public class HistoriaProcesadorDatos {
     }
 
     private void mergeRenglones(HistoriaAcademica historia, List<Renglon> nuevos) {
-        // Estrategia simple: Reemplazo inteligente o Append
-        // Para este Refactor, asumimos una estrategia de "Actualización Incremental":
-        // Si el renglón ya existe (misma fecha, materia y tipo), no lo duplicamos.
-        
         List<Renglon> actuales = historia.getRenglones();
-        
+
         for (Renglon nuevo : nuevos) {
-            boolean existe = actuales.stream().anyMatch(actual -> 
+            boolean existe = actuales.stream().anyMatch(actual ->
                     actual.getMateria().getCodigo().equals(nuevo.getMateria().getCodigo()) &&
-                    actual.getFecha().equals(nuevo.getFecha()) &&
-                    actual.getTipo().equalsIgnoreCase(nuevo.getTipo())
+                            actual.getFecha().equals(nuevo.getFecha()) &&
+                            actual.getTipo().equalsIgnoreCase(nuevo.getTipo())
             );
 
             if (!existe) {
@@ -155,24 +156,35 @@ public class HistoriaProcesadorDatos {
 
     // --- Helpers de Lógica de Negocio ---
 
+    /**
+     * Elimina las regularidades de una lista (ya sea la nueva o la persistente).
+     * Al actuar sobre historia.getRenglones(), Hibernate agendará el DELETE gracias a orphanRemoval.
+     */
     private void eliminarRegularidadesDeLaMateria(List<Renglon> lista, Materia materia) {
-        lista.removeIf(r -> 
-            r.getMateria().equals(materia) && "Regularidad".equalsIgnoreCase(r.getTipo())
+        lista.removeIf(r ->
+                r.getMateria().equals(materia) && "Regularidad".equalsIgnoreCase(r.getTipo())
         );
     }
 
+    /**
+     * Elimina todas las promociones de la historia antes de guardar.
+     * Cumple con la regla de que las promociones no se persisten.
+     */
+    private void eliminarPromociones(HistoriaAcademica historia) {
+        historia.getRenglones().removeIf(r -> "Promocion".equalsIgnoreCase(r.getTipo()));
+    }
+
     private boolean tieneAprobacionRegistrada(List<Renglon> lista, Materia materia) {
-        return lista.stream().anyMatch(r -> 
-            r.getMateria().equals(materia) && 
-            (
-                ("Promocion".equalsIgnoreCase(r.getTipo())) ||
-                (r.getNota() != null && r.getNota() >= 4.0)
-            )
+        return lista.stream().anyMatch(r ->
+                r.getMateria().equals(materia) &&
+                        (
+                                "Promocion".equalsIgnoreCase(r.getTipo()) ||
+                                        (r.getNota() != null && r.getNota() >= 4.0)
+                        )
         );
     }
 
     private List<Renglon> eliminarDuplicadosLogicos(List<Renglon> renglones) {
-        // Usamos un Set con una clave única temporal para filtrar duplicados exactos en el mismo archivo
         Set<String> vistos = new HashSet<>();
         List<Renglon> unicos = new ArrayList<>();
 

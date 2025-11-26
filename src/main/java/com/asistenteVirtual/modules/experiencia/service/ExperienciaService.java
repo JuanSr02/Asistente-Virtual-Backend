@@ -2,6 +2,8 @@ package com.asistenteVirtual.modules.experiencia.service;
 
 import com.asistenteVirtual.common.exceptions.IntegrityException;
 import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.experiencia.dto.ExamenDisponibleResponse;
 import com.asistenteVirtual.modules.experiencia.dto.ExperienciaRequest;
 import com.asistenteVirtual.modules.experiencia.dto.ExperienciaResponse;
 import com.asistenteVirtual.modules.experiencia.dto.ExperienciaUpdate;
@@ -20,6 +22,7 @@ public class ExperienciaService {
 
     private final ExperienciaRepository experienciaRepo;
     private final ExamenRepository examenRepo;
+    private final EstudianteRepository estudianteRepo;
 
     @Transactional
     public ExperienciaResponse crearExperiencia(ExperienciaRequest dto) {
@@ -93,5 +96,18 @@ public class ExperienciaService {
             throw new ResourceNotFoundException("Experiencia no encontrada");
         }
         experienciaRepo.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ExamenDisponibleResponse> obtenerExamenesPendientesDeExperiencia(Long estudianteId) {
+        if (!estudianteRepo.existsById(estudianteId)) {
+            throw new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId);
+        }
+
+        // Usamos la query que ya migraste en ExamenRepository (findByEstudianteId)
+        // esa query filtra implícitamente 'e.experiencia IS NULL'
+        return examenRepo.findByEstudianteId(estudianteId).stream()
+                .map(ExamenDisponibleResponse::fromEntity)
+                .toList();
     }
 }

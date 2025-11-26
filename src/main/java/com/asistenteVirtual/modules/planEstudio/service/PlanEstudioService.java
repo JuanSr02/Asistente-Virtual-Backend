@@ -1,6 +1,5 @@
 package com.asistenteVirtual.modules.planEstudio.service;
 
-import com.asistenteVirtual.common.exceptions.IntegrityException;
 import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.modules.planEstudio.dto.MateriaResponse;
 import com.asistenteVirtual.modules.planEstudio.dto.PlanEstudioResponse;
@@ -9,7 +8,6 @@ import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
 import com.asistenteVirtual.modules.planEstudio.repository.PlanDeEstudioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +22,7 @@ public class PlanEstudioService {
 
     private final PlanDeEstudioRepository planRepo;
     private final MateriaRepository materiaRepo;
-    private final PlanImportService planImportService; // Delegamos la complejidad del Excel aquí
+    private final PlanImportService planImportService;
 
     @Transactional
     public PlanEstudioResponse cargarPlanDesdeExcel(MultipartFile file) throws IOException {
@@ -40,15 +38,17 @@ public class PlanEstudioService {
 
     @Transactional
     public void eliminarPlanDeEstudio(String codigoPlan) {
+        // 1. Validación de existencia
         if (!planRepo.existsById(codigoPlan)) {
             throw new ResourceNotFoundException("El plan con código '" + codigoPlan + "' no existe");
         }
-        try {
-            planRepo.deleteById(codigoPlan);
-            log.info("Plan de estudio eliminado: {}", codigoPlan);
-        } catch (DataIntegrityViolationException e) {
-            throw new IntegrityException("No se puede eliminar el plan porque tiene alumnos o historias asociadas.");
-        }
+
+        // 2. Borrado en Cascada (Gestionado por JPA)
+        // Al llamar a deleteById, Hibernate buscará el Plan, verá que tiene Materias e Historias
+        // con CascadeType.ALL, y emitirá los DELETEs de los hijos antes de borrar el Plan.
+        planRepo.deleteById(codigoPlan);
+
+        log.info("Plan de estudio {} eliminado exitosamente junto con todas sus dependencias.", codigoPlan);
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +57,7 @@ public class PlanEstudioService {
                 .map(plan -> new PlanEstudioResponse(
                         plan.getCodigo(),
                         plan.getPropuesta(),
-                        (long) plan.getMaterias().size() // OJO: Esto puede ser lento si no es Lazy, usar count query es mejor
+                        (long) plan.getMaterias().size()
                 ))
                 .toList();
     }

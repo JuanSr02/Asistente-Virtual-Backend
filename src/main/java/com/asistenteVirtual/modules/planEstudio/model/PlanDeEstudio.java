@@ -29,7 +29,7 @@ public class PlanDeEstudio {
     @Builder.Default
     private List<Materia> materias = new ArrayList<>();
 
-    @OneToMany(mappedBy = "planDeEstudio", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "planDeEstudio", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<HistoriaAcademica> historias;
 }

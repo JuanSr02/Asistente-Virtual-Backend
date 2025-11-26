@@ -1,5 +1,6 @@
 package com.asistenteVirtual.modules.experiencia.controller;
 
+import com.asistenteVirtual.modules.experiencia.dto.ExamenDisponibleResponse;
 import com.asistenteVirtual.modules.experiencia.dto.ExperienciaRequest;
 import com.asistenteVirtual.modules.experiencia.dto.ExperienciaResponse;
 import com.asistenteVirtual.modules.experiencia.dto.ExperienciaUpdate;
@@ -23,6 +24,11 @@ public class ExperienciaController {
     public ResponseEntity<ExperienciaResponse> crear(@Valid @RequestBody ExperienciaRequest dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(experienciaService.crearExperiencia(dto));
+    }
+
+    @GetMapping("/examenes-por-estudiante/{estudianteId}")
+    public ResponseEntity<List<ExamenDisponibleResponse>> listarExamenesSinExperiencia(@PathVariable Long estudianteId) {
+        return ResponseEntity.ok(experienciaService.obtenerExamenesPendientesDeExperiencia(estudianteId));
     }
 
     @GetMapping("/por-materia/{codigoMateria}")

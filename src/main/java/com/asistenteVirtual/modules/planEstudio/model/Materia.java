@@ -30,9 +30,7 @@ public class Materia {
     @Column(nullable = false, length = 200)
     private String nombre;
 
-    // Relaciones de correlativas (Auto-referencia N:M gestionada como entidad débil o tabla)
-    // Para simplificar, mantenemos tu estructura actual con entidad Correlativa explícita
-    @OneToMany(mappedBy = "materia", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "materia", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     @Builder.Default
     private List<Correlativa> correlativas = new ArrayList<>();
