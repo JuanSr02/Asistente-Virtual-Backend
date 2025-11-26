@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -64,17 +65,23 @@ public class EstadisticasService {
         List<Materia> materias = materiaRepo.findByCodigo(codigoMateria);
         if (materias.isEmpty()) return;
 
-        // Buscamos todos los exámenes y experiencias de esta materia (en cualquier plan)
-        // Nota: Esto asume que tu repositorio soporta búsqueda polimórfica o que iteramos.
-        // Para optimizar, usamos la primera materia para buscar relaciones si el código es único conceptualmente.
-        Materia materiaPrincipal = materias.get(0);
+        // CORRECCIÓN: Agregar exámenes de TODOS los planes para este código de materia.
+        // La versión anterior solo tomaba materias.get(0), perdiendo datos de otros planes.
+        List<Examen> examenes = new ArrayList<>();
+        for (Materia materia : materias) {
+            // Usamos el método con JOIN FETCH para evitar N+1
+            examenes.addAll(examenRepo.findByMateriaWithJoins(materia));
+        }
 
-        List<Examen> examenes = examenRepo.findByMateriaWithJoins(materiaPrincipal);
-        List<Experiencia> experiencias = experienciaRepo.findAllByCodigoMateria(materiaPrincipal.getCodigo());
+        // Las experiencias ya se buscaban por código (string), así que esto ya era correcto en refactor
+        List<Experiencia> experiencias = experienciaRepo.findAllByCodigoMateria(codigoMateria);
 
-        EstadisticasMateria stats = EstadisticasMateria.builder()
+        // Usamos el nombre de la primera materia encontrada (asumiendo consistencia entre planes)
+        String nombreMateria = materias.getFirst().getNombre();
+
+        var stats = EstadisticasMateria.builder()
                 .codigoMateria(codigoMateria)
-                .nombreMateria(materiaPrincipal.getNombre())
+                .nombreMateria(nombreMateria)
                 .totalRendidos(examenes.size())
                 .aprobados(helper.calcularAprobados(examenes))
                 .reprobados(examenes.size() - helper.calcularAprobados(examenes))
@@ -97,7 +104,7 @@ public class EstadisticasService {
         List<Examen> todosExamenes = examenRepo.findAll();
         List<HistoriaAcademica> historias = historiaRepo.findAll();
 
-        // Consultas optimizadas para rankings
+        // Consultas optimizadas nativas para rankings (ya presentes en el repo)
         var topAprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasAprobadas());
         var topReprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasReprobadas());
 
@@ -106,7 +113,7 @@ public class EstadisticasService {
         long cantMateriaMasRendida = examenRepo.countExamenesByCodigoMateria(materiaMasRendida);
         long cantAprobadosMateriaMasRendida = examenRepo.countExamenesAprobadosByCodigoMateria(materiaMasRendida);
 
-        EstadisticasGenerales stats = EstadisticasGenerales.builder()
+        var stats = EstadisticasGenerales.builder()
                 .totalMaterias((int) materiaRepo.count())
                 .totalExamenesRendidos(todosExamenes.size())
                 .estudiantesActivos((long) historias.size())
