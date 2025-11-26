@@ -70,7 +70,7 @@ public class EstadisticasService {
         Materia materiaPrincipal = materias.get(0);
 
         List<Examen> examenes = examenRepo.findByMateriaWithJoins(materiaPrincipal);
-        List<Experiencia> experiencias = experienciaRepo.findByMateriaWithJoins(materiaPrincipal);
+        List<Experiencia> experiencias = experienciaRepo.findAllByCodigoMateria(materiaPrincipal.getCodigo());
 
         EstadisticasMateria stats = EstadisticasMateria.builder()
                 .codigoMateria(codigoMateria)

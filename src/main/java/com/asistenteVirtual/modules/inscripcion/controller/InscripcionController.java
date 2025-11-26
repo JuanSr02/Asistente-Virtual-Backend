@@ -43,7 +43,4 @@ public class InscripcionController {
         return ResponseEntity.ok(inscripcionService.obtenerInscriptos(codigoMateria, anio, turno));
     }
 
-    // Eliminamos el endpoint "/notificaciones" manual.
-    // Las notificaciones ahora son automáticas al crear la inscripción,
-    // lo cual es más seguro y consistente con el negocio.
 }

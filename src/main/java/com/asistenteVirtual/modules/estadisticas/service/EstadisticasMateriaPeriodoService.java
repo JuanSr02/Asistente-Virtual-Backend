@@ -63,7 +63,7 @@ public class EstadisticasMateriaPeriodoService {
             if (fechaLimite != null) {
                 resultados.addAll(experienciaRepository.findByMateriaAndFechaAfter(m, fechaLimite));
             } else {
-                resultados.addAll(experienciaRepository.findByMateriaWithJoins(m));
+                resultados.addAll(experienciaRepository.findAllByCodigoMateria(m.getCodigo()));
             }
         }
         return resultados;
