@@ -19,7 +19,7 @@ public class EstadisticasController {
     private final FastStatisticsService fastStatisticsService;
     private final EstadisticasService estadisticasService;
     private final EstadisticasAvanzadasService avanzadasService;
-    private final EstadisticasMateriaPeriodoService periodoService; // ✅ Inyección
+    private final EstadisticasMateriaPeriodoService periodoService;
 
     @GetMapping("/generales")
     public ResponseEntity<EstadisticasGeneralesResponse> obtenerGenerales() {
@@ -42,7 +42,15 @@ public class EstadisticasController {
     public ResponseEntity<EstadisticasGeneralesResponse> obtenerPorCarrera(
             @RequestParam String plan,
             @RequestParam(required = false, defaultValue = "ULTIMO_ANIO") PeriodoEstadisticas periodo) {
-        return ResponseEntity.ok(avanzadasService.obtenerEstadisticasPorCarrera(plan, periodo));
+        
+        // ✅ CORRECCIÓN CRÍTICA: Intenta leer caché primero (Fast), si falla, calcula (Avanzado).
+        // Esto recupera el rendimiento del "FastController" de main pero en un solo endpoint.
+        try {
+            return ResponseEntity.ok(fastStatisticsService.getCachedCarreraStatistics(plan, periodo));
+        } catch (Exception e) {
+            // Fallback: Si no hay caché, calculamos al vuelo
+            return ResponseEntity.ok(avanzadasService.obtenerEstadisticasPorCarrera(plan, periodo));
+        }
     }
 
     @PostMapping("/recalcular")

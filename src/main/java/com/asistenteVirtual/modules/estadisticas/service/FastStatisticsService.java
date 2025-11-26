@@ -24,26 +24,14 @@ public class FastStatisticsService {
     private final EstadisticasGeneralesRepository generalesRepo;
     private final EstadisticasMateriaRepository materiaRepo;
     private final JsonConverter jsonConverter;
+    private final EstadisticasPorCarreraRepository carreraRepo; // ✅ Inyectado nuevo repo
+
 
     @Transactional(readOnly = true)
     public EstadisticasGeneralesResponse getCachedGeneralStatistics() {
         EstadisticasGenerales stats = generalesRepo.findFirstByOrderByFechaUltimaActualizacionDesc()
                 .orElseThrow(() -> new ResourceNotFoundException("No hay estadísticas generales calculadas aún."));
-
-        return new EstadisticasGeneralesResponse(
-                stats.getEstudiantesActivos(),
-                stats.getTotalMaterias(),
-                stats.getTotalExamenesRendidos(),
-                stats.getPorcentajeAprobadosGeneral(),
-                stats.getPromedioGeneral(),
-                jsonConverter.fromJson(stats.getDistribucionEstudiantesPorCarrera(), new TypeReference<Map<String, Integer>>() {}),
-                jsonConverter.fromJson(stats.getDistribucionExamenesPorMateria(), new TypeReference<Map<String, Integer>>() {}),
-                jsonConverter.fromJson(stats.getMateriaMasRendida(), MateriaRankingResponse.class),
-                stats.getCantidadMateriaMasRendida(),
-                jsonConverter.fromJson(stats.getTop5Aprobadas(), new TypeReference<List<MateriaRankingResponse>>() {}),
-                jsonConverter.fromJson(stats.getTop5Reprobadas(), new TypeReference<List<MateriaRankingResponse>>() {}),
-                jsonConverter.fromJson(stats.getPromedioNotasPorMateria(), new TypeReference<Map<String, Double>>() {})
-        );
+                return mapGeneralToResponse(stats);
     }
 
     @Transactional(readOnly = true)
@@ -72,4 +60,33 @@ public class FastStatisticsService {
     private Double calcularPorcentaje(long parte, long total) {
         return total > 0 ? (double) parte / total * 100 : 0.0;
     }
+
+        @Transactional(readOnly = true)
+        public EstadisticasGeneralesResponse getCachedCarreraStatistics(String codigoPlan, PeriodoEstadisticas periodo) {
+            EstadisticasPorCarrera stats = carreraRepo.findByCodigoPlanAndPeriodo(codigoPlan, periodo.toString())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "No hay estadísticas cacheadas para el plan " + codigoPlan + " y periodo " + periodo));
+    
+            // Mapeamos la entidad de caché al DTO de respuesta
+            return mapGeneralToResponse(stats);
+        }
+        
+        // Helper para reutilizar mapeo si las entidades son similares (opcional)
+        private EstadisticasGeneralesResponse mapGeneralToResponse(EstadisticasGenerales stats) {
+             return new EstadisticasGeneralesResponse(
+                    stats.getEstudiantesActivos(),
+                    stats.getTotalMaterias(),
+                    stats.getTotalExamenesRendidos(),
+                    stats.getPorcentajeAprobadosGeneral(),
+                    stats.getPromedioGeneral(),
+                    jsonConverter.fromJson(stats.getDistribucionEstudiantesPorCarrera(), new TypeReference<Map<String, Integer>>() {}),
+                    jsonConverter.fromJson(stats.getDistribucionExamenesPorMateria(), new TypeReference<Map<String, Integer>>() {}),
+                    jsonConverter.fromJson(stats.getMateriaMasRendida(), MateriaRankingResponse.class),
+                    stats.getCantidadMateriaMasRendida(),
+                    jsonConverter.fromJson(stats.getTop5Aprobadas(), new TypeReference<List<MateriaRankingResponse>>() {}),
+                    jsonConverter.fromJson(stats.getTop5Reprobadas(), new TypeReference<List<MateriaRankingResponse>>() {}),
+                    jsonConverter.fromJson(stats.getPromedioNotasPorMateria(), new TypeReference<Map<String, Double>>() {})
+            );
+        }
+
 }
