@@ -44,7 +44,7 @@ public class HistoriaImportService {
         var datosExtraidos = parser.parse(file);
 
         // 4. Obtener o crear la historia
-        HistoriaAcademica historia = historiaRepository.findByEstudiante(estudiante)
+        HistoriaAcademica historia = historiaRepository.findByEstudiante_IdAndEstado(estudianteId, "ACTIVA")
                 .orElseGet(() -> crearHistoriaNueva(estudiante, plan));
 
         // 5. Procesamiento inteligente (Validación de plan, duplicados, reglas de negocio)

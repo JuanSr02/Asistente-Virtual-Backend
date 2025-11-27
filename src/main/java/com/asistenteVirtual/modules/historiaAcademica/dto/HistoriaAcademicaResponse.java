@@ -15,7 +15,7 @@ public record HistoriaAcademicaResponse(
             h.getEstudiante().getNombreApellido(),
             h.getPlanDeEstudio().getCodigo(),
             h.getEstado(),
-            LocalDate.now(), // O podrías buscar la fecha del último renglón si prefieres
+            LocalDate.now(),
             h.getRenglones().size()
         );
     }

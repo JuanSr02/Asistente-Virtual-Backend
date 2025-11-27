@@ -35,7 +35,7 @@ public class HistoriaProcesadorDatos {
         // 2. Validación Heurística
         validarCoincidenciaDelPlan(filasCrudas, mapaMaterias);
 
-        // 3. Transformación y Lógica de Negocio (Promoción mata Regularidad)
+        // 3. Transformación y Lógica de Negocio
         List<Renglon> nuevosRenglones = transformarYFiltrar(filasCrudas, mapaMaterias, historia);
 
         // 4. Actualización Inteligente (Merge)
@@ -111,7 +111,7 @@ public class HistoriaProcesadorDatos {
                     // Si aprobó examen, borramos regularidades (del acumulador y de la DB histórica)
                     if (fila.nota() >= 4.0) {
                         eliminarRegularidadesDeLaMateria(acumulador, materia);
-                        eliminarRegularidadesDeLaMateria(historia.getRenglones(), materia); // ¡Fix Crítico!
+                        eliminarRegularidadesDeLaMateria(historia.getRenglones(), materia);
                     }
                 }
                 acumulador.add(renglon);
@@ -122,7 +122,7 @@ public class HistoriaProcesadorDatos {
                 renglon.setTipo("Promocion");
                 // Regla: Promoción mata regularidad (del acumulador y de la DB histórica)
                 eliminarRegularidadesDeLaMateria(acumulador, materia);
-                eliminarRegularidadesDeLaMateria(historia.getRenglones(), materia); // ¡Fix Crítico!
+                eliminarRegularidadesDeLaMateria(historia.getRenglones(), materia);
 
                 acumulador.add(renglon); // Se agrega temporalmente para procesar, se borrará en el paso 5.
                 break;

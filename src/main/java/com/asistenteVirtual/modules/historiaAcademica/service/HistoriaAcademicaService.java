@@ -41,7 +41,7 @@ public class HistoriaAcademicaService {
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
-        HistoriaAcademica historia = historiaRepository.findByEstudiante(estudiante)
+        HistoriaAcademica historia = historiaRepository.findByEstudiante_IdAndEstado(estudianteId, "ACTIVA")
                 .orElseThrow(() -> new ResourceNotFoundException("El estudiante no tiene historia académica activa"));
 
         historia.setEstado("BAJA");
