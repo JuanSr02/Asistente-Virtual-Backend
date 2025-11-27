@@ -46,5 +46,5 @@ public abstract class Persona {
 
     @NotBlank
     @Column(name = "rol_usuario", nullable = false)
-    protected String rolUsuario; // CamelCase para Java estándar
+    protected String rolUsuario;
 }

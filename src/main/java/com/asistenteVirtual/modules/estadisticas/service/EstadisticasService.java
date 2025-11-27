@@ -1,6 +1,9 @@
 package com.asistenteVirtual.modules.estadisticas.service;
 
 import com.asistenteVirtual.common.utils.JsonConverter;
+import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasGeneralesResponse;
+import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasMateriaResponse;
+import com.asistenteVirtual.modules.estadisticas.dto.MateriaRankingResponse;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasGenerales;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasGeneralesRepository;
@@ -13,6 +16,7 @@ import com.asistenteVirtual.modules.historiaAcademica.repository.ExamenRepositor
 import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
 import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -38,45 +43,29 @@ public class EstadisticasService {
     private final EstadisticasCalculatorHelper helper;
     private final JsonConverter jsonConverter;
 
-    /**
-     * Recalcula TODAS las estadísticas del sistema.
-     * Ideal para ejecutar en un Cron Job nocturno.
-     */
     @Transactional
     public void actualizarTodas() {
         log.info("🔄 Iniciando actualización masiva de estadísticas...");
-
-        // 1. Actualizar por Materia
         List<String> codigosMaterias = examenRepo.findDistinctMateriasPorCodigo();
-        log.info("Se procesarán {} materias.", codigosMaterias.size());
 
         for (String codigo : codigosMaterias) {
             calcularYGuardarMateria(codigo);
         }
-
-        // 2. Actualizar Generales
         calcularYGuardarGenerales();
-
         log.info("✅ Actualización de estadísticas finalizada.");
     }
 
     @Transactional
-    public void calcularYGuardarMateria(String codigoMateria) {
+    public EstadisticasMateriaResponse calcularYGuardarMateria(String codigoMateria) {
         List<Materia> materias = materiaRepo.findByCodigo(codigoMateria);
-        if (materias.isEmpty()) return;
+        if (materias.isEmpty()) return null;
 
-        // CORRECCIÓN: Agregar exámenes de TODOS los planes para este código de materia.
-        // La versión anterior solo tomaba materias.get(0), perdiendo datos de otros planes.
         List<Examen> examenes = new ArrayList<>();
         for (Materia materia : materias) {
-            // Usamos el método con JOIN FETCH para evitar N+1
             examenes.addAll(examenRepo.findByMateriaWithJoins(materia));
         }
 
-        // Las experiencias ya se buscaban por código (string), así que esto ya era correcto en refactor
         List<Experiencia> experiencias = experienciaRepo.findAllByCodigoMateria(codigoMateria);
-
-        // Usamos el nombre de la primera materia encontrada (asumiendo consistencia entre planes)
         String nombreMateria = materias.getFirst().getNombre();
 
         var stats = EstadisticasMateria.builder()
@@ -89,22 +78,23 @@ public class EstadisticasService {
                 .promedioDiasEstudio(helper.calcularPromedioDiasEstudio(experiencias))
                 .promedioHorasDiarias(helper.calcularPromedioHorasDiarias(experiencias))
                 .promedioDificultad(helper.calcularPromedioDificultad(experiencias))
-                // Serialización automática con JsonConverter
                 .distribucionDificultad(jsonConverter.toJson(helper.calcularDistribucionDificultadMap(experiencias)))
                 .distribucionModalidad(jsonConverter.toJson(helper.calcularDistribucionModalidadMap(experiencias)))
                 .distribucionRecursos(jsonConverter.toJson(helper.calcularDistribucionRecursosMap(experiencias)))
                 .fechaUltimaActualizacion(LocalDateTime.now())
                 .build();
 
-        statsMateriaRepo.save(stats);
+        stats = statsMateriaRepo.save(stats);
+
+        // ✅ Retornamos el DTO mapeado directamente para uso inmediato
+        return mapMateriaToResponse(stats);
     }
 
     @Transactional
-    public void calcularYGuardarGenerales() {
+    public EstadisticasGeneralesResponse calcularYGuardarGenerales() {
         List<Examen> todosExamenes = examenRepo.findAll();
         List<HistoriaAcademica> historias = historiaRepo.findAll();
 
-        // Consultas optimizadas nativas para rankings (ya presentes en el repo)
         var topAprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasAprobadas());
         var topReprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasReprobadas());
 
@@ -119,7 +109,6 @@ public class EstadisticasService {
                 .estudiantesActivos((long) historias.size())
                 .promedioGeneral(helper.calcularPromedioNotas(todosExamenes))
                 .porcentajeAprobadosGeneral(helper.calcularPorcentajeGlobal(todosExamenes))
-                // JSONs
                 .distribucionEstudiantesPorCarrera(jsonConverter.toJson(helper.calcularDistribucionEstudiantesPorCarrera(historias)))
                 .distribucionExamenesPorMateria(jsonConverter.toJson(helper.calcularDistribucionExamenesPorMateria(todosExamenes)))
                 .top5Aprobadas(jsonConverter.toJson(topAprobadas))
@@ -132,6 +121,55 @@ public class EstadisticasService {
                 .fechaUltimaActualizacion(LocalDateTime.now())
                 .build();
 
-        statsGeneralesRepo.save(stats);
+        stats = statsGeneralesRepo.save(stats);
+
+        // ✅ Retornamos el DTO mapeado
+        return mapGeneralToResponse(stats);
+    }
+
+    // --- Mappers Internos (Replica la lógica de FastStatisticsService para mantener independencia) ---
+
+    private EstadisticasMateriaResponse mapMateriaToResponse(EstadisticasMateria stats) {
+        return new EstadisticasMateriaResponse(
+                stats.getCodigoMateria(),
+                stats.getNombreMateria(),
+                stats.getTotalRendidos(),
+                stats.getAprobados(),
+                stats.getReprobados(),
+                helper.calcularPorcentaje(stats.getAprobados(), stats.getTotalRendidos()),
+                stats.getPromedioNotas(),
+                stats.getPromedioDiasEstudio(),
+                stats.getPromedioHorasDiarias(),
+                stats.getPromedioDificultad(),
+                jsonConverter.fromJson(stats.getDistribucionDificultad(), new TypeReference<Map<Integer, Integer>>() {
+                }),
+                jsonConverter.fromJson(stats.getDistribucionModalidad(), new TypeReference<Map<String, Integer>>() {
+                }),
+                jsonConverter.fromJson(stats.getDistribucionRecursos(), new TypeReference<Map<String, Integer>>() {
+                }),
+                stats.getFechaUltimaActualizacion().toLocalDate()
+        );
+    }
+
+    private EstadisticasGeneralesResponse mapGeneralToResponse(EstadisticasGenerales stats) {
+        return new EstadisticasGeneralesResponse(
+                stats.getEstudiantesActivos(),
+                stats.getTotalMaterias(),
+                stats.getTotalExamenesRendidos(),
+                stats.getPorcentajeAprobadosGeneral(),
+                stats.getPromedioGeneral(),
+                jsonConverter.fromJson(stats.getDistribucionEstudiantesPorCarrera(), new TypeReference<Map<String, Integer>>() {
+                }),
+                jsonConverter.fromJson(stats.getDistribucionExamenesPorMateria(), new TypeReference<Map<String, Integer>>() {
+                }),
+                jsonConverter.fromJson(stats.getMateriaMasRendida(), MateriaRankingResponse.class),
+                stats.getCantidadMateriaMasRendida(),
+                jsonConverter.fromJson(stats.getTop5Aprobadas(), new TypeReference<List<MateriaRankingResponse>>() {
+                }),
+                jsonConverter.fromJson(stats.getTop5Reprobadas(), new TypeReference<List<MateriaRankingResponse>>() {
+                }),
+                jsonConverter.fromJson(stats.getPromedioNotasPorMateria(), new TypeReference<Map<String, Double>>() {
+                })
+        );
     }
 }

@@ -68,4 +68,10 @@ public class SupabaseJwtAuthFilter extends OncePerRequestFilter {
                     """);
         }
     }
+
+    @Override
+    protected boolean shouldNotFilter(jakarta.servlet.http.HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/favicon.ico");
+    }
 }
