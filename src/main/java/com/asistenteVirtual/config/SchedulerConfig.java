@@ -16,8 +16,9 @@ public class SchedulerConfig {
         this.estadisticasService = estadisticasService;
     }
 
-    // Actualiza estadísticas cada día a la 9 AM
-    @Scheduled(cron = "0 0 9 * * ?")
+    // Actualiza estadísticas cada día a las 6 AM (Hora Argentina)
+    // CRON: Segundos | Minutos | Horas | DíaMes | Mes | DíaSemana
+    @Scheduled(cron = "0 0 6 * * ?", zone = "America/Argentina/Buenos_Aires")
     public void actualizarEstadisticasProgramado() {
         estadisticasService.actualizarTodas();
     }
