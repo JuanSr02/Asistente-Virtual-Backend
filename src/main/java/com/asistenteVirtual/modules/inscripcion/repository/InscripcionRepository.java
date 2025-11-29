@@ -11,12 +11,10 @@ import java.util.List;
 @Repository
 public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> {
 
-    // Optimización: Traemos Materia y Estudiante en una sola query
     @Query("""
                 SELECT i FROM Inscripcion i
                 JOIN FETCH i.estudiante e
                 JOIN FETCH i.materia m
-                LEFT JOIN FETCH m.planDeEstudio
                 WHERE m.codigo = :codigo
                 AND i.anio = :anio
                 AND i.turno = :turno

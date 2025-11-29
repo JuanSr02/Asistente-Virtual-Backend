@@ -60,7 +60,7 @@ public class InscripcionService {
 
     @Transactional(readOnly = true)
     public List<InscripcionResponse> obtenerInscriptos(String materiaCodigo, Integer anio, String turno) {
-        // Usamos el método optimizado con FETCH
+        // Usamos el metodo optimizado con FETCH
         return inscripcionRepo.findCompaneros(materiaCodigo, anio, turno).stream()
                 .map(InscripcionResponse::fromEntity)
                 .toList();

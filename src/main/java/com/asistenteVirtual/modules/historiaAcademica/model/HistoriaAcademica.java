@@ -22,7 +22,7 @@ public class HistoriaAcademica {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "persona_id_estudiante", unique = true, nullable = false)
+    @JoinColumn(name = "persona_id_estudiante", nullable = false)
     private Estudiante estudiante;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,7 +35,7 @@ public class HistoriaAcademica {
 
     @Column(nullable = false)
     private String estado; // ACTIVA, BAJA
-    
+
     // Helper para mantener la consistencia bidireccional
     public void agregarRenglon(Renglon renglon) {
         renglones.add(renglon);

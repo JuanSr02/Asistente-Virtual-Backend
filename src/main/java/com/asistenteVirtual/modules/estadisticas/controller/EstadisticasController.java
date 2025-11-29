@@ -77,7 +77,7 @@ public class EstadisticasController {
 
     @PostMapping("/recalcular")
     public ResponseEntity<Void> forzarRecalculo() {
-        // Opción administrativa para regenerar todo el caché
+        // Opción administrativa para regenerar el caché
         calculationService.actualizarTodas();
         return ResponseEntity.ok().build();
     }
