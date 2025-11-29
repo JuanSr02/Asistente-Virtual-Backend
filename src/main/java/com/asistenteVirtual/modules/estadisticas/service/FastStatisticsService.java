@@ -26,9 +26,8 @@ public class FastStatisticsService {
 
     private final EstadisticasGeneralesRepository generalesRepo;
     private final EstadisticasMateriaRepository materiaRepo;
+    private final EstadisticasPorCarreraRepository carreraRepo;
     private final JsonConverter jsonConverter;
-    private final EstadisticasPorCarreraRepository carreraRepo; // ✅ Inyectado nuevo repo
-
 
     @Transactional(readOnly = true)
     public EstadisticasGeneralesResponse getCachedGeneralStatistics() {
@@ -38,9 +37,11 @@ public class FastStatisticsService {
     }
 
     @Transactional(readOnly = true)
-    public EstadisticasMateriaResponse getCachedMateriaStatistics(String codigoMateria) {
-        EstadisticasMateria stats = materiaRepo.findById(codigoMateria)
-                .orElseThrow(() -> new ResourceNotFoundException("No hay estadísticas calculadas para la materia: " + codigoMateria));
+    public EstadisticasMateriaResponse getCachedMateriaStatistics(String codigoMateria, PeriodoEstadisticas periodo) {
+        // ✅ Búsqueda compuesta por código y periodo
+        EstadisticasMateria stats = materiaRepo.findByCodigoMateriaAndPeriodo(codigoMateria, periodo.toString())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No hay estadísticas cacheadas para materia: " + codigoMateria + " en periodo: " + periodo));
 
         return new EstadisticasMateriaResponse(
                 stats.getCodigoMateria(),
@@ -63,25 +64,19 @@ public class FastStatisticsService {
         );
     }
 
-    private Double calcularPorcentaje(long parte, long total) {
-        return total > 0 ? (double) parte / total * 100 : 0.0;
-    }
-
     @Transactional(readOnly = true)
     public EstadisticasGeneralesResponse getCachedCarreraStatistics(String codigoPlan, PeriodoEstadisticas periodo) {
         EstadisticasPorCarrera stats = carreraRepo.findByCodigoPlanAndPeriodo(codigoPlan, periodo.toString())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No hay estadísticas cacheadas para el plan " + codigoPlan + " y periodo " + periodo));
 
-        // Mapeamos la entidad de caché al DTO de respuesta
         return new EstadisticasGeneralesResponse(
                 (long) stats.getEstudiantesActivos(),
                 stats.getTotalMaterias(),
                 stats.getTotalExamenesRendidos(),
                 stats.getPorcentajeAprobadosGeneral(),
                 stats.getPromedioGeneral(),
-                // En carrera, la distribución de estudiantes suele ser trivial o nula en el modelo viejo, ajustamos según entidad
-                Map.of(), // O mapear si la entidad tiene el campo (la entidad EstadisticasPorCarrera no tenía este campo en main, se usaba map vacío o default)
+                Map.of(),
                 jsonConverter.fromJson(stats.getDistribucionExamenesPorMateria(), new TypeReference<Map<String, Integer>>() {
                 }),
                 jsonConverter.fromJson(stats.getMateriaMasRendida(), MateriaRankingResponse.class),
@@ -95,7 +90,10 @@ public class FastStatisticsService {
         );
     }
 
-    // Helper para reutilizar mapeo si las entidades son similares (opcional)
+    private Double calcularPorcentaje(long parte, long total) {
+        return total > 0 ? (double) parte / total * 100 : 0.0;
+    }
+
     private EstadisticasGeneralesResponse mapGeneralToResponse(EstadisticasGenerales stats) {
         return new EstadisticasGeneralesResponse(
                 stats.getEstudiantesActivos(),
@@ -117,6 +115,4 @@ public class FastStatisticsService {
                 })
         );
     }
-
 }
-

@@ -6,6 +6,7 @@ import com.asistenteVirtual.modules.estadisticas.dto.EstadisticasMateriaResponse
 import com.asistenteVirtual.modules.estadisticas.dto.MateriaRankingResponse;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasGenerales;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
+import com.asistenteVirtual.modules.estadisticas.model.PeriodoEstadisticas;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasGeneralesRepository;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasMateriaRepository;
 import com.asistenteVirtual.modules.experiencia.model.Experiencia;
@@ -15,13 +16,16 @@ import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.historiaAcademica.repository.ExamenRepository;
 import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
 import com.asistenteVirtual.modules.planEstudio.model.Materia;
+import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
 import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
+import com.asistenteVirtual.modules.planEstudio.repository.PlanDeEstudioRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,40 +40,84 @@ public class EstadisticasService {
     private final MateriaRepository materiaRepo;
     private final HistoriaAcademicaRepository historiaRepo;
     private final ExperienciaRepository experienciaRepo;
+    private final PlanDeEstudioRepository planRepo;
 
     private final EstadisticasMateriaRepository statsMateriaRepo;
     private final EstadisticasGeneralesRepository statsGeneralesRepo;
+
+    // Inyectamos el servicio de carreras para reutilizar su lógica de cálculo y guardado
+    private final EstadisticasAvanzadasService statsCarreraService;
 
     private final EstadisticasCalculatorHelper helper;
     private final JsonConverter jsonConverter;
 
     @Transactional
     public void actualizarTodas() {
-        log.info("🔄 Iniciando actualización masiva de estadísticas...");
-        List<String> codigosMaterias = examenRepo.findDistinctMateriasPorCodigo();
+        log.info("🔄 Iniciando CRON JOB: Actualización masiva de TODAS las estadísticas...");
 
-        for (String codigo : codigosMaterias) {
-            calcularYGuardarMateria(codigo);
-        }
+        // 1. Estadísticas Generales Globales
+        log.info("📊 Calculando Generales Globales...");
         calcularYGuardarGenerales();
-        log.info("✅ Actualización de estadísticas finalizada.");
+
+        // 2. Estadísticas Por Carrera (Plan) para CADA Periodo
+        log.info("🎓 Calculando Estadísticas por Carrera y Periodo...");
+        List<PlanDeEstudio> planes = planRepo.findAll();
+        for (PlanDeEstudio plan : planes) {
+            for (PeriodoEstadisticas periodo : PeriodoEstadisticas.values()) {
+                try {
+                    // Este servicio ya calcula y guarda en la entidad EstadisticasPorCarrera
+                    statsCarreraService.obtenerEstadisticasPorCarrera(plan.getCodigo(), periodo);
+                } catch (Exception e) {
+                    log.error("Error actualizando carrera {} periodo {}: {}", plan.getCodigo(), periodo, e.getMessage());
+                }
+            }
+        }
+
+        // 3. Estadísticas Por Materia para CADA Periodo
+        log.info("📚 Calculando Estadísticas por Materia y Periodo...");
+        List<String> codigosMaterias = examenRepo.findDistinctMateriasPorCodigo();
+        for (String codigo : codigosMaterias) {
+            for (PeriodoEstadisticas periodo : PeriodoEstadisticas.values()) {
+                try {
+                    calcularYGuardarMateria(codigo, periodo);
+                } catch (Exception e) {
+                    log.error("Error actualizando materia {} periodo {}: {}", codigo, periodo, e.getMessage());
+                }
+            }
+        }
+
+        log.info("✅ Actualización masiva finalizada exitosamente.");
     }
 
     @Transactional
-    public EstadisticasMateriaResponse calcularYGuardarMateria(String codigoMateria) {
+    public EstadisticasMateriaResponse calcularYGuardarMateria(String codigoMateria, PeriodoEstadisticas periodo) {
+        // 1. Validar materia
         List<Materia> materias = materiaRepo.findByCodigo(codigoMateria);
         if (materias.isEmpty()) return null;
 
+        // 2. Determinar fecha límite según periodo
+        LocalDate fechaLimite = calcularFechaLimite(periodo);
+
+        // 3. Obtener Datos (Examenes y Experiencias) filtrados
         List<Examen> examenes = new ArrayList<>();
+        List<Experiencia> experiencias = new ArrayList<>();
+
         for (Materia materia : materias) {
-            examenes.addAll(examenRepo.findByMateriaWithJoins(materia));
+            if (fechaLimite != null) {
+                examenes.addAll(examenRepo.findByMateriaAndFechaAfter(materia, fechaLimite));
+                experiencias.addAll(experienciaRepo.findByMateriaAndFechaAfter(materia, fechaLimite));
+            } else {
+                examenes.addAll(examenRepo.findByMateriaWithJoins(materia));
+                experiencias.addAll(experienciaRepo.findByMateriaWithJoins(materia)); // Usamos el nuevo método optimizado
+            }
         }
 
-        List<Experiencia> experiencias = experienciaRepo.findAllByCodigoMateria(codigoMateria);
         String nombreMateria = materias.getFirst().getNombre();
 
+        // 4. Construir Entidad
         var stats = EstadisticasMateria.builder()
                 .codigoMateria(codigoMateria)
+                .periodo(periodo.toString()) // ✅ Guardamos el periodo
                 .nombreMateria(nombreMateria)
                 .totalRendidos(examenes.size())
                 .aprobados(helper.calcularAprobados(examenes))
@@ -84,9 +132,9 @@ public class EstadisticasService {
                 .fechaUltimaActualizacion(LocalDateTime.now())
                 .build();
 
+        // 5. Guardar
         stats = statsMateriaRepo.save(stats);
 
-        // ✅ Retornamos el DTO mapeado directamente para uso inmediato
         return mapMateriaToResponse(stats);
     }
 
@@ -99,9 +147,9 @@ public class EstadisticasService {
         var topReprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasReprobadas());
 
         String materiaMasRendida = examenRepo.findCodigoMateriaMasRendida();
-        String materiaMasRendidaNombre = materiaRepo.findFirstNombreByCodigo(materiaMasRendida);
-        long cantMateriaMasRendida = examenRepo.countExamenesByCodigoMateria(materiaMasRendida);
-        long cantAprobadosMateriaMasRendida = examenRepo.countExamenesAprobadosByCodigoMateria(materiaMasRendida);
+        String materiaMasRendidaNombre = (materiaMasRendida != null) ? materiaRepo.findFirstNombreByCodigo(materiaMasRendida) : "N/A";
+        long cantMateriaMasRendida = (materiaMasRendida != null) ? examenRepo.countExamenesByCodigoMateria(materiaMasRendida) : 0;
+        long cantAprobadosMateriaMasRendida = (materiaMasRendida != null) ? examenRepo.countExamenesAprobadosByCodigoMateria(materiaMasRendida) : 0;
 
         var stats = EstadisticasGenerales.builder()
                 .totalMaterias((int) materiaRepo.count())
@@ -122,12 +170,19 @@ public class EstadisticasService {
                 .build();
 
         stats = statsGeneralesRepo.save(stats);
-
-        // ✅ Retornamos el DTO mapeado
         return mapGeneralToResponse(stats);
     }
 
-    // --- Mappers Internos (Replica la lógica de FastStatisticsService para mantener independencia) ---
+    // --- Helpers Privados ---
+
+    private LocalDate calcularFechaLimite(PeriodoEstadisticas periodo) {
+        return switch (periodo) {
+            case ULTIMO_ANIO -> LocalDate.now().minusYears(1);
+            case ULTIMOS_2_ANIOS -> LocalDate.now().minusYears(2);
+            case ULTIMOS_5_ANIOS -> LocalDate.now().minusYears(5);
+            case TODOS_LOS_TIEMPOS -> null;
+        };
+    }
 
     private EstadisticasMateriaResponse mapMateriaToResponse(EstadisticasMateria stats) {
         return new EstadisticasMateriaResponse(

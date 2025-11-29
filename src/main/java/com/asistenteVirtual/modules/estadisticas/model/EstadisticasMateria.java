@@ -1,7 +1,11 @@
 package com.asistenteVirtual.modules.estadisticas.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -10,11 +14,16 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "estadisticas_materia")
+@IdClass(EstadisticasMateriaId.class) // ✅ Clave compuesta para soportar periodos
 public class EstadisticasMateria {
 
     @Id
     @Column(length = 15)
     private String codigoMateria;
+
+    @Id
+    @Column(length = 20, nullable = false)
+    private String periodo; // ✅ Nuevo campo: ULTIMO_ANIO, TODOS_LOS_TIEMPOS, etc.
 
     @Column(length = 200)
     private String nombreMateria;

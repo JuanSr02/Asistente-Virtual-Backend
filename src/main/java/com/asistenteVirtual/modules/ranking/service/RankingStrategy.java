@@ -1,6 +1,8 @@
 package com.asistenteVirtual.modules.ranking.service;
 
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
+import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateriaId;
+import com.asistenteVirtual.modules.estadisticas.model.PeriodoEstadisticas;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasMateriaRepository;
 import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.historiaAcademica.model.Renglon;
@@ -81,7 +83,7 @@ class RankingStrategy { // Package-private: Solo el servicio lo usa
     }
 
     private EstadisticasFinalResponse obtenerEstadisticas(String codigoMateria) {
-        return estadisticasRepo.findById(codigoMateria)
+        return estadisticasRepo.findById(new EstadisticasMateriaId(codigoMateria, PeriodoEstadisticas.TODOS_LOS_TIEMPOS.toString()))
                 .map(this::mapEstadisticas)
                 .orElse(null);
     }
