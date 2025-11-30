@@ -38,7 +38,7 @@ public class EstadisticasAvanzadasService {
     private final PlanDeEstudioRepository planRepository;
     private final HistoriaAcademicaRepository historiaRepository;
     private final EstadisticasPorCarreraRepository statsPorCarreraRepo;
-    
+
     private final EstadisticasCalculatorHelper helper;
     private final JsonConverter jsonConverter;
 
@@ -64,7 +64,7 @@ public class EstadisticasAvanzadasService {
         return response;
     }
 
-    private EstadisticasGeneralesResponse calcularMetricas(PlanDeEstudio plan, List<Examen> examenes, 
+    private EstadisticasGeneralesResponse calcularMetricas(PlanDeEstudio plan, List<Examen> examenes,
                                                            List<HistoriaAcademica> historias, List<String> codigosMaterias) {
         if (examenes.isEmpty()) {
             return construirRespuestaVacia(codigosMaterias.size(), historias.size());
@@ -78,16 +78,16 @@ public class EstadisticasAvanzadasService {
         // Rankings y Distribuciones
         // Nota: No podemos usar las queries SQL nativas del repo general porque aquí filtramos por FECHA y PLAN
         // Debemos calcular en memoria sobre la lista 'examenesFiltrados'.
-        
+
         MateriaRankingResponse materiaMasRendida = calcularMateriaMasRendida(examenes);
         List<MateriaRankingResponse> top5Aprobadas = calcularTopRankings(examenes, true);
         List<MateriaRankingResponse> top5Reprobadas = calcularTopRankings(examenes, false);
-        
+
         Map<String, Integer> distExamenes = helper.calcularDistribucionExamenesPorMateria(examenes);
         // La distribución de estudiantes por carrera es trivial aquí (todos son de esta carrera), 
         // pero mantenemos el mapa por compatibilidad con el frontend.
         Map<String, Integer> distEstudiantes = Map.of(plan.getPropuesta(), historias.size());
-        
+
         Map<String, Double> promediosMateria = calcularPromediosPorMateriaEnMemoria(examenes);
 
         return new EstadisticasGeneralesResponse(
@@ -99,7 +99,7 @@ public class EstadisticasAvanzadasService {
                 distEstudiantes,
                 distExamenes,
                 materiaMasRendida,
-                materiaMasRendida != null ? 0L : 0L, // Cantidad ya va implícita en el ranking si se requiere
+                materiaMasRendida.cantidad(),
                 top5Aprobadas,
                 top5Reprobadas,
                 promediosMateria
@@ -142,16 +142,16 @@ public class EstadisticasAvanzadasService {
                     String codigo = entry.getKey();
                     List<Examen> listaExamenes = entry.getValue();
                     String nombre = listaExamenes.get(0).getRenglon().getMateria().getNombre();
-                    
+
                     long total = listaExamenes.size();
                     long aprobados = helper.calcularAprobados(listaExamenes);
-                    
+
                     // Si buscamos aprobadas, ordenamos por % aprobados. Si reprobadas, por % reprobados.
-                    double score = buscarAprobadas 
+                    double score = buscarAprobadas
                             ? helper.calcularPorcentaje(aprobados, total)
                             : helper.calcularPorcentaje(total - aprobados, total); // % Reprobados
 
-                    return new MateriaRankingResponse(codigo, nombre, score);
+                    return new MateriaRankingResponse(codigo, nombre, score, 0L);
                 })
                 .sorted(Comparator.comparingDouble(MateriaRankingResponse::porcentaje).reversed())
                 .limit(5)
@@ -177,13 +177,13 @@ public class EstadisticasAvanzadasService {
                             .findFirst()
                             .map(e -> e.getRenglon().getMateria().getNombre())
                             .orElse("Desconocida");
-                            
+
                     // Calculamos aprobados para el DTO
                     long total = entry.getValue();
                     long aprobados = examenes.stream()
                             .filter(e -> e.getRenglon().getMateria().getCodigo().equals(codigo) && e.getNota() >= 4)
                             .count();
-                            
+
                     return helper.crearRankingDTO(codigo, nombre, total, aprobados);
                 })
                 .orElse(null);
@@ -212,11 +212,11 @@ public class EstadisticasAvanzadasService {
             case TODOS_LOS_TIEMPOS -> null;
         };
     }
-    
+
     private EstadisticasGeneralesResponse construirRespuestaVacia(int totalMaterias, long estudiantesActivos) {
         return new EstadisticasGeneralesResponse(
-                estudiantesActivos, totalMaterias, 0, 0.0, 0.0, 
-                Collections.emptyMap(), Collections.emptyMap(), null, 0L, 
+                estudiantesActivos, totalMaterias, 0, 0.0, 0.0,
+                Collections.emptyMap(), Collections.emptyMap(), null, 0L,
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyMap()
         );
     }

@@ -90,7 +90,7 @@ public class EstadisticasCalculatorHelper {
 
     public MateriaRankingResponse crearRankingDTO(String codigoMateria, String nombre, long cantidad, long aprobados) {
         Double porcentaje = calcularPorcentaje(aprobados, cantidad);
-        return new MateriaRankingResponse(codigoMateria, nombre, porcentaje);
+        return new MateriaRankingResponse(codigoMateria, nombre, porcentaje, cantidad);
     }
 
     public Map<String, Double> obtenerPromediosPorMateria(List<EstadisticasMateria> todasLasEstadisticas) {
@@ -120,7 +120,7 @@ public class EstadisticasCalculatorHelper {
         long total = ((Number) row[2]).longValue();
         long aprobados = ((Number) row[3]).longValue();
 
-        return new MateriaRankingResponse(codigo, nombre, calcularPorcentaje(aprobados, total));
+        return new MateriaRankingResponse(codigo, nombre, calcularPorcentaje(aprobados, total), 0L);
     }
 
     // --- Métodos de Experiencia (Feedback) ---
