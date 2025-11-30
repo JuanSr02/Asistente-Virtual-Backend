@@ -22,17 +22,7 @@ public class HistoriaAcademicaController {
             @PathVariable Long estudianteId,
             @RequestParam("file") MultipartFile file,
             @RequestParam("codigoPlan") String codigoPlan) throws IOException {
-        
-        return ResponseEntity.ok(historiaService.procesarHistoria(file, estudianteId, codigoPlan));
-    }
 
-    @PatchMapping(value = "/{estudianteId}/actualizacion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<HistoriaAcademicaResponse> actualizarHistoria(
-            @PathVariable Long estudianteId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("codigoPlan") String codigoPlan) throws IOException {
-        
-        // Reutilizamos la misma lógica porque nuestro 'ImportService' ya maneja el merge inteligente.
         return ResponseEntity.ok(historiaService.procesarHistoria(file, estudianteId, codigoPlan));
     }
 
