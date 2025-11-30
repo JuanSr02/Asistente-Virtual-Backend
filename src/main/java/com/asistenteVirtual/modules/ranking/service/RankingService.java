@@ -45,7 +45,7 @@ public class RankingService {
         if (!estudianteRepo.existsById(estudianteId)) {
             throw new ResourceNotFoundException("Estudiante no encontrado");
         }
-        return historiaRepo.findByEstudiante_Id(estudianteId)
+        return historiaRepo.findByEstudiante_IdAndEstado(estudianteId, "ACTIVA")
                 .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada"));
     }
 }
