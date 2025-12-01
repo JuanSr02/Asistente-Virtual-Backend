@@ -55,3 +55,62 @@ El sistema utiliza perfiles de Spring. Para producción (o ejecución completa),
 Si no tienes PostgreSQL instalado, levanta el contenedor incluido:
 
 docker-compose up -d
+
+### 3. Ejecutar la aplicación
+Usando el wrapper de Maven incluido:
+
+# Linux/Mac
+./mvnw spring-boot:run -Dspring-boot.run.profiles=prod
+
+# Windows
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=prod
+
+## 📡 Documentación de API
+
+La API requiere el header `Authorization: Bearer <TOKEN>` para endpoints protegidos.
+
+### 🧑‍🎓 Estudiantes (`/api/shared/estudiantes`)
+* **POST** `/api/public/estudiantes`: Registrar nuevo estudiante.
+* **GET** `/:id`: Obtener perfil.
+* **PATCH** `/:id`: Actualizar datos (Email, Teléfono).
+
+### 📚 Historia Académica (`/api/shared/historia-academica`)
+* **POST** `/:estudianteId/carga`: Subir archivo (`.pdf` o `.xlsx`) para procesar historia.
+    * *Params*: `file` (Multipart), `codigoPlan` (String).
+* **GET** `/:estudianteId`: Consultar estado académico actual.
+
+### 🏆 Ranking y Recomendaciones (`/api/shared/finales`)
+* **GET** `/:estudianteId`: Obtener lista de finales sugeridos.
+    * *Query Param*: `orden` (`CORRELATIVAS`, `VENCIMIENTO`, `ESTADISTICAS`).
+* **GET** `/:estudianteId/inscripciones`: Materias habilitadas para inscripción.
+
+### 📝 Inscripciones (`/api/shared/inscripciones`)
+* **POST** `/:`: Inscribirse a una mesa. Dispara emails a compañeros.
+* **GET** `/:`: Listar compañeros en una materia/turno/año.
+
+### 📊 Estadísticas (`/api/shared/estadisticas`)
+* **GET** `/generales`: Métricas globales del sistema.
+* **GET** `/materia/{codigoMateria}`: Métricas de aprobación y dificultad por materia.
+* **GET** `/generales/carrera`: Estadísticas filtradas por plan de estudio.
+
+### 🗣️ Experiencias (`/api/shared/experiencias`)
+* **POST** `/:`: Cargar reseña de examen (dificultad, tiempo estudio, recursos).
+* **GET** `/por-materia/{codigo}`: Ver experiencias de otros alumnos.
+
+### 🛠️ Administración (`/api/admin`) - *Requiere Rol ADMIN*
+* **POST** `/planes-estudio/carga`: Carga masiva de planes vía Excel.
+* **POST** `/administradores`: Crear nuevos administradores.
+
+---
+
+## 🏗️ Arquitectura del Proyecto
+
+El proyecto sigue una estructura modular vertical (Package by Feature):
+
+* **modules/historiaAcademica**: Lógica de *Strategy Pattern* para parsers (`PdfHistoriaParser`, `ExcelHistoriaParser`) y reglas de negocio para validar planes y regularidades.
+* **modules/estadisticas**: Separación de responsabilidades entre cálculo pesado (`EstadisticasService`) y lectura rápida (`FastStatisticsService`).
+* **modules/ranking**: Implementación de estrategias de ordenamiento para recomendaciones (`RankingStrategy`).
+* **modules/security**: Filtro `SupabaseJwtAuthFilter` para integración transparente con Supabase.
+
+## 📄 Licencia
+Este proyecto es software propietario/privado.
