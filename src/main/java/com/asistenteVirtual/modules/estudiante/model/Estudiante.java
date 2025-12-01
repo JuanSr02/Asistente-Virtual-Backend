@@ -21,9 +21,9 @@ import java.util.List;
 @PrimaryKeyJoinColumn(name = "persona_id")
 public class Estudiante extends Persona {
 
-    @OneToOne(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private HistoriaAcademica historiaAcademica;
+    private List<HistoriaAcademica> historiaAcademica;
 
     @OneToMany(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
