@@ -138,6 +138,7 @@ public class EstadisticasService {
                 .build();
 
         // 5. Guardar
+        statsMateriaRepo.deleteByCodigoMateriaAndPeriodo(codigoMateria, periodo.toString());
         stats = statsMateriaRepo.save(stats);
 
         return mapMateriaToResponse(stats);

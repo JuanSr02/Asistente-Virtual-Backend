@@ -15,4 +15,6 @@ public interface EstadisticasMateriaRepository extends JpaRepository<Estadistica
     Optional<EstadisticasMateria> findByCodigoMateriaAndPeriodo(String codigoMateria, String periodo);
 
     List<EstadisticasMateria> findByPeriodo(String periodo);
+
+    void deleteByCodigoMateriaAndPeriodo(String codigoMateria, String periodo);
 }

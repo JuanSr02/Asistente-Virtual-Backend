@@ -53,6 +53,7 @@ public class EstadisticasAvanzadasService {
         List<String> codigosMaterias = materiasCarrera.stream().map(Materia::getCodigo).toList();
 
         List<Examen> examenesFiltrados = filtrarExamenes(codigosMaterias, fechaLimite, codigoPlan);
+        if (examenesFiltrados.isEmpty()) return null;
         List<HistoriaAcademica> historiasCarrera = historiaRepository.findByPlanDeEstudio_Codigo(codigoPlan);
 
         // 2. Construir el DTO de respuesta (Cálculo en memoria)
