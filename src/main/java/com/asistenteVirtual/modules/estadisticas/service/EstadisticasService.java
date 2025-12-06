@@ -58,9 +58,18 @@ public class EstadisticasService {
         // 0. Borrado de Historias BAJA
         historiaRepo.deleteByEstado("BAJA");
 
-        // 1. Estadísticas Generales Globales
-        log.info("📊 Calculando Generales Globales...");
-        calcularYGuardarGenerales();
+        // 1. Estadísticas Por Materia para CADA Periodo
+        log.info("📚 Calculando Estadísticas por Materia y Periodo...");
+        List<String> codigosMaterias = examenRepo.findDistinctMateriasPorCodigo();
+        for (String codigo : codigosMaterias) {
+            for (PeriodoEstadisticas periodo : PeriodoEstadisticas.values()) {
+                try {
+                    calcularYGuardarMateria(codigo, periodo);
+                } catch (Exception e) {
+                    log.error("Error actualizando materia {} periodo {}: {}", codigo, periodo, e.getMessage());
+                }
+            }
+        }
 
         // 2. Estadísticas Por Carrera (Plan) para CADA Periodo
         log.info("🎓 Calculando Estadísticas por Carrera y Periodo...");
@@ -76,18 +85,9 @@ public class EstadisticasService {
             }
         }
 
-        // 3. Estadísticas Por Materia para CADA Periodo
-        log.info("📚 Calculando Estadísticas por Materia y Periodo...");
-        List<String> codigosMaterias = examenRepo.findDistinctMateriasPorCodigo();
-        for (String codigo : codigosMaterias) {
-            for (PeriodoEstadisticas periodo : PeriodoEstadisticas.values()) {
-                try {
-                    calcularYGuardarMateria(codigo, periodo);
-                } catch (Exception e) {
-                    log.error("Error actualizando materia {} periodo {}: {}", codigo, periodo, e.getMessage());
-                }
-            }
-        }
+        // 3. Estadísticas Generales Globales
+        log.info("📊 Calculando Generales Globales...");
+        calcularYGuardarGenerales();
 
         log.info("✅ Actualización masiva finalizada exitosamente.");
     }
