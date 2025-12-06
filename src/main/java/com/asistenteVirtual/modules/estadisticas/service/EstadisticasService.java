@@ -55,6 +55,9 @@ public class EstadisticasService {
     public void actualizarTodas() {
         log.info("🔄 Iniciando CRON JOB: Actualización masiva de TODAS las estadísticas...");
 
+        // 0. Borrado de Historias BAJA
+        historiaRepo.deleteByEstado("BAJA");
+
         // 1. Estadísticas Generales Globales
         log.info("📊 Calculando Generales Globales...");
         calcularYGuardarGenerales();
@@ -112,12 +115,14 @@ public class EstadisticasService {
             }
         }
 
+        if (examenes.isEmpty()) return null;
+
         String nombreMateria = materias.getFirst().getNombre();
 
         // 4. Construir Entidad
         var stats = EstadisticasMateria.builder()
                 .codigoMateria(codigoMateria)
-                .periodo(periodo.toString()) // ✅ Guardamos el periodo
+                .periodo(periodo.toString())
                 .nombreMateria(nombreMateria)
                 .totalRendidos(examenes.size())
                 .aprobados(helper.calcularAprobados(examenes))
@@ -161,7 +166,7 @@ public class EstadisticasService {
                 .distribucionExamenesPorMateria(jsonConverter.toJson(helper.calcularDistribucionExamenesPorMateria(todosExamenes)))
                 .top5Aprobadas(jsonConverter.toJson(topAprobadas))
                 .top5Reprobadas(jsonConverter.toJson(topReprobadas))
-                .promedioNotasPorMateria(jsonConverter.toJson(helper.obtenerPromediosPorMateria(statsMateriaRepo.findAll())))
+                .promedioNotasPorMateria(jsonConverter.toJson(helper.obtenerPromediosPorMateria(statsMateriaRepo.findByPeriodo("TODOS_LOS_TIEMPOS"))))
                 .materiaMasRendida(jsonConverter.toJson(
                         helper.crearRankingDTO(materiaMasRendida, materiaMasRendidaNombre, cantMateriaMasRendida, cantAprobadosMateriaMasRendida)
                 ))
@@ -169,6 +174,7 @@ public class EstadisticasService {
                 .fechaUltimaActualizacion(LocalDateTime.now())
                 .build();
 
+        statsGeneralesRepo.deleteAll();
         stats = statsGeneralesRepo.save(stats);
         return mapGeneralToResponse(stats);
     }

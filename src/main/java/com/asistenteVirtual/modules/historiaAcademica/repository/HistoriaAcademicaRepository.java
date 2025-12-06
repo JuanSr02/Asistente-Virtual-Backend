@@ -20,4 +20,6 @@ public interface HistoriaAcademicaRepository extends JpaRepository<HistoriaAcade
     boolean existsByEstudiante(Estudiante estudiante);
 
     List<HistoriaAcademica> findByPlanDeEstudio_Codigo(String codigoPlan);
+
+    void deleteByEstado(String estado);
 }
