@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -153,7 +154,11 @@ public class EstadisticasService {
         var topReprobadas = helper.mapToMateriaRankingResponse(examenRepo.findTop5MateriasReprobadas());
 
         String materiaMasRendida = examenRepo.findCodigoMateriaMasRendida();
-        String materiaMasRendidaNombre = (materiaMasRendida != null) ? materiaRepo.findFirstNombreByCodigo(materiaMasRendida) : "N/A";
+        List<Materia> nombresDiferentes = materiaRepo.findByCodigo(materiaMasRendida);
+        String materiaMasRendidaNombre = nombresDiferentes.stream()
+                .map(Materia::getNombre)              // 1. Transformamos la lista de objetos a lista de Strings (nombres)
+                .distinct()                           // 2. Eliminamos nombres repetidos (por si es el mismo en varios planes)
+                .collect(Collectors.joining(" - "));  // 3. Unimos con el separador
         long cantMateriaMasRendida = (materiaMasRendida != null) ? examenRepo.countExamenesByCodigoMateria(materiaMasRendida) : 0;
         long cantAprobadosMateriaMasRendida = (materiaMasRendida != null) ? examenRepo.countExamenesAprobadosByCodigoMateria(materiaMasRendida) : 0;
 
