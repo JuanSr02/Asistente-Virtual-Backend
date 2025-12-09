@@ -13,7 +13,6 @@ import java.util.Optional;
 @Repository
 public interface MateriaRepository extends JpaRepository<Materia, String> {
 
-    // ✅ ESTE ES EL QUE FALTABA: Búsqueda por códigos (Strings) directa
     // Spring Data interpreta el "_" como navegación a la propiedad 'codigo' del objeto 'planDeEstudio'
     Optional<Materia> findByCodigoAndPlanDeEstudio_Codigo(String codigo, String planCodigo);
 

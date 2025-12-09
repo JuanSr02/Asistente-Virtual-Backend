@@ -3,8 +3,6 @@ package com.asistenteVirtual.modules.inscripcion.service.email;
 import com.asistenteVirtual.common.exceptions.EmailException;
 import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 import jakarta.mail.internet.MimeMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class EmailNotificationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmailNotificationService.class);
     private static final String DEFAULT_FROM_ADDRESS = "noreply@sistema-recomendador.com";
     private static final String UTF_8_ENCODING = "UTF-8";
 
@@ -63,14 +60,10 @@ public class EmailNotificationService {
             MimeMessage message = createMimeMessage(data);
             mailSender.send(message);
 
-            logger.info("Email de notificación enviado exitosamente a: {} para materia: {}",
-                    emailDestinatario, materiaNombre);
 
             return CompletableFuture.completedFuture(null);
 
         } catch (Exception e) {
-            logger.error("Error al enviar email de notificación a: {} para materia: {}. Error: {}",
-                    emailDestinatario, materiaNombre, e.getMessage(), e);
             throw new EmailException("Error al enviar email de notificación", e.getMessage());
         }
     }
