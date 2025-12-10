@@ -100,8 +100,11 @@ class RankingStrategy { // Package-private: Solo el servicio lo usa
     }
 
     private double calcularPuntajeEstadisticas(FinalResponse f) {
-        if (f.estadisticas() == null || f.estadisticas().getPromedioDificultad() == null || f.estadisticas().getPromedioDificultad() == 0) {
+        if (f.estadisticas() == null) {
             return 0.0;
+        }
+        if (f.estadisticas().getPromedioDificultad() == null || f.estadisticas().getPromedioDificultad() == 0) {
+            return f.estadisticas().getPorcentajeAprobados();
         }
         // Fórmula: Más aprobados y menos dificultad = Mejor puntaje
         return f.estadisticas().getPorcentajeAprobados() / f.estadisticas().getPromedioDificultad();
