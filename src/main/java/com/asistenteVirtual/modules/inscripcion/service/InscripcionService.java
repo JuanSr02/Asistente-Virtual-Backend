@@ -9,6 +9,7 @@ import com.asistenteVirtual.modules.inscripcion.model.Inscripcion;
 import com.asistenteVirtual.modules.inscripcion.repository.InscripcionRepository;
 import com.asistenteVirtual.modules.inscripcion.service.email.EmailNotificationService;
 import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
+import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -72,7 +73,7 @@ public class InscripcionService {
         // 1. Primero hay que buscar la inscripción para saber de quién es
         var inscripcion = inscripcionRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Inscripción no encontrada"));
-        
+
         // 2. Validar que el dueño de la inscripción es quien llama
         securityValidator.validarAutoria(inscripcion.getEstudiante().getSupabaseUserId());
 

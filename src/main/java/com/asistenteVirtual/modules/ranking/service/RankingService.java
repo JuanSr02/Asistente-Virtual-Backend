@@ -6,6 +6,7 @@ import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademi
 import com.asistenteVirtual.modules.planEstudio.dto.MateriaResponse;
 import com.asistenteVirtual.modules.ranking.dto.FinalResponse;
 import com.asistenteVirtual.modules.ranking.model.OrdenFinales;
+import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -7,12 +7,11 @@ import com.asistenteVirtual.modules.estudiante.dto.EstudianteResponse;
 import com.asistenteVirtual.modules.estudiante.dto.EstudianteUpdate;
 import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import com.asistenteVirtual.modules.security.service.SupabaseAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

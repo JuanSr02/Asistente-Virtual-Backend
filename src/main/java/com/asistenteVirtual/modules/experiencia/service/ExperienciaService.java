@@ -10,6 +10,7 @@ import com.asistenteVirtual.modules.experiencia.dto.ExperienciaUpdate;
 import com.asistenteVirtual.modules.experiencia.model.Experiencia;
 import com.asistenteVirtual.modules.experiencia.repository.ExperienciaRepository;
 import com.asistenteVirtual.modules.historiaAcademica.repository.ExamenRepository;
+import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +38,7 @@ public class ExperienciaService {
 
         // Accedemos al estudiante a través del grafo de objetos: Examen -> Renglon -> Historia -> Estudiante
         var propietarioId = examen.getRenglon().getHistoriaAcademica().getEstudiante().getSupabaseUserId();
-        
+
         // Validamos
         securityValidator.validarAutoria(propietarioId);
 
@@ -83,7 +84,7 @@ public class ExperienciaService {
     public ExperienciaResponse actualizarExperiencia(Long id, ExperienciaUpdate dto) {
         var exp = experienciaRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
-        
+
         // Validar autoría navegando el grafo
         var propietarioId = exp.getExamen().getRenglon().getHistoriaAcademica().getEstudiante().getSupabaseUserId();
         securityValidator.validarAutoria(propietarioId);
@@ -104,11 +105,11 @@ public class ExperienciaService {
     @Transactional
     public void eliminarExperiencia(Long id) {
         var exp = experienciaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
-        
+
         // Validar autoría navegando el grafo
         var propietarioId = exp.getExamen().getRenglon().getHistoriaAcademica().getEstudiante().getSupabaseUserId();
         securityValidator.validarAutoria(propietarioId);
-        
+
         experienciaRepo.deleteById(id);
     }
 
