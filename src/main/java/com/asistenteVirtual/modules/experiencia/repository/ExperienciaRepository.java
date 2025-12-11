@@ -15,7 +15,6 @@ public interface ExperienciaRepository extends JpaRepository<Experiencia, Long> 
 
     boolean existsByExamen_Id(Long examenId);
 
-    // Consultas básicas con Fetch para evitar N+1 en listados
     @Query("""
                 SELECT e FROM Experiencia e
                 JOIN FETCH e.examen ex
@@ -34,7 +33,6 @@ public interface ExperienciaRepository extends JpaRepository<Experiencia, Long> 
             """)
     List<Experiencia> findAllByEstudianteId(@Param("estudianteId") Long estudianteId);
 
-    // ✅ LOS QUE FALTABAN (Usados en EstadisticasMateriaPeriodoService)
 
     @Query("""
                 SELECT e FROM Experiencia e

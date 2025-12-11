@@ -10,6 +10,7 @@ import com.asistenteVirtual.modules.experiencia.dto.ExperienciaUpdate;
 import com.asistenteVirtual.modules.experiencia.model.Experiencia;
 import com.asistenteVirtual.modules.experiencia.repository.ExperienciaRepository;
 import com.asistenteVirtual.modules.historiaAcademica.repository.ExamenRepository;
+import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class ExperienciaService {
     private final ExperienciaRepository experienciaRepo;
     private final ExamenRepository examenRepo;
     private final EstudianteRepository estudianteRepo;
+    private final SecurityValidator securityValidator;
 
     @Transactional
     public ExperienciaResponse crearExperiencia(ExperienciaRequest dto) {
@@ -33,6 +35,12 @@ public class ExperienciaService {
         if (experienciaRepo.existsByExamen_Id(examen.getId())) {
             throw new IntegrityException("Ya existe una experiencia cargada para este examen.");
         }
+
+        // Accedemos al estudiante a través del grafo de objetos: Examen -> Renglon -> Historia -> Estudiante
+        var propietarioId = examen.getRenglon().getHistoriaAcademica().getEstudiante().getSupabaseUserId();
+
+        // Validamos
+        securityValidator.validarAutoria(propietarioId);
 
         // 2. Build Entity
         var experiencia = Experiencia.builder()
@@ -77,6 +85,10 @@ public class ExperienciaService {
         var exp = experienciaRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
 
+        // Validar autoría navegando el grafo
+        var propietarioId = exp.getExamen().getRenglon().getHistoriaAcademica().getEstudiante().getSupabaseUserId();
+        securityValidator.validarAutoria(propietarioId);
+
         // Actualización parcial limpia usando Optional de Java
         if (dto.dificultad() != null) exp.setDificultad(dto.dificultad());
         if (dto.diasEstudio() != null) exp.setDiasEstudio(dto.diasEstudio());
@@ -92,9 +104,12 @@ public class ExperienciaService {
 
     @Transactional
     public void eliminarExperiencia(Long id) {
-        if (!experienciaRepo.existsById(id)) {
-            throw new ResourceNotFoundException("Experiencia no encontrada");
-        }
+        var exp = experienciaRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Experiencia no encontrada"));
+
+        // Validar autoría navegando el grafo
+        var propietarioId = exp.getExamen().getRenglon().getHistoriaAcademica().getEstudiante().getSupabaseUserId();
+        securityValidator.validarAutoria(propietarioId);
+
         experienciaRepo.deleteById(id);
     }
 
@@ -104,8 +119,6 @@ public class ExperienciaService {
             throw new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId);
         }
 
-        // Usamos la query que ya migraste en ExamenRepository (findByEstudianteId)
-        // esa query filtra implícitamente 'e.experiencia IS NULL'
         return examenRepo.findByEstudianteId(estudianteId).stream()
                 .map(ExamenDisponibleResponse::fromEntity)
                 .toList();

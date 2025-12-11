@@ -16,7 +16,6 @@ public class ExcelHelper {
     public boolean isEmptyRow(Row row) {
         if (row == null) return true;
 
-        // Optimización: Usamos stream o un loop rápido. El loop es más eficiente para POI.
         for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
             Cell cell = row.getCell(i);
             if (cell != null && cell.getCellType() != CellType.BLANK) {
@@ -59,7 +58,7 @@ public class ExcelHelper {
         try {
             return Double.parseDouble(valor);
         } catch (NumberFormatException e) {
-            return null; // O lanzar excepción si el dato corrupto no es tolerable
+            return null;
         }
     }
 
@@ -82,7 +81,7 @@ public class ExcelHelper {
                 default -> "";
             };
         } catch (Exception e) {
-            return ""; // Fallback seguro si la fórmula falla
+            return ""; 
         }
     }
 }

@@ -6,6 +6,7 @@ import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademi
 import com.asistenteVirtual.modules.planEstudio.dto.MateriaResponse;
 import com.asistenteVirtual.modules.ranking.dto.FinalResponse;
 import com.asistenteVirtual.modules.ranking.model.OrdenFinales;
+import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +21,10 @@ public class RankingService {
     private final EstudianteRepository estudianteRepo;
     private final HistoriaAcademicaRepository historiaRepo;
     private final RankingStrategy rankingStrategy; // Inyectamos nuestra estrategia encapsulada
+    private final SecurityValidator securityValidator;
 
     public List<FinalResponse> obtenerFinalesParaRendir(Long estudianteId, OrdenFinales orden) {
+        securityValidator.validarAccesoEstudiante(estudianteId);
         var historia = buscarHistoria(estudianteId);
 
         // 1. Buscar habilitadas
@@ -32,6 +35,7 @@ public class RankingService {
     }
 
     public List<MateriaResponse> obtenerFinalesParaInscribirse(Long estudianteId) {
+        securityValidator.validarAccesoEstudiante(estudianteId);
         // Reutilizamos la lógica de búsqueda pero proyectamos a MateriaResponse simple
         var historia = buscarHistoria(estudianteId);
 

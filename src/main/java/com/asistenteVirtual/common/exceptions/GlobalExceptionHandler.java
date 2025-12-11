@@ -37,7 +37,11 @@ public class GlobalExceptionHandler {
         return buildResponse("Ocurrió un error interno inesperado. Contacte al soporte.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Metodo helper privado para evitar repetir código (DRY)
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccessDenied(AccesoDenegadoException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
     private ResponseEntity<ApiErrorResponse> buildResponse(String message, HttpStatus status) {
         return new ResponseEntity<>(new ApiErrorResponse(message, status.value()), status);
     }

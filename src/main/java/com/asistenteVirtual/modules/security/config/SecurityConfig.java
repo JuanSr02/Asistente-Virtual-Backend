@@ -26,7 +26,6 @@ public class SecurityConfig {
 
     private final SupabaseJwtAuthFilter jwtAuthFilter;
 
-    // ✅ Inyección de propiedades: Spring convierte "url1,url2" a List<String>
     @Value("${cors.allowed-origins}")
     private List<String> allowedOrigins;
 
@@ -50,7 +49,6 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // ✅ Usamos la lista inyectada en lugar de hardcodear
         config.setAllowedOrigins(allowedOrigins);
 
         config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));

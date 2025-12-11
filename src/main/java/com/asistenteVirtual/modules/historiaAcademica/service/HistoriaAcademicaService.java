@@ -6,6 +6,7 @@ import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
 import com.asistenteVirtual.modules.historiaAcademica.dto.HistoriaAcademicaResponse;
 import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
+import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class HistoriaAcademicaService {
     private final HistoriaImportService historiaImportService;
     private final HistoriaAcademicaRepository historiaRepository;
     private final EstudianteRepository estudianteRepository;
+    private final SecurityValidator securityValidator;
 
     /**
      * Carga o Actualiza la historia académica.
@@ -29,6 +31,7 @@ public class HistoriaAcademicaService {
      */
     @Transactional
     public HistoriaAcademicaResponse procesarHistoria(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
+        securityValidator.validarAccesoEstudiante(estudianteId);
         HistoriaAcademica historia = historiaImportService.cargarHistoria(file, estudianteId, codigoPlan);
         return HistoriaAcademicaResponse.fromEntity(historia);
     }
@@ -38,6 +41,7 @@ public class HistoriaAcademicaService {
      */
     @Transactional
     public void eliminarHistoria(Long estudianteId) {
+        securityValidator.validarAccesoEstudiante(estudianteId);
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
@@ -46,13 +50,14 @@ public class HistoriaAcademicaService {
 
         historia.setEstado("BAJA");
         historiaRepository.save(historia);
-        
+
         log.info("Historia académica dada de baja para el estudiante ID: {}", estudianteId);
     }
-    
+
     @Transactional(readOnly = true)
     public HistoriaAcademicaResponse obtenerHistoria(Long estudianteId) {
-         Estudiante estudiante = estudianteRepository.findById(estudianteId)
+        securityValidator.validarAccesoEstudiante(estudianteId);
+        Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
         return historiaRepository.findByEstudiante(estudiante)

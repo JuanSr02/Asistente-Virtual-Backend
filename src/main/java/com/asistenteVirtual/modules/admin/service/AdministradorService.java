@@ -20,7 +20,7 @@ import java.util.List;
 public class AdministradorService {
 
     private final AdministradorRepository administradorRepo;
-    private final PersonaRepository personaRepo; // Para validar mails únicos globalmente
+    private final PersonaRepository personaRepo;
     private final SupabaseAuthService supabaseAuthService;
 
     public AdministradorResponse crearAdministrador(AdministradorRequest dto) {

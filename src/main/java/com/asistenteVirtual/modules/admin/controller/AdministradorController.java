@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/administradores")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMINISTRADOR')") // Seguridad reforzada a nivel de clase
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 public class AdministradorController {
 
     private final AdministradorService administradorService;

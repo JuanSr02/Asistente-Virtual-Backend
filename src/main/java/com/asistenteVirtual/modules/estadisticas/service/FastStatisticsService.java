@@ -38,7 +38,6 @@ public class FastStatisticsService {
 
     @Transactional(readOnly = true)
     public EstadisticasMateriaResponse getCachedMateriaStatistics(String codigoMateria, PeriodoEstadisticas periodo) {
-        // ✅ Búsqueda compuesta por código y periodo
         EstadisticasMateria stats = materiaRepo.findByCodigoMateriaAndPeriodo(codigoMateria, periodo.toString())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "No hay estadísticas cacheadas para materia: " + codigoMateria + " en periodo: " + periodo));
