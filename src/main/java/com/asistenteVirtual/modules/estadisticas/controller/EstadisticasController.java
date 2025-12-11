@@ -32,7 +32,6 @@ public class EstadisticasController {
         }
     }
 
-    // ✅ Endpoint Unificado: Ahora soporta periodo opcional y siempre usa la estrategia de caché
     @GetMapping("/materia/{codigoMateria}")
     public ResponseEntity<EstadisticasMateriaResponse> obtenerPorMateria(
             @PathVariable String codigoMateria,

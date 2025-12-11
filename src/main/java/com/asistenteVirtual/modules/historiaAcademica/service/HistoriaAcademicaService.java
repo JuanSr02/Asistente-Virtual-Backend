@@ -22,6 +22,7 @@ public class HistoriaAcademicaService {
     private final HistoriaImportService historiaImportService;
     private final HistoriaAcademicaRepository historiaRepository;
     private final EstudianteRepository estudianteRepository;
+    private final SecurityValidator securityValidator;
 
     /**
      * Carga o Actualiza la historia académica.
@@ -29,6 +30,7 @@ public class HistoriaAcademicaService {
      */
     @Transactional
     public HistoriaAcademicaResponse procesarHistoria(MultipartFile file, Long estudianteId, String codigoPlan) throws IOException {
+        securityValidator.validarAccesoEstudiante(estudianteId);
         HistoriaAcademica historia = historiaImportService.cargarHistoria(file, estudianteId, codigoPlan);
         return HistoriaAcademicaResponse.fromEntity(historia);
     }
@@ -38,6 +40,7 @@ public class HistoriaAcademicaService {
      */
     @Transactional
     public void eliminarHistoria(Long estudianteId) {
+        securityValidator.validarAccesoEstudiante(estudianteId);
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
@@ -52,6 +55,7 @@ public class HistoriaAcademicaService {
     
     @Transactional(readOnly = true)
     public HistoriaAcademicaResponse obtenerHistoria(Long estudianteId) {
+        securityValidator.validarAccesoEstudiante(estudianteId);
          Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 

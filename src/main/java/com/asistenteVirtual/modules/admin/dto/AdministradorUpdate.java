@@ -14,6 +14,6 @@ public record AdministradorUpdate(
         @Size(max = 15)
         String telefono,
 
-        String contrasenia // Opcional, para actualizar en Supabase
+        String contrasenia
 ) {
 }

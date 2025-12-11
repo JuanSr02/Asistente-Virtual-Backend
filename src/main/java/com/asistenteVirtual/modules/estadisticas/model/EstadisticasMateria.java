@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity
 @Table(name = "estadisticas_materia")
-@IdClass(EstadisticasMateriaId.class) // ✅ Clave compuesta para soportar periodos
+@IdClass(EstadisticasMateriaId.class)
 public class EstadisticasMateria {
 
     @Id
@@ -23,7 +23,7 @@ public class EstadisticasMateria {
 
     @Id
     @Column(length = 20, nullable = false)
-    private String periodo; // ✅ Nuevo campo: ULTIMO_ANIO, TODOS_LOS_TIEMPOS, etc.
+    private String periodo;
 
     @Column(length = 200)
     private String nombreMateria;

@@ -108,7 +108,7 @@ public class PdfReaderTest {
         // 1. Limpiar "Actividad Fecha Tipo Nota Resultado"
         pdfContent = pdfContent.replaceAll("Actividad\\s+Fecha\\s+Tipo\\s+Nota\\s+Resultado", "");
 
-        // 2. Limpiar patrones como "Derecho Procesal Penal (MT2104019) 25/03/2025 En curso"
+        // 2. Limpiar patrones
         // IMPORTANTE: Hacer esto ANTES de reemplazar saltos de línea
         pdfContent = pdfContent.replaceAll("(?m)^([A-ZÁÉÍÓÚÜÑa-záéíóúüñ0-9\\s\\.\\-,]+?)\\s*\\((\\w{9,})\\)\\s+(\\d{2}/\\d{2}/\\d{4})\\s+En\\s+curso\\s*$", "");
 

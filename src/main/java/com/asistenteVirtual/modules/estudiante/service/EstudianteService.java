@@ -22,9 +22,10 @@ public class EstudianteService {
     private final EstudianteRepository estudianteRepository;
     private final PersonaRepository personaRepository;
     private final SupabaseAuthService supabaseAuthService;
+    private final SecurityValidator securityValidator;
 
     public EstudianteResponse crearEstudiante(EstudianteRequest dto) {
-        // Validar si el mail ya existe (aunque la BD tiene constraint, es mejor capturarlo antes)
+        // Validar si el mail ya existe
         if (personaRepository.existsByMail(dto.mail())) {
             throw new IllegalArgumentException("El email ya está registrado");
         }
@@ -42,19 +43,14 @@ public class EstudianteService {
 
     @Transactional(readOnly = true)
     public EstudianteResponse obtenerPorId(Long id) {
+        securityValidator.validarAccesoEstudiante(id);
         return estudianteRepository.findById(id)
                 .map(EstudianteResponse::fromEntity)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + id));
     }
 
-    @Transactional(readOnly = true)
-    public List<EstudianteResponse> obtenerTodos() {
-        return estudianteRepository.findAll().stream()
-                .map(EstudianteResponse::fromEntity)
-                .toList();
-    }
-
     public EstudianteResponse actualizarEstudiante(Long id, EstudianteUpdate dto) {
+        securityValidator.validarAccesoEstudiante(id);
         Estudiante estudiante = estudianteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + id));
 
@@ -90,6 +86,7 @@ public class EstudianteService {
     }
 
     public void eliminarEstudiante(Long id) {
+        securityValidator.validarAccesoEstudiante(id);
         Estudiante estudiante = estudianteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + id));
 

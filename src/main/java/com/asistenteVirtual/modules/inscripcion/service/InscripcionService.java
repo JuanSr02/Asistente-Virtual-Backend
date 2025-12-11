@@ -25,9 +25,11 @@ public class InscripcionService {
     private final MateriaRepository materiaRepo;
     private final EstudianteRepository estudianteRepo;
     private final EmailNotificationService emailService;
+    private final SecurityValidator securityValidator;
 
     @Transactional
     public InscripcionResponse crearInscripcion(InscripcionRequest dto) {
+        securityValidator.validarAccesoEstudiante(dto.estudianteId());
         // 1. Validación de Integridad (Fail fast)
         if (inscripcionRepo.existeInscripcion(
                 dto.materiaCodigo(), dto.materiaPlan(), dto.estudianteId(), dto.anio(), dto.turno())) {
@@ -60,7 +62,6 @@ public class InscripcionService {
 
     @Transactional(readOnly = true)
     public List<InscripcionResponse> obtenerInscriptos(String materiaCodigo, Integer anio, String turno) {
-        // Usamos el metodo optimizado con FETCH
         return inscripcionRepo.findCompaneros(materiaCodigo, anio, turno).stream()
                 .map(InscripcionResponse::fromEntity)
                 .toList();
@@ -68,10 +69,14 @@ public class InscripcionService {
 
     @Transactional
     public void eliminarInscripcion(Long id) {
-        if (!inscripcionRepo.existsById(id)) {
-            throw new ResourceNotFoundException("Inscripción no encontrada");
-        }
-        inscripcionRepo.deleteById(id);
+        // 1. Primero hay que buscar la inscripción para saber de quién es
+        var inscripcion = inscripcionRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Inscripción no encontrada"));
+        
+        // 2. Validar que el dueño de la inscripción es quien llama
+        securityValidator.validarAutoria(inscripcion.getEstudiante().getSupabaseUserId());
+
+        inscripcionRepo.delete(inscripcion);
     }
 
     /**

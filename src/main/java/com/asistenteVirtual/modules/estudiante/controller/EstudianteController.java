@@ -28,11 +28,6 @@ public class EstudianteController {
         return ResponseEntity.ok(estudianteService.obtenerPorId(id));
     }
 
-    @GetMapping("/shared/estudiantes")
-    public ResponseEntity<List<EstudianteResponse>> obtenerTodos() {
-        return ResponseEntity.ok(estudianteService.obtenerTodos());
-    }
-
     @PatchMapping("/shared/estudiantes/{id}")
     public ResponseEntity<EstudianteResponse> actualizar(
             @PathVariable Long id,
