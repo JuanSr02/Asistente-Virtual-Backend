@@ -48,7 +48,6 @@ public class PlanEstudioService {
         // con CascadeType.ALL, y emitirá los DELETEs de los hijos antes de borrar el Plan.
         planRepo.deleteById(codigoPlan);
 
-        log.info("Plan de estudio {} eliminado exitosamente junto con todas sus dependencias.", codigoPlan);
     }
 
     @Transactional(readOnly = true)

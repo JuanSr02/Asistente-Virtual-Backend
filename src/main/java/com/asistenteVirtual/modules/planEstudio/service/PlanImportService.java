@@ -53,7 +53,6 @@ public class PlanImportService {
                 throw new PlanEstudioValidationException("El plan de estudios con código " + plan.getCodigo() + " ya está cargado.");
             }
             plan = planRepo.save(plan);
-            log.info("Plan guardado: {} - {}", plan.getCodigo(), plan.getPropuesta());
 
             // 2. Procesar y guardar Materias
             Map<String, Materia> mapaMaterias = procesarMaterias(sheet, plan);
@@ -163,7 +162,6 @@ public class PlanImportService {
 
         if (!correlativasParaGuardar.isEmpty()) {
             correlativaRepo.saveAll(correlativasParaGuardar);
-            log.info("Se guardaron {} correlativas para el plan {}", correlativasParaGuardar.size(), plan.getCodigo());
         }
     }
 }

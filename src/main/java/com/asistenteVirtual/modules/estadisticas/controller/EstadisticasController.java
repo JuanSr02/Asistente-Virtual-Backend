@@ -27,7 +27,6 @@ public class EstadisticasController {
         try {
             return ResponseEntity.ok(fastService.getCachedGeneralStatistics());
         } catch (ResourceNotFoundException e) {
-            log.info("Cache miss: Calculando Generales al vuelo...");
             return ResponseEntity.ok(calculationService.calcularYGuardarGenerales());
         }
     }
@@ -42,7 +41,6 @@ public class EstadisticasController {
             return ResponseEntity.ok(fastService.getCachedMateriaStatistics(codigoMateria, periodo));
         } catch (ResourceNotFoundException e) {
             // 2. Cache Miss -> Calcular, Guardar y Retornar
-            log.info("Cache miss materia {} periodo {}. Calculando al vuelo...", codigoMateria, periodo);
             var result = calculationService.calcularYGuardarMateria(codigoMateria, periodo);
 
             if (result == null) {
@@ -60,7 +58,6 @@ public class EstadisticasController {
         try {
             return ResponseEntity.ok(fastService.getCachedCarreraStatistics(plan, periodo));
         } catch (ResourceNotFoundException e) {
-            log.info("Cache miss carrera {} periodo {}. Calculando al vuelo...", plan, periodo);
             return ResponseEntity.ok(avanzadasService.obtenerEstadisticasPorCarrera(plan, periodo));
         }
     }

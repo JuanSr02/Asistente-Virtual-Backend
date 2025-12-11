@@ -36,7 +36,6 @@ public class SupabaseAuthService {
                 })
                 .toBodilessEntity();
 
-        log.info("Usuario Supabase eliminado: {}", userId);
     }
 
     /**
@@ -55,7 +54,6 @@ public class SupabaseAuthService {
                 })
                 .toBodilessEntity();
 
-        log.info("Usuario Supabase actualizado: {}", userId);
     }
 
     // Helper para construir el cliente con headers comunes

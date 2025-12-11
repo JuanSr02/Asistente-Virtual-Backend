@@ -51,7 +51,6 @@ public class HistoriaAcademicaService {
         historia.setEstado("BAJA");
         historiaRepository.save(historia);
 
-        log.info("Historia académica dada de baja para el estudiante ID: {}", estudianteId);
     }
 
     @Transactional(readOnly = true)
