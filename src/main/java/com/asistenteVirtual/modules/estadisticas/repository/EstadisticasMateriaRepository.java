@@ -17,4 +17,9 @@ public interface EstadisticasMateriaRepository extends JpaRepository<Estadistica
     List<EstadisticasMateria> findByPeriodo(String periodo);
 
     void deleteByCodigoMateriaAndPeriodo(String codigoMateria, String periodo);
+
+    // Buscar estadísticas de muchas materias a la vez
+@Query("SELECT e FROM EstadisticasMateria e WHERE e.codigoMateria IN :codigos AND e.periodo = :periodo")
+List<EstadisticasMateria> findByCodigoMateriaInAndPeriodo(@Param("codigos") List<String> codigos, 
+                                                          @Param("periodo") String periodo);
 }
