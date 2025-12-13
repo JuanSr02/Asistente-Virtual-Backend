@@ -1,7 +1,7 @@
 package com.asistenteVirtual.modules.ranking.service;
 
+import com.asistenteVirtual.config.AcademicProperties;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
-import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateriaId;
 import com.asistenteVirtual.modules.estadisticas.model.PeriodoEstadisticas;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasMateriaRepository;
 import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
@@ -16,32 +16,50 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-class RankingStrategy { // Package-private: Solo el servicio lo usa
+class RankingStrategy {
 
     private final RenglonRepository renglonRepo;
     private final CorrelativaRepository correlativaRepo;
     private final EstadisticasMateriaRepository estadisticasRepo;
+    private final AcademicProperties academicConfig;
 
-    /**
-     * Busca las materias regulares que el alumno puede rendir (filtra correlativas no aprobadas).
-     */
     public List<FinalResponse> buscarMateriasHabilitadas(HistoriaAcademica historia) {
         List<Renglon> regulares = renglonRepo.findRegularesHabilitadas(historia.getId());
+        if (regulares.isEmpty()) return List.of();
+
+        List<String> codigos = regulares.stream()
+                .map(r -> r.getMateria().getCodigo())
+                .toList();
+        String planCodigo = historia.getPlanDeEstudio().getCodigo();
+
+        Map<String, Long> correlativasMap = correlativaRepo.contarCorrelativasFuturasMasivo(codigos, planCodigo)
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        Map<String, EstadisticasMateria> statsMap = estadisticasRepo
+                .findByCodigoMateriaInAndPeriodo(codigos, PeriodoEstadisticas.TODOS_LOS_TIEMPOS.toString())
+                .stream()
+                .collect(Collectors.toMap(EstadisticasMateria::getCodigoMateria, Function.identity()));
 
         return regulares.stream()
-                .map(this::mapToResponse)
+                .map(r -> mapToResponseOptimizado(r, correlativasMap, statsMap))
                 .toList();
     }
 
     public List<FinalResponse> ordenar(List<FinalResponse> finales, OrdenFinales criterio) {
-        // Hacemos una copia mutable de la lista (toList() retorna inmutable en Java 16+)
-        List<FinalResponse> listaOrdenable = new java.util.ArrayList<>(finales);
-
+        List<FinalResponse> listaOrdenable = new ArrayList<>(finales);
         switch (criterio) {
             case CORRELATIVAS ->
                     listaOrdenable.sort(Comparator.comparingLong(FinalResponse::vecesEsCorrelativa).reversed());
@@ -52,12 +70,15 @@ class RankingStrategy { // Package-private: Solo el servicio lo usa
         return listaOrdenable;
     }
 
-    // --- Métodos de Mapeo y Cálculo Interno ---
+    // --- Helpers Internos ---
 
-    private FinalResponse mapToResponse(Renglon renglon) {
+    private FinalResponse mapToResponseOptimizado(Renglon renglon, Map<String, Long> correlativasMap, Map<String, EstadisticasMateria> statsMap) {
         String codigo = renglon.getMateria().getCodigo();
-        String plan = renglon.getMateria().getPlanDeEstudio().getCodigo();
         LocalDate fechaReg = renglon.getFecha();
+
+        // Obtener datos de los mapas en memoria
+        long cantCorrelativas = correlativasMap.getOrDefault(codigo, 0L);
+        EstadisticasMateria stats = statsMap.get(codigo);
 
         return new FinalResponse(
                 codigo,
@@ -65,31 +86,24 @@ class RankingStrategy { // Package-private: Solo el servicio lo usa
                 fechaReg,
                 calcularVencimiento(fechaReg),
                 calcularSemanasRestantes(fechaReg),
-                contarCorrelativas(codigo, plan),
-                obtenerEstadisticas(codigo)
+                cantCorrelativas,
+                mapEstadisticas(stats)
         );
     }
 
+
     private LocalDate calcularVencimiento(LocalDate fechaRegularidad) {
-        return fechaRegularidad.plusYears(2).plusMonths(9); // Regla de negocio hardcodeada (podría ser configurable)
+        return fechaRegularidad
+                .plusYears(academicConfig.getRegularidadAnios())
+                .plusMonths(academicConfig.getRegularidadMeses());
     }
 
     private long calcularSemanasRestantes(LocalDate fechaRegularidad) {
         return ChronoUnit.WEEKS.between(LocalDate.now(), calcularVencimiento(fechaRegularidad));
     }
 
-    private long contarCorrelativas(String codigoMateria, String codigoPlan) {
-        return correlativaRepo.countByCorrelativaCodigo_CodigoAndCorrelativaCodigo_PlanDeEstudio_Codigo(codigoMateria, codigoPlan);
-    }
-
-    private EstadisticasFinalResponse obtenerEstadisticas(String codigoMateria) {
-        return estadisticasRepo.findById(new EstadisticasMateriaId(codigoMateria, PeriodoEstadisticas.TODOS_LOS_TIEMPOS.toString()))
-                .map(this::mapEstadisticas)
-                .orElse(null);
-    }
-
     private EstadisticasFinalResponse mapEstadisticas(EstadisticasMateria stats) {
-        // Usamos el builder del DTO existente (asumiendo que ya fue refactorizado o se usa el viejo temporalmente)
+        if (stats == null) return null;
         return EstadisticasFinalResponse.builder()
                 .porcentajeAprobados(stats.getTotalRendidos() > 0 ? (double) stats.getAprobados() / stats.getTotalRendidos() * 100 : 0)
                 .promedioNotas(stats.getPromedioNotas())
@@ -100,13 +114,10 @@ class RankingStrategy { // Package-private: Solo el servicio lo usa
     }
 
     private double calcularPuntajeEstadisticas(FinalResponse f) {
-        if (f.estadisticas() == null) {
-            return 0.0;
-        }
+        if (f.estadisticas() == null) return 0.0;
         if (f.estadisticas().getPromedioDificultad() == null || f.estadisticas().getPromedioDificultad() == 0) {
             return f.estadisticas().getPorcentajeAprobados();
         }
-        // Fórmula: Más aprobados y menos dificultad = Mejor puntaje
         return f.estadisticas().getPorcentajeAprobados() / f.estadisticas().getPromedioDificultad();
     }
 }
