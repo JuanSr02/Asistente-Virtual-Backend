@@ -1,5 +1,6 @@
 package com.asistenteVirtual.modules.ranking.service;
 
+import com.asistenteVirtual.config.AcademicProperties;
 import com.asistenteVirtual.modules.estadisticas.model.EstadisticasMateria;
 import com.asistenteVirtual.modules.estadisticas.model.PeriodoEstadisticas;
 import com.asistenteVirtual.modules.estadisticas.repository.EstadisticasMateriaRepository;
@@ -15,7 +16,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -57,9 +61,11 @@ class RankingStrategy {
     public List<FinalResponse> ordenar(List<FinalResponse> finales, OrdenFinales criterio) {
         List<FinalResponse> listaOrdenable = new ArrayList<>(finales);
         switch (criterio) {
-            case CORRELATIVAS -> listaOrdenable.sort(Comparator.comparingLong(FinalResponse::vecesEsCorrelativa).reversed());
+            case CORRELATIVAS ->
+                    listaOrdenable.sort(Comparator.comparingLong(FinalResponse::vecesEsCorrelativa).reversed());
             case VENCIMIENTO -> listaOrdenable.sort(Comparator.comparingLong(FinalResponse::semanasParaVencimiento));
-            case ESTADISTICAS -> listaOrdenable.sort(Comparator.comparingDouble(this::calcularPuntajeEstadisticas).reversed());
+            case ESTADISTICAS ->
+                    listaOrdenable.sort(Comparator.comparingDouble(this::calcularPuntajeEstadisticas).reversed());
         }
         return listaOrdenable;
     }
@@ -85,7 +91,7 @@ class RankingStrategy {
         );
     }
 
-    
+
     private LocalDate calcularVencimiento(LocalDate fechaRegularidad) {
         return fechaRegularidad
                 .plusYears(academicConfig.getRegularidadAnios())
@@ -108,10 +114,10 @@ class RankingStrategy {
     }
 
     private double calcularPuntajeEstadisticas(FinalResponse f) {
-         if (f.estadisticas() == null) return 0.0;
-         if (f.estadisticas().getPromedioDificultad() == null || f.estadisticas().getPromedioDificultad() == 0) {
-             return f.estadisticas().getPorcentajeAprobados();
-         }
-         return f.estadisticas().getPorcentajeAprobados() / f.estadisticas().getPromedioDificultad();
+        if (f.estadisticas() == null) return 0.0;
+        if (f.estadisticas().getPromedioDificultad() == null || f.estadisticas().getPromedioDificultad() == 0) {
+            return f.estadisticas().getPorcentajeAprobados();
+        }
+        return f.estadisticas().getPorcentajeAprobados() / f.estadisticas().getPromedioDificultad();
     }
 }
