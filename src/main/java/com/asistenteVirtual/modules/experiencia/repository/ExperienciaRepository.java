@@ -3,6 +3,7 @@ package com.asistenteVirtual.modules.experiencia.repository;
 import com.asistenteVirtual.modules.experiencia.model.Experiencia;
 import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -51,4 +52,8 @@ public interface ExperienciaRepository extends JpaRepository<Experiencia, Long> 
                 WHERE r.materia = :materia
             """)
     List<Experiencia> findByMateriaWithJoins(@Param("materia") Materia materia);
+
+    @Modifying
+    @Query("DELETE FROM Experiencia e WHERE e.id = :id")
+    void BorrarExperiencia(@Param("id") Long id);
 }

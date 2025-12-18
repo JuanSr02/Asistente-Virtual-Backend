@@ -110,7 +110,7 @@ public class ExperienciaService {
         var propietarioId = exp.getExamen().getRenglon().getHistoriaAcademica().getEstudiante().getSupabaseUserId();
         securityValidator.validarAutoria(propietarioId);
 
-        experienciaRepo.deleteById(id);
+        experienciaRepo.BorrarExperiencia(id);
     }
 
     @Transactional(readOnly = true)
