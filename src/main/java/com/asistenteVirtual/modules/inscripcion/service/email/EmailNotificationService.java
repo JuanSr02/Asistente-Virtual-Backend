@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class EmailNotificationService {
 
-    private static final String DEFAULT_FROM_ADDRESS = "noreply@sistema-recomendador.com";
+    private static final String DEFAULT_FROM_ADDRESS = "sistemarecomendadordefinales@gmail.com";
     private static final String UTF_8_ENCODING = "UTF-8";
 
     private final JavaMailSender mailSender;
