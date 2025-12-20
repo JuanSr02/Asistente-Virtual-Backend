@@ -3,6 +3,7 @@ package com.asistenteVirtual.modules.estudiante.controller;
 import com.asistenteVirtual.modules.estudiante.dto.EstudianteRequest;
 import com.asistenteVirtual.modules.estudiante.dto.EstudianteResponse;
 import com.asistenteVirtual.modules.estudiante.dto.EstudianteUpdate;
+import com.asistenteVirtual.modules.estudiante.dto.PersonaResponse;
 import com.asistenteVirtual.modules.estudiante.service.EstudianteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,13 @@ public class EstudianteController {
         return ResponseEntity.ok(estudianteService.obtenerPorId(id));
     }
 
-    @GetMapping("/shared/estudiantes/usuario/{supabaseId}")
-    public ResponseEntity<EstudianteResponse> obtenerPorSupabaseId(@PathVariable String supabaseId) {
+    @GetMapping("/shared/personas/usuario/{supabaseId}")
+    public ResponseEntity<PersonaResponse> obtenerPorSupabaseId(@PathVariable String supabaseId) {
         return ResponseEntity.ok(estudianteService.obtenerPorSupabaseId(supabaseId));
     }
 
-    @GetMapping("/shared/estudiantes/buscar")
-    public ResponseEntity<EstudianteResponse> obtenerPorEmail(@RequestParam String email) {
+    @GetMapping("/shared/personas/buscar")
+    public ResponseEntity<PersonaResponse> obtenerPorEmail(@RequestParam String email) {
         return ResponseEntity.ok(estudianteService.obtenerPorEmail(email));
     }
 

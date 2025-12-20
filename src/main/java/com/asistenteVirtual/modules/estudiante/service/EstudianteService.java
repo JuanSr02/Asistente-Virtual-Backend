@@ -5,6 +5,7 @@ import com.asistenteVirtual.common.repository.PersonaRepository;
 import com.asistenteVirtual.modules.estudiante.dto.EstudianteRequest;
 import com.asistenteVirtual.modules.estudiante.dto.EstudianteResponse;
 import com.asistenteVirtual.modules.estudiante.dto.EstudianteUpdate;
+import com.asistenteVirtual.modules.estudiante.dto.PersonaResponse;
 import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
 import com.asistenteVirtual.modules.security.service.SecurityValidator;
@@ -49,21 +50,19 @@ public class EstudianteService {
     }
 
     @Transactional(readOnly = true)
-    public EstudianteResponse obtenerPorEmail(String email) {
-        EstudianteResponse estudiante = estudianteRepository.findByMail(email)
-                .map(EstudianteResponse::fromEntity)
+    public PersonaResponse obtenerPorEmail(String email) {
+        securityValidator.validarAccesoPersonaMail(email);
+        return personaRepository.findByMail(email)
+                .map(PersonaResponse::fromEntity)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con mail: " + email));
-        securityValidator.validarAccesoEstudiante(estudiante.id());
-        return estudiante;
     }
 
     @Transactional(readOnly = true)
-    public EstudianteResponse obtenerPorSupabaseId(String supabaseUserId) {
-        EstudianteResponse estudiante = estudianteRepository.findBySupabaseUserId(supabaseUserId)
-                .map(EstudianteResponse::fromEntity)
+    public PersonaResponse obtenerPorSupabaseId(String supabaseUserId) {
+        securityValidator.validarAccesoPersonaSupabase(supabaseUserId);
+        return personaRepository.findBySupabaseUserId(supabaseUserId)
+                .map(PersonaResponse::fromEntity)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con supabaseId: " + supabaseUserId));
-        securityValidator.validarAccesoEstudiante(estudiante.id());
-        return estudiante;
     }
 
     public EstudianteResponse actualizarEstudiante(Long id, EstudianteUpdate dto) {
