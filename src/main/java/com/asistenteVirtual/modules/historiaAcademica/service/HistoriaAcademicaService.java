@@ -61,6 +61,8 @@ public class HistoriaAcademicaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
         return historiaRepository.findByEstudiante_IdAndEstado(estudianteId, "ACTIVA")
-                .orElseThrow(() -> new ResourceNotFoundException("El estudiante no tiene historia académica"));
-            }
+                .map(HistoriaAcademicaCheck::fromEntity)
+                .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada"));
+
+    }
 }
