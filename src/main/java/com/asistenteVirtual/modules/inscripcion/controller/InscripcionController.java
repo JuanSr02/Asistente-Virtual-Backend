@@ -43,4 +43,9 @@ public class InscripcionController {
         return ResponseEntity.ok(inscripcionService.obtenerInscriptos(codigoMateria, anio, turno));
     }
 
+    @GetMapping("/estudiante/{id}")
+    public ResponseEntity<List<InscripcionResponse>> listarPorEstudiante(@PathVariable Long id) {
+        return ResponseEntity.ok(inscripcionService.obtenerInscripcionesPorEstudiante(id));
+    }
+
 }

@@ -37,4 +37,6 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> 
                               @Param("estudianteId") Long estudianteId,
                               @Param("anio") Integer anio,
                               @Param("turno") String turno);
+
+    List<Inscripcion> findByEstudianteId(@Param("id") Long id);
 }

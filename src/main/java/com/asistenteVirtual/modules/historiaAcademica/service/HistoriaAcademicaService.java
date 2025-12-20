@@ -3,6 +3,7 @@ package com.asistenteVirtual.modules.historiaAcademica.service;
 import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
 import com.asistenteVirtual.modules.estudiante.model.Estudiante;
 import com.asistenteVirtual.modules.estudiante.repository.EstudianteRepository;
+import com.asistenteVirtual.modules.historiaAcademica.dto.HistoriaAcademicaCheck;
 import com.asistenteVirtual.modules.historiaAcademica.dto.HistoriaAcademicaResponse;
 import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
@@ -54,14 +55,14 @@ public class HistoriaAcademicaService {
     }
 
     @Transactional(readOnly = true)
-    public HistoriaAcademicaResponse obtenerHistoria(Long estudianteId) {
+    public HistoriaAcademicaCheck obtenerHistoria(Long estudianteId) {
         securityValidator.validarAccesoEstudiante(estudianteId);
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
         return historiaRepository.findByEstudiante(estudiante)
                 .filter(h -> !"BAJA".equals(h.getEstado()))
-                .map(HistoriaAcademicaResponse::fromEntity)
+                .map(HistoriaAcademicaCheck::fromEntity)
                 .orElseThrow(() -> new ResourceNotFoundException("Historia académica no encontrada"));
     }
 }

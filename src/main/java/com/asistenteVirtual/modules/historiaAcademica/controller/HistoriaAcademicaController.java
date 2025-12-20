@@ -1,5 +1,6 @@
 package com.asistenteVirtual.modules.historiaAcademica.controller;
 
+import com.asistenteVirtual.modules.historiaAcademica.dto.HistoriaAcademicaCheck;
 import com.asistenteVirtual.modules.historiaAcademica.dto.HistoriaAcademicaResponse;
 import com.asistenteVirtual.modules.historiaAcademica.service.HistoriaAcademicaService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class HistoriaAcademicaController {
     }
 
     @GetMapping("/{estudianteId}")
-    public ResponseEntity<HistoriaAcademicaResponse> obtenerHistoria(@PathVariable Long estudianteId) {
+    public ResponseEntity<HistoriaAcademicaCheck> obtenerHistoria(@PathVariable Long estudianteId) {
         return ResponseEntity.ok(historiaService.obtenerHistoria(estudianteId));
     }
 

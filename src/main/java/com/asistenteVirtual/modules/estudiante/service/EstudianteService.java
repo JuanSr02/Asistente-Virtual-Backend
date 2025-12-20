@@ -48,6 +48,24 @@ public class EstudianteService {
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public EstudianteResponse obtenerPorEmail(String email) {
+        EstudianteResponse estudiante = estudianteRepository.findByMail(email)
+                .map(EstudianteResponse::fromEntity)
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con mail: " + email));
+        securityValidator.validarAccesoEstudiante(estudiante.id());
+        return estudiante;
+    }
+
+    @Transactional(readOnly = true)
+    public EstudianteResponse obtenerPorSupabaseId(String supabaseUserId) {
+        EstudianteResponse estudiante = estudianteRepository.findBySupabaseUserId(supabaseUserId)
+                .map(EstudianteResponse::fromEntity)
+                .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con supabaseId: " + supabaseUserId));
+        securityValidator.validarAccesoEstudiante(estudiante.id());
+        return estudiante;
+    }
+
     public EstudianteResponse actualizarEstudiante(Long id, EstudianteUpdate dto) {
         securityValidator.validarAccesoEstudiante(id);
         Estudiante estudiante = estudianteRepository.findById(id)

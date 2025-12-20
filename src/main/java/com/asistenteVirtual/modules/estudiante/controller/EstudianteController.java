@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -26,6 +24,16 @@ public class EstudianteController {
     @GetMapping("/shared/estudiantes/{id}")
     public ResponseEntity<EstudianteResponse> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.obtenerPorId(id));
+    }
+
+    @GetMapping("/shared/estudiantes/usuario/{supabaseId}")
+    public ResponseEntity<EstudianteResponse> obtenerPorSupabaseId(@PathVariable String supabaseId) {
+        return ResponseEntity.ok(estudianteService.obtenerPorSupabaseId(supabaseId));
+    }
+
+    @GetMapping("/shared/estudiantes/buscar")
+    public ResponseEntity<EstudianteResponse> obtenerPorEmail(@RequestParam String email) {
+        return ResponseEntity.ok(estudianteService.obtenerPorEmail(email));
     }
 
     @PatchMapping("/shared/estudiantes/{id}")

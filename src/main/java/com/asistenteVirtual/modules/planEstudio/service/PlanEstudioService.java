@@ -1,8 +1,10 @@
 package com.asistenteVirtual.modules.planEstudio.service;
 
 import com.asistenteVirtual.common.exceptions.ResourceNotFoundException;
+import com.asistenteVirtual.modules.planEstudio.dto.MateriaBusquedaRequest;
 import com.asistenteVirtual.modules.planEstudio.dto.MateriaResponse;
 import com.asistenteVirtual.modules.planEstudio.dto.PlanEstudioResponse;
+import com.asistenteVirtual.modules.planEstudio.model.Materia;
 import com.asistenteVirtual.modules.planEstudio.model.PlanDeEstudio;
 import com.asistenteVirtual.modules.planEstudio.repository.MateriaRepository;
 import com.asistenteVirtual.modules.planEstudio.repository.PlanDeEstudioRepository;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -67,4 +70,18 @@ public class PlanEstudioService {
                 .map(m -> new MateriaResponse(m.getCodigo(), m.getNombre()))
                 .toList();
     }
+
+    public List<MateriaResponse> buscarMateriasPorCodigos(List<MateriaBusquedaRequest> busquedas) {
+        List<Materia> materiasEncontradas = new ArrayList<>();
+
+        for (MateriaBusquedaRequest busqueda : busquedas) {
+            materiaRepo.findByCodigoAndPlanDeEstudio_Codigo(busqueda.codigo(), busqueda.plan()).ifPresent(materiasEncontradas::add);
+        }
+
+        return materiasEncontradas.stream()
+                .map(m -> new MateriaResponse(m.getCodigo(), m.getNombre()))
+                .toList();
+    }
+
+    
 }

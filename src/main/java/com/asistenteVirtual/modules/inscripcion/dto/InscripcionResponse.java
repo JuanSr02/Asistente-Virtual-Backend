@@ -10,7 +10,8 @@ public record InscripcionResponse(
         String materiaNombre,
         String materiaPlan,
         Long estudianteId,
-        String estudianteNombre
+        String estudianteNombre,
+        String estudianteEmail
 ) {
     public static InscripcionResponse fromEntity(Inscripcion i) {
         return new InscripcionResponse(
@@ -21,7 +22,8 @@ public record InscripcionResponse(
                 i.getMateria().getNombre(),
                 i.getMateria().getPlanDeEstudio().getCodigo(), // Ojo: esto requiere fetch del plan si es Lazy
                 i.getEstudiante().getId(),
-                i.getEstudiante().getNombreApellido()
+                i.getEstudiante().getNombreApellido(),
+                i.getEstudiante().getMail()
         );
     }
 }

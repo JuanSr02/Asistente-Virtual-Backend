@@ -68,6 +68,13 @@ public class InscripcionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<InscripcionResponse> obtenerInscripcionesPorEstudiante(Long estudianteId) {
+        return inscripcionRepo.findByEstudianteId(estudianteId).stream()
+                .map(InscripcionResponse::fromEntity)
+                .toList();
+    }
+
     @Transactional
     public void eliminarInscripcion(Long id) {
         // 1. Primero hay que buscar la inscripción para saber de quién es
