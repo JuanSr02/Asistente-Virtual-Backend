@@ -33,15 +33,21 @@ public class HistoriaImportService {
         // 1. Validaciones previas
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new RuntimeException("Estudiante no encontrado"));
-        
+
         PlanDeEstudio plan = planRepository.findById(codigoPlan)
                 .orElseThrow(() -> new RuntimeException("Plan de estudio no encontrado"));
 
         // 2. Selección del Parser adecuado (Strategy Pattern)
         HistoriaFileParser parser = parserFactory.getParser(file);
-        
+
         // 3. Extracción de datos crudos (sin lógica de negocio aún)
         var datosExtraidos = parser.parse(file);
+
+        // Si el parser no encontró ningún registro válido, asumimos que el archivo
+        // es inválido, corrupto o no corresponde a una historia académica.
+        if (datosExtraidos.isEmpty()) {
+            throw new UnsupportedFileTypeException("Archivo inválido o corrupto: No se pudo extraer información académica legible.");
+        }
 
         // 4. Obtener o crear la historia
         HistoriaAcademica historia = historiaRepository.findByEstudiante_IdAndEstado(estudianteId, "ACTIVA")

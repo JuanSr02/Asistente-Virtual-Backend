@@ -56,10 +56,7 @@ public class HistoriaProcesadorDatos {
         double porcentaje = (double) coincidencias / filas.size() * 100.0;
 
         if (porcentaje < UMBRAL_COINCIDENCIA_PLAN) {
-            throw new PlanIncompatibleException(String.format(
-                    "El archivo no parece corresponder al plan seleccionado. Solo el %.1f%% de las materias coinciden (mínimo requerido: %.0f%%).",
-                    porcentaje, UMBRAL_COINCIDENCIA_PLAN
-            ));
+            throw new PlanIncompatibleException("El archivo no parece corresponder al plan seleccionado.");
         }
     }
 
