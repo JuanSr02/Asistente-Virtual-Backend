@@ -77,7 +77,7 @@ public class PlanImportService {
     private PlanDeEstudio procesarCabeceraPlan(Sheet sheet) {
         Row row = sheet.getRow(ROW_INDEX_PLAN_INFO);
         if (row == null) {
-            throw new PlanEstudioValidationException("No se encontró la fila de información del plan (Fila 2)");
+            throw new PlanEstudioValidationException("El archivo esta corrupto o no es de un plan de estudios");
         }
 
         String propuestaRaw = ExcelHelper.extractCellValue(row.getCell(0));
