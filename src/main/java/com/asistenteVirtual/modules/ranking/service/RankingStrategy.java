@@ -65,12 +65,22 @@ class RankingStrategy {
                     listaOrdenable.sort(Comparator.comparingLong(FinalResponse::vecesEsCorrelativa).reversed());
             case VENCIMIENTO -> listaOrdenable.sort(Comparator.comparingLong(FinalResponse::semanasParaVencimiento));
             case ESTADISTICAS ->
-                    listaOrdenable.sort(Comparator.comparingDouble(this::calcularPuntajeEstadisticas).reversed());
+                // Usamos el metodo auxiliar (this::extraerPuntaje)
+                // .reversed() para que los de mayor puntaje queden arriba
+                    listaOrdenable.sort(Comparator.comparingDouble(this::extraerPuntaje).reversed());
         }
         return listaOrdenable;
     }
 
     // --- Helpers Internos ---
+
+    private double extraerPuntaje(FinalResponse f) {
+        // Verificamos nulos para evitar NullPointerException
+        if (f.estadisticas() != null && f.estadisticas().getPuntaje() != null) {
+            return f.estadisticas().getPuntaje();
+        }
+        return 0.0; // Si no hay datos, el puntaje es 0
+    }
 
     private FinalResponse mapToResponseOptimizado(Renglon renglon, Map<String, Long> correlativasMap, Map<String, EstadisticasMateria> statsMap) {
         String codigo = renglon.getMateria().getCodigo();
@@ -104,20 +114,40 @@ class RankingStrategy {
 
     private EstadisticasFinalResponse mapEstadisticas(EstadisticasMateria stats) {
         if (stats == null) return null;
+
+        double aprobadosPct = stats.getTotalRendidos() > 0
+                ? (double) stats.getAprobados() / stats.getTotalRendidos() * 100
+                : 0;
+
+        double dificultad = stats.getPromedioDificultad() != null ? stats.getPromedioDificultad() : 0.0;
+
         return EstadisticasFinalResponse.builder()
-                .porcentajeAprobados(stats.getTotalRendidos() > 0 ? (double) stats.getAprobados() / stats.getTotalRendidos() * 100 : 0)
+                .porcentajeAprobados(aprobadosPct)
                 .promedioNotas(stats.getPromedioNotas())
                 .promedioDiasEstudio(stats.getPromedioDiasEstudio())
                 .promedioHorasDiarias(stats.getPromedioHorasDiarias())
                 .promedioDificultad(stats.getPromedioDificultad())
+                .puntaje(calcularScorePonderado(aprobadosPct, dificultad))
                 .build();
     }
 
-    private double calcularPuntajeEstadisticas(FinalResponse f) {
-        if (f.estadisticas() == null) return 0.0;
-        if (f.estadisticas().getPromedioDificultad() == null || f.estadisticas().getPromedioDificultad() == 0) {
-            return f.estadisticas().getPorcentajeAprobados();
-        }
-        return f.estadisticas().getPorcentajeAprobados() / f.estadisticas().getPromedioDificultad();
+    /**
+     * Opción 1: Promedio Ponderado
+     * 70% Peso a la tasa de aprobación
+     * 30% Peso a la facilidad (inversa de dificultad)
+     */
+    private double calcularScorePonderado(double porcentajeAprobados, double dificultadPromedio) {
+        // Normalizar dificultad (1-10) a Facilidad (0-100)
+        // Si dificultad es 0 o nula, asumimos dificultad media (5) para no penalizar ni premiar en exceso
+        double dificultadEfectiva = dificultadPromedio > 0 ? dificultadPromedio : 5.0;
+
+        // Dificultad 1 -> Facilidad 100 | Dificultad 10 -> Facilidad 0
+        double facilidad = (10.0 - dificultadEfectiva) * (100.0 / 9.0);
+        if (facilidad < 0) facilidad = 0;
+        if (facilidad > 100) facilidad = 100;
+
+        // Ponderación
+        return (porcentajeAprobados * 0.7) + (facilidad * 0.3);
     }
+
 }

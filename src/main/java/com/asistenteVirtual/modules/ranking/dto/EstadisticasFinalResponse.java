@@ -13,4 +13,5 @@ public class EstadisticasFinalResponse {
     private Double promedioDiasEstudio;
     private Double promedioHorasDiarias;
     private Double promedioDificultad;
+    private Double puntaje;
 }
