@@ -9,7 +9,9 @@ import com.asistenteVirtual.modules.experiencia.dto.ExperienciaResponse;
 import com.asistenteVirtual.modules.experiencia.dto.ExperienciaUpdate;
 import com.asistenteVirtual.modules.experiencia.model.Experiencia;
 import com.asistenteVirtual.modules.experiencia.repository.ExperienciaRepository;
+import com.asistenteVirtual.modules.historiaAcademica.model.HistoriaAcademica;
 import com.asistenteVirtual.modules.historiaAcademica.repository.ExamenRepository;
+import com.asistenteVirtual.modules.historiaAcademica.repository.HistoriaAcademicaRepository;
 import com.asistenteVirtual.modules.security.service.SecurityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class ExperienciaService {
     private final ExamenRepository examenRepo;
     private final EstudianteRepository estudianteRepo;
     private final SecurityValidator securityValidator;
+    private final HistoriaAcademicaRepository historiaAcademicaRepo;
 
     @Transactional
     public ExperienciaResponse crearExperiencia(ExperienciaRequest dto) {
@@ -119,7 +122,9 @@ public class ExperienciaService {
             throw new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId);
         }
 
-        return examenRepo.findByEstudianteId(estudianteId).stream()
+        HistoriaAcademica HAactiva = historiaAcademicaRepo.findByEstudiante_IdAndEstado(estudianteId, "ACTIVA").orElseThrow();
+
+        return examenRepo.findAllByHistoriaAcademica(HAactiva).stream()
                 .map(ExamenDisponibleResponse::fromEntity)
                 .toList();
     }
